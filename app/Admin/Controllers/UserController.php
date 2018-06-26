@@ -29,6 +29,7 @@ class UserController extends Controller
             $content->body($this->grid());
         });
     }
+    
 
     /**
      * Edit interface.
