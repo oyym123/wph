@@ -42,6 +42,20 @@ return [
     */
 
     'disks' => [
+        'qiniu' => [
+            'driver'  => 'qiniu',
+            'domains' => [
+                'default'   => 'od83l5fvw.bkt.clouddn.com', //你的七牛域名
+                'https'     => '',
+                'custom'    => '',
+            ],
+            'access_key'=> 'f-KIZZ1SYOlx4YCicakrFOisWit4ecyp57JmT9oB',  //AccessKey
+            'secret_key'=> 'udndYYIGsy-_OKsxmGsZ8wl9L3S0AlqlZNLiZbUN',  //SecretKey
+            'bucket'    => 'oyym',  //Bucket名字
+            'notify_url'=> '',  //持久化处理回调地址
+            'url'       => 'http://of8kfibjo.bkt.clouddn.com/',  // 填写文件访问根url
+            'access'    => 'public'  //空间访问控制 public 或 private
+        ],
 
         'local' => [
             'driver' => 'local',

@@ -18,6 +18,8 @@ Route::group([
         $router->resource('users', 'UserController');
         //优惠券
         $router->resource('coupon', 'couponController');
+        //拍卖师
+        $router->resource('auctioneer', 'AuctioneerController');
     });
 
     $router->get('/', 'HomeController@index');
@@ -32,5 +34,7 @@ Route::group([
     $router->get('image', 'ImageController@index');
     $router->get('image/{id}/edit', 'ImageController@edit');
     $router->get('image/create', 'ImageController@create');
+    
+
 
 });

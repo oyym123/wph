@@ -67,9 +67,7 @@ return [
      * Laravel-admin upload setting.
      */
     'upload' => [
-
-        'disk' => 'admin',
-
+        'disk' => 'qiniu',
         'directory' => [
             'image' => 'images',
             'file' => 'files',

@@ -6,7 +6,14 @@ use Illuminate\Routing\Router;
 
 Route::any('server', 'ServerController@index'); // 这个要放到中间件的外面
 
+Route::group(['prefix' => 'swagger'], function () {
+    Route::get('json', 'SwaggerController@getJSON');
+    Route::get('my-data', 'SwaggerController@getMyData');
+});
+
 Route::group(['middleware' => 'web'], function () {
+
+
 
     // 测试
     Route::get('server/test', 'ServerController@test');

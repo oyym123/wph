@@ -177,7 +177,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Encore\Admin\AdminServiceProvider::class,
-        Overtrue\LaravelWechat\ServiceProvider::class
+        Overtrue\LaravelWechat\ServiceProvider::class,
+        zgldh\QiniuStorage\QiniuFilesystemServiceProvider::class,
 
     ],
 
