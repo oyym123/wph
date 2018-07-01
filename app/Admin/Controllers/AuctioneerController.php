@@ -81,6 +81,7 @@ class AuctioneerController extends Controller
             $grid->status('状态');
             $grid->unit('单位机构');
             $grid->image('头像');
+            $grid->created_by('创建人');
             $grid->created_at('创建时间');
             $grid->updated_at('修改时间');
         });
@@ -110,9 +111,8 @@ class AuctioneerController extends Controller
             $form->text('unit', '单位机构')->rules('required', [
                 'required' => '请填写单位机构',
             ]);
-
+            $form->hidden('created_by', '创建人')->value(Admin::user()->id);
             $form->image('image');
-
             $disk = \Storage::disk('qiniu');
             $disk->getDriver()->downloadUrl('file.jpg');
             $form->switch('status', '状态')->states(Base::getStates());

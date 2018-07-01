@@ -2,7 +2,8 @@
 /**
  * Api数据接口路由
  */
-use Illuminate\Routing\Router;
+use App\Models\Auctioneer;
+use Illuminate\Support\Facades\Route;
 
 Route::any('server', 'ServerController@index'); // 这个要放到中间件的外面
 
@@ -11,9 +12,13 @@ Route::group(['prefix' => 'swagger'], function () {
     Route::get('my-data', 'SwaggerController@getMyData');
 });
 
+Route::get('/auctioneer', function () {
+    return new \App\Http\Resources\AuctioneerCollection(Auctioneer::paginate());
+});
+
 Route::group(['middleware' => 'web'], function () {
 
-
+    Route::get('auctioneer', 'AuctioneerController@index');
 
     // 测试
     Route::get('server/test', 'ServerController@test');

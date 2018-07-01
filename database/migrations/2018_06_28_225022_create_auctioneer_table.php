@@ -20,6 +20,7 @@ class CreateAuctioneerTable extends Migration
             $table->text('tags')->comment('标签');
             $table->string('certificate')->comment('证书')->nullable();
             $table->tinyInteger('years')->comment('工作年限')->nullable();
+            $table->Integer('created_by')->comment('创建人');
             $table->string('number')->comment('编号')->nullable();
             $table->tinyInteger('status')->default('1')->comment('状态 0=禁用；1=启用')->nullable();
             $table->string('unit')->comment('单位机构');

@@ -80,11 +80,11 @@ class WebController extends Controller
         }
 
         //   if ((isset($_GET['debug']) && $_GET['debug'] == '1') || strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
-        if ((isset($_GET['debug']) && $_GET['debug'] == '1') || strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') == false) {
+        if ((isset($_GET['debug']) && $_GET['debug'] == '1') || strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') == true) {
             echo "<pre>";
             print_r($_REQUEST);
             print_r($item);
-        } else {
+      //  } else {
             //编码
             $item = json_encode($item);
 
@@ -100,16 +100,8 @@ class WebController extends Controller
         exit;
     }
 
-    /**
-     * Name: changes
-     * Desc:
-     * User: lixinxin <lixinxinlgm@fangdazhongxin.com>
-     * Date: 2017-00-00
-     * @param $arr
-     * @return mixed
-     */
-    public
-    static function int2String($arr)
+
+    public static function int2String($arr)
     {
         foreach ($arr as $k => $v) {
             if (is_int($v)) {
@@ -121,8 +113,7 @@ class WebController extends Controller
         return $arr;
     }
 
-    public
-    static function post($url, $post_data)
+    public static function post($url, $post_data)
     {
 
         $ch = curl_init();
@@ -146,8 +137,7 @@ class WebController extends Controller
     }
 
     /** 根据user-agent取手机类型 */
-    public
-    static function getAppTypeByUa()
+    public static function getAppTypeByUa()
     {
         $tmp = 0;
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'iPhone') || strpos($_SERVER['HTTP_USER_AGENT'], 'iPad')) {
@@ -159,8 +149,7 @@ class WebController extends Controller
     }
 
     /** 缓存用户提交的数据（优化） */
-    public
-    function postSessionCache(Request $request, $name, $params)
+    public function postSessionCache(Request $request, $name, $params)
     {
         //所有提交数据存在“用户ip+名称”字段里
         session([$request->getClientIp() . $name => $params]);

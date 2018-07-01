@@ -109,9 +109,16 @@ class UserController extends Controller
             $form->display('id', 'ID');
             $form->text('name', '名字');
             $form->text('email', '邮箱');
-            $form->password('password', '密码');
-            $form->password('remember_token', '密码');
-            $form->image('avatar', '头像');
+            $form->password('password', '密码')->rules('required', [
+                'required' => '密码不能为空',
+            ]);
+            $form->password('remember_token', '密码')->rules('required', [
+                'required' => '密码不能为空',
+            ]);
+
+            $form->image('avatar','头像');
+            $disk = \Storage::disk('qiniu');
+            $disk->getDriver()->downloadUrl('file.jpg');
             $form->text('role_id', '角色');
            // $form->text('created_at', '创建时间');
             //$form->text('updated_at', '修改时间');
