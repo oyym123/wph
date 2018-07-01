@@ -16,9 +16,9 @@
     <div class="weui-msg__extra-area">
         <div class="weui-footer">
             <p class="weui-footer__links">
-                <a href="javascript:void(0);" class="weui-footer__link">爱谛集团</a>
+                <a href="javascript:void(0);" class="weui-footer__link">12微排行</a>
             </p>
-            <p class="weui-footer__text">Copyright &copy; 2008-2017 www.edichina.cc</p>
+            <p class="weui-footer__text">Copyright &copy; 2008-2017 </p>
         </div>
     </div>
 </div>

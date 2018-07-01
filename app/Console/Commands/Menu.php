@@ -44,7 +44,7 @@ class Menu extends Command
 
         $buttons = [
             [
-                "name" => "爱谛集团",
+                "name" => "微排行",
                 "sub_button" => [
                     [
                         "type" => "click",

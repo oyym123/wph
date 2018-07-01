@@ -298,7 +298,7 @@ class ServerController extends WebController
                 $this->weixin->server->setMessageHandler(function () {
                     $news1 = new News([
                         'title' => '沉香烟宝',
-                        'description' => '爱谛沉香烟宝是爱谛集团独家发明拥有的专利产品，是以原产纯正印度尼西亚巴布亚岛之千年原生态极品精细沉香粉，应用印尼特有配方技术精心加工调制而成的世界独一无二的沉香香烟伴侣精品，该产品已荣获中国国家发明专利并已成功投放市场。',
+                        'description' => '爱谛沉香烟宝是微排行独家发明拥有的专利产品，是以原产纯正印度尼西亚巴布亚岛之千年原生态极品精细沉香粉，应用印尼特有配方技术精心加工调制而成的世界独一无二的沉香香烟伴侣精品，该产品已荣获中国国家发明专利并已成功投放市场。',
                         'url' => 'https://mp.weixin.qq.com/s/f2RtWieBR1TLfs88dShFSw',
                         'image' => 'https://mmbiz.qpic.cn/mmbiz_png/16rcM8fWf9YzuKPMre32FIkvj1ZJ49TXHiaGmsTRdYmH6k64icyxHxe19Wicpq9kxcAzMOhPs8h2kDHicLNw4UFicvg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1',
                     ]);

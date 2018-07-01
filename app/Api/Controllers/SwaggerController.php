@@ -12,8 +12,13 @@ class SwaggerController extends WebController
      * 这里需要一个主`Swagger`定义：
      * @SWG\Swagger(
      *   @SWG\Info(
-     *     title="我的`Swagger`API文档",
-     *     version="1.0.0"
+     *     title="《微排行》API文档",
+     *     version="1.0.0",
+     *      description="
+    [code] => 0=正常; 1=需要登入
+    [msg] => 返回的报错信息
+    [version] => 版本号
+    [res] => 返回的数据",
      *   )
      * )
      */

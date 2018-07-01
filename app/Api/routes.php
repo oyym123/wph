@@ -27,6 +27,8 @@ Route::group(['middleware' => 'web'], function () {
     Route::any('user/get-invite-qr-code', 'UserController@getInviteQrCode');
     Route::get('home/success', 'HomeController@success');
     Route::get('home/success-view', 'HomeController@successView');
+    Route::get('home', 'HomeController@index');
+    Route::get('home/dealEnd', 'HomeController@dealEnd');
 
     /** 用户中心 */
     Route::get('user/register-view', 'UserController@registerView');//用户注册视图

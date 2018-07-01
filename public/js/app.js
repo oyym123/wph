@@ -47293,12 +47293,12 @@ var staticRenderFns = [
               staticClass: "weui-footer__link",
               attrs: { href: "javascript:void(0);" }
             },
-            [_vm._v("爱谛集团")]
+            [_vm._v("微排行")]
           )
         ]),
         _vm._v(" "),
         _c("p", { staticClass: "weui-footer__text" }, [
-          _vm._v("Copyright © 2008-2017 www.edichina.cc")
+          _vm._v("Copyright © 2008-2017 ")
         ])
       ])
     ])

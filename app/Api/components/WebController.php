@@ -53,8 +53,7 @@ class WebController extends Controller
      * @param  int $msg 是否直接输出,1为返回值
      * @return array
      **/
-    public
-    static function showMsg($res, $code = 0, $msg = '')
+    public static function showMsg($res, $code = 0, $msg = '')
     {
         //header("Content-type: application/json; charset=utf-8");
 
@@ -66,12 +65,12 @@ class WebController extends Controller
             }
         }
         // 构造数据
-        $item = array('code' => $code, 'msg' => $msg, 'version' => 1, 'res' => null);
+        $item = array('code' => $code, 'message' => $msg, 'data' => null);
 
         if (is_array($res) && !empty($res)) {
-            $item['res'] = self::int2String($res); // 强制转换为string类型下放
+            $item['data'] = self::int2String($res); // 强制转换为string类型下放
         } elseif (is_string($res)) {
-            $item['msg'] = $res;
+            $item['message'] = $res;
         }
 
         // 是否需要送出get
