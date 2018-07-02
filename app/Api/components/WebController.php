@@ -53,7 +53,7 @@ class WebController extends Controller
      * @param  int $msg 是否直接输出,1为返回值
      * @return array
      **/
-    public static function showMsg($res, $code = 0, $msg = '')
+    public static function showMsg($res, $code = 0, $msg = '成功')
     {
         //header("Content-type: application/json; charset=utf-8");
 

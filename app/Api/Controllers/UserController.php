@@ -117,21 +117,146 @@ class UserController extends WebController
         return view('api.user.bindmobile_success');
     }
 
-
-    /** 用户中心 */
+    /**
+     * /**
+     * @SWG\Get(path="/api/user/center",
+     *   tags={"用户中心"},
+     *   summary="用户中心",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="name", in="query", default="", description="",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
     public function center()
     {
-        list($info, $status) = $this->userInfo();
-        if (!$status) {
-            return redirect()->action('UserController@registerView');
-        }
-        $data = [
-            'user_photo' => $info->user_photo,
-            'nick_name' => $info->nickname,
-            'sex' => $info->sex
-        ];
-        return view('api.user.center', ['data' => $data]);
+        $data = array(
+            'id' => 1328115335,
+            'avatar' => 'https://qnimg.gogobids.com/avatar/default_user_avatar.png',
+            'nickname' => '131****7904',
+            'mobile_num' => '13161057904',
+            'create_time' => 1529628433047.0,
+            'type' => 0,
+            'status' => 1,
+            'app_id' => 1003,
+            'register_type' => 1,
+            'real_bids' => 0,
+            'voucher_bids' => 0,
+            'shop_bids' => 0,
+            'integration' => 5,
+            'is_black' => NULL,
+            'qq_num' => '1052156115',
+            'discounts' => 0,
+        );
+        self::showMsg($data);
     }
+
+    /**
+     * @SWG\Get(path="/api/user/my-auction",
+     *   tags={"用户中心"},
+     *   summary="我的竞拍",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="name", in="query", default="", description="",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function MyAuction()
+    {
+        $data = array(
+            'period_id' => 4372346,
+            'product_id' => 626,
+            'period_code' => '201806210002',
+            'title' => 'Apple iPhone 8 Plus 256G 颜色随机',
+            'img_cover' => '1505284333822',
+            'bid_step' => 1,
+            'product_type' => 0,
+            'is_purchase_enable' => 1,
+            'sell_price' => '8787.00',
+            'num' => 1,
+            'settlement_bid_price' => '862.00',
+            'pay_real_price' => '862.00',
+            'end_time' => 1529635328574.0,
+            'is_long_history' => 0,
+            'id' => 'b1b7b2ae63f70914016424fa59fc0d53',
+            'bid_type' => 0,
+            'order_type' => 4,
+            'result_status' => 2,
+            'pay_status' => 1,
+            'pay_time' => NULL,
+            'pay_price' => 0,
+            'pay_shop_bids' => 0,
+            'order_time' => NULL,
+            'check_status' => 0,
+            'return_real_bids' => 0,
+            'return_voucher_bids' => 0,
+            'used_real_bids' => 0,
+            'used_voucher_bids' => 5,
+            'return_shop_bids' => 0,
+            'user_id' => 1328115335,
+            'category' => 1,
+            'nickname' => '一心一意',
+            'delivery_id' => NULL,
+            'delivery_mode' => NULL,
+            'delivery_code' => NULL,
+            'delivery_state' => NULL,
+            'delivery_state_desc' => NULL,
+            'delivery_title' => '',
+            'show_confirm_trans' => 0,
+            'proxy_all_times' => 0,
+            'proxy_bid_times' => 0,
+        );
+        self::showMsg($data);
+
+    }
+
+
+    /**
+     * @SWG\Get(path="/api/user/shipping-address",
+     *   tags={"用户中心"},
+     *   summary="收货地址",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="name", in="query", default="", description="",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function shippingAddress()
+    {
+        $data = array(
+            'id' => 61303,
+            'user_id' => 1328115335,
+            'true_name' => '张三',
+            'address' => '青海 果洛州 甘德县',
+            'address_street' => '江千乡',
+            'address_detail' => '四巷胡同1008号',
+            'mobile_num' => '18779284965',
+            'alipay_name' => '张文吉',
+            'alipay_num' => '187792948@163.com',
+            'qq_num' => '1052156115',
+            'is_default' => 1,
+            'remark' => '胡同',
+            'address_type' => 2,
+            'province_code' => '29',
+            'city_code' => '2605',
+            'district_code' => '2607',
+            'street_code' => '16694',
+
+        );
+        self::showMsg($data);
+    }
+
+
+
 
     /** 会员卡 */
     public function memberCard()

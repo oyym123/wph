@@ -16,9 +16,8 @@ class SwaggerController extends WebController
      *     version="1.0.0",
      *      description="
     [code] => 0=正常; 1=需要登入
-    [msg] => 返回的报错信息
-    [version] => 版本号
-    [res] => 返回的数据",
+    [message] => 返回的报错信息
+    [data] => 返回的数据",
      *   )
      * )
      */
@@ -32,22 +31,4 @@ class SwaggerController extends WebController
         return response()->json($swagger, 200);
     }
 
-    /**
-     * /**
-     * @SWG\Get(path="/api/swagger/my-data",
-     *   tags={"demo"},
-     *   summary="",
-     *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="", required=true,
-     *     type="string",
-     *   ),
-     *   @SWG\Response(
-     *       response=200,description="successful operation"
-     *   )
-     * )
-     */
-    public function getMyData()
-    {
-        self::showMsg('12321');
-    }
 }

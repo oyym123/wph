@@ -27,10 +27,27 @@ Route::group(['middleware' => 'web'], function () {
     Route::any('user/get-invite-qr-code', 'UserController@getInviteQrCode');
     Route::get('home/success', 'HomeController@success');
     Route::get('home/success-view', 'HomeController@successView');
+
+    //首页
     Route::get('home', 'HomeController@index');
-    Route::get('home/dealEnd', 'HomeController@dealEnd');
+    Route::get('home/deal-end', 'HomeController@dealEnd');
+    Route::get('home/hot-auction', 'HomeController@hotAuction');
+
+    //最新成交
+    Route::get('latest-deal', 'LatestDealController@index');
+
+    //产品
+    Route::get('product', 'ProductController@index');
+    Route::get('product/type', 'ProductController@type');
 
     /** 用户中心 */
+    Route::get('user/shipping-address', 'UserController@shippingAddress');//用户注册视图
+    Route::get('user/my-auction', 'UserController@MyAuction');//用户注册视图
+
+    //收藏
+    Route::get('collection', 'CollectionController@index');
+
+
     Route::get('user/register-view', 'UserController@registerView');//用户注册视图
     Route::post('user/register', 'UserController@register');//用户注册提交表单
     Route::post('user/update-post', 'UserController@updatePost');//用户注册提交表单
