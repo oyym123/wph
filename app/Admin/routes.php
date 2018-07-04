@@ -20,6 +20,8 @@ Route::group([
         $router->resource('coupon', 'couponController');
         //拍卖师
         $router->resource('auctioneer', 'AuctioneerController');
+        //产品分类
+        $router->resource('product-type', 'ProductTypeController');
     });
 
     $router->get('/', 'HomeController@index');

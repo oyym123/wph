@@ -36,7 +36,7 @@ class WebController extends Controller
             session(['user_id' => 1]); //本地环境模拟用户id为1
             session()->save();
         }
-        
+
         $userInfo = DB::table('user_info')->where('user_id', session('user_id'))->first();
 
         if ($userInfo && $userInfo->bind_mobile) {
@@ -83,22 +83,16 @@ class WebController extends Controller
             echo "<pre>";
             print_r($_REQUEST);
             print_r($item);
-      //  } else {
+            //编码
+            echo json_encode($item);
+        } else {
             //编码
             $item = json_encode($item);
-
-            // 是否为jsonp访问
-            if (isset($_GET['callback']) && !empty($_GET['callback'])) {
-                $item = "{$_GET['callback']}($item)";
-            }
-
             // 送出信息
             echo "{$item}";
         }
-
         exit;
     }
-
 
     public static function int2String($arr)
     {
