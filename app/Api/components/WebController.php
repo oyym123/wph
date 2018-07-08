@@ -152,17 +152,17 @@ class WebController extends Controller
     static function weixin()
     {
         include __DIR__ . '/../../../vendor/autoload.php'; // 引入 composer 入口文件
-        $redirect = urlencode('http://' . (empty($_SERVER['HTTP_HOST']) ? 'adcx.fangdazhongxin.com' : $_SERVER['HTTP_HOST']) .
+        $redirect = urlencode('http://' . (empty($_SERVER['HTTP_HOST']) ? 'wph.com' : $_SERVER['HTTP_HOST']) .
             (empty($_SERVER['REQUEST_URI']) ?: $_SERVER['REQUEST_URI']));
         $options = [
             'debug' => true,
             'app_id' => env('WEIXIN_APP_ID'),         // AppID
             'secret' => env('WEIXIN_SECRET'),     // AppSecret
-            'token' => env('WEIXIN_TOKEN'),          // Token
-            'aes_key' => env('WEIXIN_ENCODING_AES_KEY'),                    // EncodingAESKey
+            //'token' => env('WEIXIN_TOKEN'),          // Token
+            //'aes_key' => env('WEIXIN_ENCODING_AES_KEY'),                    // EncodingAESKey
             'log' => [
                 'level' => 'debug',
-                'file' => '/www/logs/easy_we_chat/adcx.log', // XXX: 绝对路径！！！！
+                'file' => '/www/logs/easy_we_chat/wph.log', // XXX: 绝对路径！！！！
             ],
             'oauth' => [
                 'scopes' => ['snsapi_userinfo'],

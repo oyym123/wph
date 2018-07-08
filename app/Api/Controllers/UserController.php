@@ -48,8 +48,8 @@ class UserController extends WebController
         return view('api.user.register_success');
     }
 
-    /** 注册 */
-    public function register(RegisterUserPost $request)
+
+    public function register()
     {
         //  var_dump($request->session()->all());exit;
         $this->weixinWebOauth(); // 需要网页授权登录
@@ -57,10 +57,8 @@ class UserController extends WebController
 
         $user = new User();
         $openId = session('wechat_user')['id'];
-        list($msg, $status) = $user->userRegister($request->input(), session('user_id'));
-        if ($status < 0) {
-            return redirect()->action('UserController@registerView', ['data' => $request->input(), 'codeError' => $msg]);
-        }
+        list($msg, $status) = $user->userRegister([], session('user_id'));
+
         return view('api.user.register_success');
     }
 
@@ -255,62 +253,4 @@ class UserController extends WebController
         self::showMsg($data);
     }
 
-
-
-
-    /** 会员卡 */
-    public function memberCard()
-    {
-        list($info, $status) = $this->userInfo();
-        $data = [
-            'mobile' => $info->bind_mobile
-        ];
-        return view('api.user.member_card', ['data' => $data]);
-    }
-
-    public function upload($params)
-    {
-        // 传七牛
-        list($ret, $err) = UploadForm::uploadImgToQiniu($params['file_path'],
-            Yii::$app->params['qiniu_bucket_images'], $params['file_name']);
-        if ($err) {
-            Helper::writeLog($err);
-            throw new Exception('上传七牛出错');
-        } else {
-            $saveParams = [
-                'name' => $params['file_name'],
-                'type' => Image::TYPE_PRODUCT_SHARE,
-                'type_id' => $params['product_id'],
-                'url' => $params['file_name'],
-                'size_type' => Image::SIZE_MEDIUM,
-                'status' => Base::STATUS_ENABLE,
-                'sort' => 0,
-                //'capacity_audit' => 1, //开启智能审核
-            ];
-        }
-    }
-
-    /** 生成永久二维码 并保存ticket到user_info表, ticket是取二维码的凭证 */
-    function getInviteQrCode()
-    {
-        $result = self::weixin()->qrcode->forever(10);
-        $ticket = $result->ticket;
-//        echo $this->weixin->qrcode->url($ticket);
-        print_r(self::weixin()->qrcode->url($ticket));
-        exit;
-        Redirect::to($this->weixin->qrcode->url($ticket));
-        exit;
-        // 文档地址 https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1443433542
-        if (用户有ticket) {
-            $ticket = user_info表里的ticket;
-        } else {
-            $result = $this->weixin->qrcode->forever($userInfo->user_id);
-            $ticket = $result->ticket;
-            // $url = $result->url; //二维码图片解析后的地址，开发者可根据该地址自行生成需要的二维码图片
-            // 保存ticket到user_info表
-
-        }
-
-        return $this->weixin->qrcode->url($ticket); // 二维码图片地址
-    }
 }

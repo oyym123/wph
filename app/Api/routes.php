@@ -12,11 +12,17 @@ Route::group(['prefix' => 'swagger'], function () {
     Route::get('my-data', 'SwaggerController@getMyData');
 });
 
+
 Route::get('/auctioneer', function () {
     return new \App\Http\Resources\AuctioneerCollection(Auctioneer::paginate());
 });
 
 Route::group(['middleware' => 'web'], function () {
+
+    //新手指引banner链接
+    Route::get('/newbie-guide', function () {
+        return view('api.home.newbie_guide');
+    });
 
     Route::get('auctioneer', 'AuctioneerController@index');
 
@@ -30,6 +36,7 @@ Route::group(['middleware' => 'web'], function () {
 
     //首页
     Route::get('home', 'HomeController@index');
+    Route::get('home/banner', 'HomeController@banner');
     Route::get('home/deal-end', 'HomeController@dealEnd');
     Route::get('home/hot-auction', 'HomeController@hotAuction');
 
@@ -54,7 +61,7 @@ Route::group(['middleware' => 'web'], function () {
 
 
     Route::get('user/register-view', 'UserController@registerView');//用户注册视图
-    Route::post('user/register', 'UserController@register');//用户注册提交表单
+    Route::get('user/register', 'UserController@register');//用户注册提交表单
     Route::post('user/update-post', 'UserController@updatePost');//用户注册提交表单
     //Route::get('user/register-success', 'UserController@registerSuccess');//视图
 

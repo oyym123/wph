@@ -13,7 +13,120 @@ class HomeController extends WebController
     }
 
     /**
-     * /**
+     * @SWG\Get(path="/api/home/banner",
+     *   tags={"首页"},
+     *   summary="首页banner",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="name", in="query", default="", description="",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function banner()
+    {
+        $data = array(
+            0 =>
+                array(
+                    'id' => 5,
+                    'title' => '新手指引',
+                    'img' => env('QINIU_URL_IMAGES') . '1485314751522.jpg',
+                    'function' => 'html',
+                    'params' =>
+                        array(
+                            0 =>
+                                array(
+                                    'key' => 'url',
+                                    'type' => 'String',
+                                    'value' => $_SERVER["HTTP_HOST"] . '/api/newbie-guide',
+                                ),
+                            1 =>
+                                array(
+                                    'key' => 'to_promotion_status',
+                                    'type' => 'string',
+                                    'value' => 0,
+                                ),
+                        ),
+                    'to_promotion_status' => 0,
+                ),
+        );
+        self::showMsg($data);
+    }
+
+    /**
+     * @SWG\Get(path="/api/demo/demo",
+     *   tags={"demo"},
+     *   summary="",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="name", in="query", default="", description="", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function module()
+    {
+        $data = array(
+            0 =>
+                array(
+                    'id' => 11,
+                    'title' => '充值',
+                    'img' => '1490015569219',
+                    'function' => 'recharge.html',
+                    'params' =>
+                        array(),
+                ),
+            1 =>
+                array(
+                    'id' => 13,
+                    'title' => '10元专区',
+                    'img' => '1490015605523',
+                    'function' => 'goods_list.html',
+                    'params' =>
+                        array(
+                            0 =>
+                                array(
+                                    'key' => 'pr',
+                                    'type' => 'undefined',
+                                    'value' => '10',
+                                ),
+                        ),
+                ),
+            2 =>
+                array(
+                    'id' => 14,
+                    'title' => '晒单',
+                    'img' => '1490015587751',
+                    'function' => 'share.html',
+                    'params' =>
+                        array(),
+                ),
+            3 =>
+                array(
+                    'id' => 12,
+                    'title' => '常见问题',
+                    'img' => '1490015634162',
+                    'function' => 'html',
+                    'params' =>
+                        array(
+                            0 =>
+                                array(
+                                    'key' => 'url',
+                                    'type' => 'String',
+                                    'value' => 'https://m.gogobids.com/h_service.html',
+                                ),
+                        ),
+                ),
+        );
+        self::showMsg($data);
+    }
+
+    /**
+     *
      * @SWG\Get(path="/api/home",
      *   tags={"首页"},
      *   summary="",
@@ -78,50 +191,50 @@ class HomeController extends WebController
     public function dealEnd()
     {
         $data = array(
-                0 =>
-                    array(
-                        'id' => 4487037,
-                        'title' => '大洋世家 阿根廷红虾L1 2kg盒 30-40只 海鲜大虾',
-                        'bid_step' => 1,
-                        'end_time' => 1530541509006.0,
-                        'img_cover' => '1529056468333',
-                        'period_code' => '201807020047',
-                        'product_id' => 1050,
-                        'sell_price' => '197.00',
-                        'bid_price' => '18.50',
-                        'user_id' => 1194971827,
-                        'nickname' => 'Andying',
-                    ),
-                1 =>
-                    array(
-                        'id' => 4487157,
-                        'title' => '金沙河 面粉5kg*2袋',
-                        'bid_step' => 1,
-                        'end_time' => 1530541505973.0,
-                        'img_cover' => '1499421562472',
-                        'period_code' => '201807020136',
-                        'product_id' => 528,
-                        'sell_price' => '70.00',
-                        'bid_price' => '8.80',
-                        'user_id' => 1361837785,
-                        'nickname' => '命里有时终有之',
-                    ),
-                2 =>
-                    array(
-                        'id' => 4486992,
-                        'title' => '可莱丝 水润保湿面膜20片',
-                        'bid_step' => 1,
-                        'end_time' => 1530541476438.0,
-                        'img_cover' => '1501837156838',
-                        'period_code' => '201807020041',
-                        'product_id' => 569,
-                        'sell_price' => '282.00',
-                        'bid_price' => '25.00',
-                        'user_id' => 1988396280,
-                        'nickname' => '我无为',
-                    ),
+            0 =>
+                array(
+                    'id' => 4487037,
+                    'title' => '大洋世家 阿根廷红虾L1 2kg盒 30-40只 海鲜大虾',
+                    'bid_step' => 1,
+                    'end_time' => 1530541509006.0,
+                    'img_cover' => '1529056468333',
+                    'period_code' => '201807020047',
+                    'product_id' => 1050,
+                    'sell_price' => '197.00',
+                    'bid_price' => '18.50',
+                    'user_id' => 1194971827,
+                    'nickname' => 'Andying',
+                ),
+            1 =>
+                array(
+                    'id' => 4487157,
+                    'title' => '金沙河 面粉5kg*2袋',
+                    'bid_step' => 1,
+                    'end_time' => 1530541505973.0,
+                    'img_cover' => '1499421562472',
+                    'period_code' => '201807020136',
+                    'product_id' => 528,
+                    'sell_price' => '70.00',
+                    'bid_price' => '8.80',
+                    'user_id' => 1361837785,
+                    'nickname' => '命里有时终有之',
+                ),
+            2 =>
+                array(
+                    'id' => 4486992,
+                    'title' => '可莱丝 水润保湿面膜20片',
+                    'bid_step' => 1,
+                    'end_time' => 1530541476438.0,
+                    'img_cover' => '1501837156838',
+                    'period_code' => '201807020041',
+                    'product_id' => 569,
+                    'sell_price' => '282.00',
+                    'bid_price' => '25.00',
+                    'user_id' => 1988396280,
+                    'nickname' => '我无为',
+                ),
 
-            );
+        );
         self::showMsg($data);
     }
 

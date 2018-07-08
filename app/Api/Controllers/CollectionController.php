@@ -45,4 +45,29 @@ class CollectionController extends WebController
         self::showMsg($data);
     }
 
+    /**
+     * @SWG\Get(path="/api/collection/collect",
+     *   tags={"收藏"},
+     *   summary="收藏或者取消收藏",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="product_id", in="query", default="", description="",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function collect()
+    {
+        $data = array(
+            0 =>
+                array(
+                    'product_id' => '800',
+                    'is_favorite' => 1,
+                ),
+        );
+        self::showMsg($data);
+    }
+
 }

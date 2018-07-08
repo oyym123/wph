@@ -85,13 +85,13 @@ class User extends Authenticatable
 //
 //                throw new \Exception("改邮箱已注册");
 //            }
-            $info['real_name'] = $params['name'];
-            $info['sex'] = $params['sex_select'];
-            $info['bind_mobile'] = $params['bind_mobile'];
-            $info['birthday'] = isset($params['birthday']) ? $params['birthday'] : '';
-            $info['id_card'] = $params['id_card'];
-            $info['detail_address'] = $params['detail_address'];
-
+//            $info['real_name'] = $params['name'];
+//            $info['sex'] = $params['sex_select'];
+//            $info['bind_mobile'] = $params['bind_mobile'];
+//            $info['birthday'] = isset($params['birthday']) ? $params['birthday'] : '';
+//            $info['id_card'] = $params['id_card'];
+//            $info['detail_address'] = $params['detail_address'];
+            $info=[];
             list($msg, $status) = Sms::check([
                 'user_id' => $userInfo->user_id,
                 'type' => 1,
