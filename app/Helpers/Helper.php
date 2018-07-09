@@ -64,7 +64,7 @@ class Helper
     }
 
     /** 模拟带header头的get请求 */
-    public static function get($url, $header)
+    public static function get($url, $header = [])
     {
         $ch = curl_init();
 

@@ -1,6 +1,7 @@
 <?php
 namespace App\Api\components;
 
+use App\Helpers\Helper;
 use EasyWeChat\Foundation\Application;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -148,8 +149,27 @@ class WebController extends Controller
         session([$request->getClientIp() . $name => $params]);
     }
 
+
     /** 获取微信授权 */
-    static function weixin()
+    static function weixin($code)
+    {
+        //声明CODE，获取小程序传过来的CODE
+        $appid = env('WEIXIN_APP_ID');
+        $secret = env('WEIXIN_SECRET');
+        //api接口
+        $api = "https://api.weixin.qq.com/sns/jscode2session?appid={$appid}&secret={$secret}&js_code={$code}&grant_type=authorization_code";
+        //发送
+        echo  Helper::get($api);die;
+        $res = json_decode(Helper::get($api), true);
+        return [
+            $res['session_key'],
+            $res['openid']
+        ];
+    }
+
+
+    /** 获取微信授权 */
+    static function weixinbak()
     {
         include __DIR__ . '/../../../vendor/autoload.php'; // 引入 composer 入口文件
         $redirect = urlencode('http://' . (empty($_SERVER['HTTP_HOST']) ? 'wph.com' : $_SERVER['HTTP_HOST']) .
@@ -191,7 +211,6 @@ class WebController extends Controller
             ]);
             session()->save();
         }
-
     }
 }
 
