@@ -61,7 +61,7 @@ Route::group(['middleware' => 'web'], function () {
 
 
     Route::get('user/register-view', 'UserController@registerView');//用户注册视图
-    Route::get('user/register', 'UserController@register');//用户注册提交表单
+    Route::get('user/info', 'UserController@info');//用户注册提交表单
     Route::post('user/update-post', 'UserController@updatePost');//用户注册提交表单
     //Route::get('user/register-success', 'UserController@registerSuccess');//视图
 
