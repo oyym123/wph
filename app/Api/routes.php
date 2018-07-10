@@ -46,6 +46,7 @@ Route::group(['middleware' => 'web'], function () {
     //产品
     Route::get('product', 'ProductController@index');
     Route::get('product/type', 'ProductController@type');
+    Route::post('product/type-product-list', 'ProductController@typeProductList');
     Route::get('product/detail', 'ProductController@detail');
     Route::get('product/bid-record', 'ProductController@bidRecord');
     Route::get('product/bid-rules', 'ProductController@bidRules');

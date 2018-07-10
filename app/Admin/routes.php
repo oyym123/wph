@@ -22,6 +22,8 @@ Route::group([
         $router->resource('auctioneer', 'AuctioneerController');
         //产品分类
         $router->resource('product-type', 'ProductTypeController');
+        //产品
+        $router->resource('product', 'ProductController');
     });
 
     $router->get('/', 'HomeController@index');

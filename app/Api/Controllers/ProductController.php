@@ -11,6 +11,8 @@ namespace App\Api\Controllers;
 
 use App\Api\components\WebController;
 use App\Models\ProductType;
+use Composer\DependencyResolver\Request;
+use Illuminate\Support\Facades\Input;
 
 class ProductController extends WebController
 {
@@ -850,13 +852,250 @@ class ProductController extends WebController
      */
     public function type()
     {
-        $data = [];
-        foreach (ProductType::all() as $item) {
-            $data[] = [
-                'id' => $item->id,
-                'title' => $item->name,
-            ];
+        self::showMsg(ProductType::getList());
+    }
+
+    /**
+     * @SWG\Post(path="/api/product/type-product-list",
+     *   tags={"产品"},
+     *   summary="分类产品列表",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="type_id", in="formData", default="1", description="类型id",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function typeProductList(Request $request)
+    {
+        if (Input::get('type_id')) {
+
         }
+        $data = array(
+            0 =>
+                array(
+                    'id' => 4570371,
+                    'product_id' => 419,
+                    'period_code' => '201807100006',
+                    'title' => '2017款 Apple iMac Pro 27英寸 3.2GHz八核处理器 32GB内存 1TB固态硬盘（发货周期一个月）',
+                    'img_cover' => '1496734422804',
+                    'sell_price' => '43437.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            1 =>
+                array(
+                    'id' => 4570741,
+                    'product_id' => 851,
+                    'period_code' => '201807100009',
+                    'title' => '欧米茄 手表 海马系列机械男表 212.30.41.20.01.003',
+                    'img_cover' => '1509681943111',
+                    'sell_price' => '28156.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            2 =>
+                array(
+                    'id' => 4569990,
+                    'product_id' => 423,
+                    'period_code' => '201807100007',
+                    'title' => '2017款 Apple MacBook Pro 13英寸 3.1GHz 256GB 颜色随机',
+                    'img_cover' => '1496749031039',
+                    'sell_price' => '15717.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            3 =>
+                array(
+                    'id' => 4571297,
+                    'product_id' => 635,
+                    'period_code' => '201807100016',
+                    'title' => '中国黄金 Au9999黄金金元宝50g',
+                    'img_cover' => '1517389553224',
+                    'sell_price' => '16088.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            4 =>
+                array(
+                    'id' => 4571373,
+                    'product_id' => 813,
+                    'period_code' => '201807100016',
+                    'title' => '中国黄金 Au9999黄金薄片投资金条50g',
+                    'img_cover' => '1517389701883',
+                    'sell_price' => '16088.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            5 =>
+                array(
+                    'id' => 4570539,
+                    'product_id' => 809,
+                    'period_code' => '201807100008',
+                    'title' => 'Apple iPhone X 64GB 颜色随机',
+                    'img_cover' => '1505283417013',
+                    'sell_price' => '9227.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            6 =>
+                array(
+                    'id' => 4571397,
+                    'product_id' => 643,
+                    'period_code' => '201807100035',
+                    'title' => '中国黄金 Au9999黄金薄片投资金条20g',
+                    'img_cover' => '1517389610477',
+                    'sell_price' => '6431.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            7 =>
+                array(
+                    'id' => 4571406,
+                    'product_id' => 850,
+                    'period_code' => '201807100030',
+                    'title' => '华为 Mate 10 Pro 全网通 6GB+64GB 颜色随机',
+                    'img_cover' => '1508487287928',
+                    'sell_price' => '5389.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            8 =>
+                array(
+                    'id' => 4571410,
+                    'product_id' => 814,
+                    'period_code' => '201807100009',
+                    'title' => '中国黄金 Au9999黄金薄片投资金条100g',
+                    'img_cover' => '1517389752869',
+                    'sell_price' => '32175.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            9 =>
+                array(
+                    'id' => 4571477,
+                    'product_id' => 280,
+                    'period_code' => '201807100051',
+                    'title' => '海信 BCD-535WTVBP/Q 535L 对开门冰箱 变频节能静音 （流光金）',
+                    'img_cover' => '1493889435765',
+                    'sell_price' => '3959.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            10 =>
+                array(
+                    'id' => 4571494,
+                    'product_id' => 951,
+                    'period_code' => '201807100051',
+                    'title' => 'OPPO R15 全面屏手机 6G+128G 颜色随机',
+                    'img_cover' => '1521443309021',
+                    'sell_price' => '3299.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            11 =>
+                array(
+                    'id' => 4571499,
+                    'product_id' => 284,
+                    'period_code' => '201807100043',
+                    'title' => 'vivo Xplay6 全网通 6GB+128GB 4G手机 颜色随机',
+                    'img_cover' => '1493889744047',
+                    'sell_price' => '4948.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            12 =>
+                array(
+                    'id' => 4571507,
+                    'product_id' => 407,
+                    'period_code' => '201807100026',
+                    'title' => '大疆“御”Mavic Pro 可折叠4K超清航拍无人机 全能套装',
+                    'img_cover' => '1496405945137',
+                    'sell_price' => '8799.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            13 =>
+                array(
+                    'id' => 4571520,
+                    'product_id' => 146,
+                    'period_code' => '201807100031',
+                    'title' => 'Apple iPhone 7 128GB 颜色随机',
+                    'img_cover' => '1492654169352',
+                    'sell_price' => '6807.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            14 =>
+                array(
+                    'id' => 4571545,
+                    'product_id' => 812,
+                    'period_code' => '201807100054',
+                    'title' => '中国黄金 Au9999黄金薄片投资金条10g',
+                    'img_cover' => '1517389656916',
+                    'sell_price' => '3248.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            15 =>
+                array(
+                    'id' => 4571558,
+                    'product_id' => 158,
+                    'period_code' => '201807100069',
+                    'title' => '小米 Ninebot九号平衡车 颜色随机',
+                    'img_cover' => '1489658629414',
+                    'sell_price' => '2199.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            16 =>
+                array(
+                    'id' => 4571585,
+                    'product_id' => 853,
+                    'period_code' => '201807100004',
+                    'title' => '中国黄金 Au9999黄金薄片投资金条200g',
+                    'img_cover' => '1517389895501',
+                    'sell_price' => '63910.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            17 =>
+                array(
+                    'id' => 4571529,
+                    'product_id' => 949,
+                    'period_code' => '201807100046',
+                    'title' => 'vivo X21 全面屏 双摄美颜拍照手机 6GB+128GB 颜色随机',
+                    'img_cover' => '1521531050452',
+                    'sell_price' => '3518.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            18 =>
+                array(
+                    'id' => 4571592,
+                    'product_id' => 141,
+                    'period_code' => '201807100028',
+                    'title' => 'Apple iPhone 7 Plus 128GB 颜色随机',
+                    'img_cover' => '1489655988379',
+                    'sell_price' => '7907.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+            19 =>
+                array(
+                    'id' => 4570749,
+                    'product_id' => 636,
+                    'period_code' => '201807100008',
+                    'title' => 'Apple iPhone X 256GB 颜色随机',
+                    'img_cover' => '1505282863087',
+                    'sell_price' => '10657.00',
+                    'bid_step' => 10,
+                    'is_favorite' => 0,
+                ),
+
+        );
         self::showMsg($data);
     }
 }

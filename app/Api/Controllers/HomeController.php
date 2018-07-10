@@ -233,7 +233,6 @@ class HomeController extends WebController
                     'user_id' => 1988396280,
                     'nickname' => '我无为',
                 ),
-
         );
         self::showMsg($data);
     }
