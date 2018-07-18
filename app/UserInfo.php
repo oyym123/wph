@@ -32,41 +32,7 @@ class UserInfo extends Base
     public function createWeixinUser($data)
     {
         $userInfo = DB::table('user_info')->where('openid', $data['id'])->first();
-        if (empty($userInfo)) {
-            $userInfo['openid'] = $data['id'];
-            $user = WebController::weixin()->user->get($data['id']);
-            $userInfo['subscribed_at'] = time();
-            $userInfo['unsubscribed_at'] = 0; // 如果之前取消关注,再次关注则去掉取消关注这个值
-            $userInfo['nickname'] = $user['nickname'];
-            $userInfo['user_photo'] = $user['headimgurl'];
-            $userInfo['sex'] = $user['sex'];
-            $userInfo['updated_at'] = $user['subscribe_time'];
-            $userInfo['address_str'] = $user['province'] . ' ' . $user['city'] . ' ' . $user['country'];
 
-            // 新增
-            $id = DB::table('users')->insertGetId([
-                'email' => time() . mt_rand(1000000, 9999999) . '@e.com',
-                'name' => md5($userInfo['openid']),
-                'avatar' => 'users/default.png',
-                'password' => md5($userInfo['openid'] . mt_rand(100000, 999999)),
-                'remember_token' => time(),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ]);
-            if (!$id) {
-                throw new \Exception('保存用户出错');
-            }
-            $userInfoId = DB::table('user_info')->insertGetId([
-                    'user_id' => $id,
-                    'updated_at' => time(),
-                    'created_at' => time(),
-                ] + $userInfo);
-            if (!$userInfoId) {
-                throw new \Exception('保存用户信息出错');
-            }
-            $userInfo = DB::table('user_info')->where('openid', $data['id'])->first();
-        }
-        return $userInfo;
     }
 
     /** 绑定二维码推荐关系 */

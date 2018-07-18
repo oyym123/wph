@@ -9,6 +9,7 @@ class HomeController extends WebController
 {
     public function successView(Request $request)
     {
+       // echo encrypt(12321);
         return view('api.home.success', ['data' => $request->input()]);
     }
 
@@ -384,6 +385,4 @@ class HomeController extends WebController
         );
         self::showMsg($data);
     }
-
-
 }

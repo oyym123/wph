@@ -52,6 +52,11 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('product/bid-rules', 'ProductController@bidRules');
     Route::get('product/past-deals', 'ProductController@pastDeals');
     Route::get('product/share-order', 'ProductController@shareOrder');
+    Route::get('product/period', 'ProductController@period');
+
+
+    //竞拍
+    Route::post('bid/bidding', 'BidController@bidding');
 
     /** 用户中心 */
     Route::get('user/shipping-address', 'UserController@shippingAddress');//用户注册视图

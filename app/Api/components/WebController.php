@@ -37,13 +37,7 @@ class WebController extends Controller
             session(['user_id' => 1]); //本地环境模拟用户id为1
             session()->save();
         }
-
         $userInfo = DB::table('user_info')->where('user_id', session('user_id'))->first();
-
-        if ($userInfo && $userInfo->bind_mobile) {
-            return [$userInfo, true];
-        }
-        return [$userInfo, false];//使用第二个参数进行判断用户是否注册
     }
 
     /**
@@ -158,59 +152,15 @@ class WebController extends Controller
         $secret = env('WEIXIN_SECRET');
         //api接口
         $api = "https://api.weixin.qq.com/sns/jscode2session?appid={$appid}&secret={$secret}&js_code={$code}&grant_type=authorization_code";
-        //发送
-        echo  Helper::get($api);die;
         $res = json_decode(Helper::get($api), true);
+        session_start();
+        session(['']);
+        print_r($res);
+        exit;
         return [
             $res['session_key'],
             $res['openid']
         ];
-    }
-
-
-    /** 获取微信授权 */
-    static function weixinbak()
-    {
-        include __DIR__ . '/../../../vendor/autoload.php'; // 引入 composer 入口文件
-        $redirect = urlencode('http://' . (empty($_SERVER['HTTP_HOST']) ? 'wph.com' : $_SERVER['HTTP_HOST']) .
-            (empty($_SERVER['REQUEST_URI']) ?: $_SERVER['REQUEST_URI']));
-        $options = [
-            'debug' => true,
-            'app_id' => env('WEIXIN_APP_ID'),         // AppID
-            'secret' => env('WEIXIN_SECRET'),     // AppSecret
-            //'token' => env('WEIXIN_TOKEN'),          // Token
-            //'aes_key' => env('WEIXIN_ENCODING_AES_KEY'),                    // EncodingAESKey
-            'log' => [
-                'level' => 'debug',
-                'file' => '/www/logs/easy_we_chat/wph.log', // XXX: 绝对路径！！！！
-            ],
-            'oauth' => [
-                'scopes' => ['snsapi_userinfo'],
-                'callback' => '/api/weixin-oauth-callback?redirect=' . $redirect,
-            ],
-            //...
-        ];
-        return new Application($options);
-    }
-
-    /** 微信网页授权 */
-    function weixinWebOauth($targetUrl = '')
-    {
-        if (empty(session('wechat_user'))) {
-            file_put_contents('/tmp/test.log', '开始授权登录' . PHP_EOL, FILE_APPEND);
-            self::weixin()->oauth->redirect()->send();
-            exit; // 这儿要终止执行
-            // 这里不一定是return，如果你的框架action不是返回内容的话你就得使用
-            // $oauth->redirect()->send();
-        } elseif (empty(session('user_id'))) {
-            // 如果user_id 不在session中
-            $userInfo = (new UserInfo())->createWeixinUser(session('wechat_user'));
-            session([
-                'bind_mobile' => empty($userInfo->bind_mobile) ? '' : $userInfo->bind_mobile,
-                'user_id' => empty($userInfo->user_id) ? 0 : $userInfo->user_id,
-            ]);
-            session()->save();
-        }
     }
 }
 

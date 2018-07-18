@@ -13,7 +13,6 @@ Route::group([
 ], function (Router $router) {
 
     $router->group([], function ($router) {
-
         /* @var \Illuminate\Routing\Router $router */
         $router->resource('users', 'UserController');
         //优惠券
@@ -24,6 +23,10 @@ Route::group([
         $router->resource('product-type', 'ProductTypeController');
         //产品
         $router->resource('product', 'ProductController');
+        //产品期数
+        $router->resource('period', 'PeriodController');
+        //投标记录
+        $router->resource('bid', 'BidController');
     });
 
     $router->get('/', 'HomeController@index');
@@ -33,12 +36,10 @@ Route::group([
     $router->get('users/{id}/edit', 'UserController@edit');
     $router->get('users/create', 'UserController@create');
 
-
     //图片管理
     $router->get('image', 'ImageController@index');
     $router->get('image/{id}/edit', 'ImageController@edit');
     $router->get('image/create', 'ImageController@create');
-    
 
 
 });

@@ -10,6 +10,7 @@ namespace App\Api\Controllers;
 
 
 use App\Api\components\WebController;
+use App\Models\Period;
 use App\Models\ProductType;
 use Composer\DependencyResolver\Request;
 use Illuminate\Support\Facades\Input;
@@ -1097,5 +1098,12 @@ class ProductController extends WebController
 
         );
         self::showMsg($data);
+    }
+
+
+    public function period()
+    {
+        $model = new Period();
+        $model->saveData(2);
     }
 }

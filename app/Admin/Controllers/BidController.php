@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Period;
+use App\Models\Bid;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -11,7 +11,7 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 
-class PeriodController extends Controller
+class BidController extends Controller
 {
     use ModelForm;
 
@@ -71,15 +71,12 @@ class PeriodController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(Period::class, function (Grid $grid) {
+        return Admin::grid(Bid::class, function (Grid $grid) {
 
             $grid->id('ID')->sortable();
-            $grid->code('期数代码');
-            $grid->product_id('产品id')->sortable();
-            $grid->status('状态');
 
-            $grid->created_at('创建时间');
-            $grid->updated_at('修改时间');
+            $grid->created_at();
+            $grid->updated_at();
         });
     }
 
@@ -90,13 +87,12 @@ class PeriodController extends Controller
      */
     protected function form()
     {
-        return Admin::form(Period::class, function (Form $form) {
+        return Admin::form(Bid::class, function (Form $form) {
+
             $form->display('id', 'ID');
-            $form->display('code', '期数代码');
-            $form->display('product_id', '产品ID');
-            $form->select('status', '状态')->options(Period::getStatus());
-            $form->display('created_at', '创建时间');
-            $form->display('updated_at', '修改时间');
+            
+            $form->display('created_at', 'Created At');
+            $form->display('updated_at', 'Updated At');
         });
     }
 }

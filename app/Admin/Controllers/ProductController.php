@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Base;
+use App\Models\Period;
 use App\Models\Product;
 
 use App\Models\ProductType;
@@ -104,6 +105,12 @@ class ProductController extends Controller
         });
     }
 
+    public function period()
+    {
+        $model = new Period();
+        $model->saveData(2);
+    }
+
     /**
      * Make a form builder.
      *
@@ -136,6 +143,14 @@ class ProductController extends Controller
             $form->switch('status', '状态')->states(Base::getStates())->default(1);
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '修改时间');
+            $form->saved(function (Form $form) {
+                $diff = strtotime($form->model()->updated_at) - strtotime($form->model()->created_at);
+                if (abs($diff) < 3) { //表示只在创建的时候增加期数
+                    $period = new Period();
+                    $period->saveData($form->model()->id);
+                }
+            });
         });
+
     }
 }

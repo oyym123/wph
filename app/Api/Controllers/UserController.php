@@ -67,14 +67,6 @@ class UserController extends WebController
     {
         self::weixin($request->code);
         exit;
-        //  var_dump($request->session()->all());exit;
-        $this->weixinWebOauth(); // 需要网页授权登录
-        // file_put_contents('/tmp/test.log', '授权登录成功' . PHP_EOL, FILE_APPEND);
-        $user = new User();
-        $openId = session('wechat_user')['id'];
-        list($msg, $status) = $user->userRegister([], session('user_id'));
-
-        return view('api.user.register_success');
     }
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\UserInfo;
 use Illuminate\Support\Facades\DB;
@@ -71,38 +71,8 @@ class User extends Authenticatable
     {
         DB::beginTransaction();
         try {
-            $userInfo = DB::table('user_info')->where('user_id', $userId)->first();
-//            $params['email'] = time() . mt_rand(1000000, 9999999) . '@e.com';
-//            if (!$params['email']) {
-//                throw new \Exception("邮箱不可为空");
-//            }
-//            $result = DB::table('users')->where('id', $userId)->update([
-//                    'email' => $params['email'] ?: $params['bind_mobile'] . '163.com',
-//                ]
-//            );
-//            // throw new \Exception("$userInfo->id");
-//            if (!$result) {
-//
-//                throw new \Exception("改邮箱已注册");
-//            }
-//            $info['real_name'] = $params['name'];
-//            $info['sex'] = $params['sex_select'];
-//            $info['bind_mobile'] = $params['bind_mobile'];
-//            $info['birthday'] = isset($params['birthday']) ? $params['birthday'] : '';
-//            $info['id_card'] = $params['id_card'];
-//            $info['detail_address'] = $params['detail_address'];
-            $info=[];
-            list($msg, $status) = Sms::check([
-                'user_id' => $userInfo->user_id,
-                'type' => 1,
-                'mobile' => $params['bind_mobile'],
-                'sms_code' => $params['code']
-            ]);
-
-            if ($status < 0) {
-                throw new \Exception("$msg");
-            }
-
+            $userInfo = DB::table('user')->where('user', $userId)->first();
+            $info = [];
             $result = DB::table('user_info')->where('user_id', $userId)->update($info);
 
             if (!$result) {
