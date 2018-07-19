@@ -8,10 +8,18 @@ use App\Http\Requests\RegisterUserPost;
 use App\User;
 use App\Api\components\WebController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Redis;
 
 class UserController extends WebController
 {
+//    public function __construct(Request $request){
+//        parent::init();
+//        if (empty($this->userId)) {
+//            self::needLogin();
+//        }
+//    }
+
+
     public function index()
     {
         $data = [
@@ -220,7 +228,6 @@ class UserController extends WebController
         self::showMsg($data);
 
     }
-
 
     /**
      * @SWG\Get(path="/api/user/shipping-address",

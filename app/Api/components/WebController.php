@@ -5,8 +5,11 @@ use App\Helpers\Helper;
 use EasyWeChat\Foundation\Application;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\DB;
 use App\UserInfo;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 
 class WebController extends Controller
 {
@@ -20,6 +23,78 @@ class WebController extends Controller
     public $token;
     public $weixin;
 
+    public function __construct(Request $request)
+    {
+        $request->offset && $this->offset = $request->offset;
+        $request->skip && $this->skip = $request->skip;
+        $request->psize && $this->psize = $request->psize;
+        // $this->token = empty($_SERVER['HTTP_KY_TOKEN']) ? '' : $_SERVER['HTTP_KY_TOKEN'];
+        //  $this->token && $this->userId = Yii::$app->redis->hget('token', $this->token);
+//        if ($this->userId) {
+//            Yii::$app->user->identity = $this->getApiUser();
+//        }
+        echo $this->offset;exit;
+        $allowIp = ['218.17.209.172', '127.0.0.1'];
+        if (in_array(Helper::getIP(), $allowIp)) {
+            $path = $this->isWindows() ? 'G:/logs/wph.log' : '/www/logs/wph.log';
+            if (!empty($_POST)) {
+                Helper::writeLog($_POST, $path);
+            }
+            if (!empty($_GET)) {
+                Helper::writeLog($_GET, $path);
+            }
+        }
+    }
+
+    function init(Request $request)
+    {
+        $request->offset && $this->offset = $request->offset;
+        $request->skip && $this->skip = $request->skip;
+        $request->psize && $this->psize = $request->psize;
+        // $this->token = empty($_SERVER['HTTP_KY_TOKEN']) ? '' : $_SERVER['HTTP_KY_TOKEN'];
+        //  $this->token && $this->userId = Yii::$app->redis->hget('token', $this->token);
+//        if ($this->userId) {
+//            Yii::$app->user->identity = $this->getApiUser();
+//        }
+        //if (I::checkIP()) {
+        if ($this->isWindows()) {
+            file_put_contents('E:/logs/test.log', date('Y-m-d-H:i:s') . var_export($_GET, 1) . "\n", FILE_APPEND);
+        } else {
+
+        }
+
+        // }
+    }
+
+
+    /** 取缓存数据 */
+    public static function getCache()
+    {
+        Redis::select(1);
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $val = Redis::hget('cache', md5($_SERVER['REQUEST_URI']));
+            if ($val) {
+                echo $val;
+                exit;
+            }
+        }
+    }
+
+    /** 设置缓存数据 */
+    public static function setCache($key, $val)
+    {
+
+        Redis::select(1);
+        Redis::hset('cache', $key, $val);
+    }
+
+    /** 删除缓存数据 */
+    public static function delCache($key)
+    {
+        Redis::select(1);
+        Redis::hdel('cache', $key);
+    }
+
     /** 判断操作系统是不是windows，方便测试和开发 */
     public function isWindows()
     {
@@ -28,8 +103,9 @@ class WebController extends Controller
         };
     }
 
+
     /** 获取用户信息 */
-    public function userInfo()
+    function getUser_info()
     {
         if (!$this->isWindows()) {  //本地的时候不需要网页授权
             $this->weixinWebOauth(); // 需要网页授权登录
@@ -39,6 +115,15 @@ class WebController extends Controller
         }
         $userInfo = DB::table('user_info')->where('user_id', session('user_id'))->first();
     }
+
+    public function needLogin()
+    {
+        if ($this->token) {
+            self::showMsg('登录已过期', -100);
+        }
+        self::showMsg('需要登录', -100);
+    }
+
 
     /**
      * 解析并送出JSON

@@ -254,10 +254,9 @@ class Helper
     }
 
     /** 写入测试数据 */
-    public static function writeLog($data)
+    public static function writeLog($data, $path)
     {
-        file_put_contents('/tmp/request.log', date('Y-m-d-H:i:s') . var_export($data, 1) . "\n", FILE_APPEND);
-        // file_put_contents('d:/request.log', date('Y-m-d-H:i:s') . var_export($data, 1) . "\n", FILE_APPEND);
+        file_put_contents($path, date('Y-m-d-H:i:s') . "\n" . var_export($data, 1) . "\n", FILE_APPEND);
     }
 
     public static function errors()
@@ -340,24 +339,42 @@ class Helper
         return $str;
     }
 
-    /** 获取ip */
     public static function getIP()
     {
-        if (getenv('HTTP_CLIENT_IP')) {
-            $ip = getenv('HTTP_CLIENT_IP');
-        } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
-            $ip = getenv('HTTP_X_FORWARDED_FOR');
-        } elseif (getenv('HTTP_X_FORWARDED')) {
-            $ip = getenv('HTTP_X_FORWARDED');
-        } elseif (getenv('HTTP_FORWARDED_FOR')) {
-            $ip = getenv('HTTP_FORWARDED_FOR');
-        } elseif (getenv('HTTP_FORWARDED')) {
-            $ip = getenv('HTTP_FORWARDED');
-        } else {
+        $unknown = 'unknown';
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] && strcasecmp($_SERVER['HTTP_X_FORWARDED_FOR'], $unknown)) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } elseif (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], $unknown)) {
             $ip = $_SERVER['REMOTE_ADDR'];
         }
+        /*
+        处理多层代理的情况
+        或者使用正则方式：$ip = preg_match("/[\d\.]{7,15}/", $ip, $matches) ? $matches[0] : $unknown;
+        */
+        if (false !== strpos($ip, ','))
+            $ip = reset(explode(',', $ip));
         return $ip;
     }
+
+//
+//    /** 获取ip */
+//    public static function getIP()
+//    {
+//        if (getenv('HTTP_CLIENT_IP')) {
+//            $ip = getenv('HTTP_CLIENT_IP');
+//        } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
+//            $ip = getenv('HTTP_X_FORWARDED_FOR');
+//        } elseif (getenv('HTTP_X_FORWARDED')) {
+//            $ip = getenv('HTTP_X_FORWARDED');
+//        } elseif (getenv('HTTP_FORWARDED_FOR')) {
+//            $ip = getenv('HTTP_FORWARDED_FOR');
+//        } elseif (getenv('HTTP_FORWARDED')) {
+//            $ip = getenv('HTTP_FORWARDED');
+//        } else {
+//            $ip = $_SERVER['REMOTE_ADDR'];
+//        }
+//        return $ip;
+//    }
 
 
     /** 客户端路由 */
@@ -368,6 +385,7 @@ class Helper
         }
         return trim($prefix, '&');
     }
+
 
     /** 敏感词检测 */
     public static function wordScreen($contents)
