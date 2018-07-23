@@ -131,9 +131,14 @@ class User extends Authenticatable
         $openId = \Faker\Provider\Uuid::uuid();
         $token = md5(md5($openId . $sessionKey));
         $user = DB::table('users')->where(['email' => $randQQ . '@qq.com', 'is_real' => User::TYPE_REBOT])->first();
-        $img = file_get_contents('C:\xampp\htdocs\100.png'); //测试图片
-        $img2 = file_get_contents('C:\xampp\htdocs\100.jpg'); //测试图片
-        $img3 = file_get_contents('C:\xampp\htdocs\100girl.jpg'); //测试图片
+
+//        $img = file_get_contents('C:\xampp\htdocs\100.png'); //测试图片
+//        $img2 = file_get_contents('C:\xampp\htdocs\100.jpg'); //测试图片
+//        $img3 = file_get_contents('C:\xampp\htdocs\100girl.jpg'); //测试图片
+
+        $img = file_get_contents('/www/img/100.png'); //测试图片
+        $img2 = file_get_contents('/www/img/100.jpg'); //测试图片
+        $img3 = file_get_contents('/www/img/100girl.jpg'); //测试图片
         $imgQQ = Helper::get($qqInfo[0]);
         $flag = 0;
         if ($imgQQ != $img && $imgQQ != $img2 && $imgQQ != $img3) {
