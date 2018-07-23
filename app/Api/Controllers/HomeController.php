@@ -58,15 +58,17 @@ class HomeController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/api/demo/demo",
-     *   tags={"demo"},
+     * @SWG\Get(path="/api/home/module",
+     *   tags={"首页"},
      *   summary="",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="", required=true,
-     *     type="string",
-     *   ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *              [id] => id
+     *              [title] => 标题
+     *              [img] => 封面图片
+     *              [url] => 地址
+     *     "
      *   )
      * )
      */
@@ -78,50 +80,29 @@ class HomeController extends WebController
                     'id' => 11,
                     'title' => '充值',
                     'img' => '1490015569219',
-                    'function' => 'recharge.html',
-                    'params' =>
-                        array(),
+                    'url' => 'recharge.html',
                 ),
             1 =>
                 array(
                     'id' => 13,
                     'title' => '10元专区',
                     'img' => '1490015605523',
-                    'function' => 'goods_list.html',
-                    'params' =>
-                        array(
-                            0 =>
-                                array(
-                                    'key' => 'pr',
-                                    'type' => 'undefined',
-                                    'value' => '10',
-                                ),
-                        ),
+                    'url' => 'goods_list.html',
                 ),
             2 =>
                 array(
                     'id' => 14,
                     'title' => '晒单',
                     'img' => '1490015587751',
-                    'function' => 'share.html',
-                    'params' =>
-                        array(),
+                    'url' => 'share.html',
+
                 ),
             3 =>
                 array(
                     'id' => 12,
                     'title' => '常见问题',
                     'img' => '1490015634162',
-                    'function' => 'html',
-                    'params' =>
-                        array(
-                            0 =>
-                                array(
-                                    'key' => 'url',
-                                    'type' => 'String',
-                                    'value' => 'https://m.gogobids.com/h_service.html',
-                                ),
-                        ),
+                    'url' => 'html',
                 ),
         );
         self::showMsg($data);

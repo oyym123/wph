@@ -16,13 +16,6 @@ use Ramsey\Uuid\Uuid;
 
 class UserController extends WebController
 {
-//    public function __construct(Request $request){
-//        parent::init();
-//        if (empty($this->userId)) {
-//            self::needLogin();
-//        }
-//    }
-
 
     public function index()
     {
@@ -218,7 +211,7 @@ class UserController extends WebController
      *   tags={"用户中心"},
      *   summary="我的竞拍",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
+     *   @SWG\Parameter(name="token", in="header", default="", description="用户token" ,required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -262,6 +255,7 @@ class UserController extends WebController
      */
     public function MyAuction()
     {
+        $this->auth();
         $data = array(
             'period_id' => 4372346,
             'product_id' => 626,

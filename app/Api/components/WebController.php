@@ -15,7 +15,7 @@ class WebController extends Controller
 {
     public $enableCsrfValidation = false;
     public $offset = 0;
-    public $limit = 0;
+    public $limit = 10;
     public $psize = 10;
     public $userId = 0;
     public $userIdent = 0;
@@ -27,11 +27,10 @@ class WebController extends Controller
         $request->offset && $this->offset = $request->offset;
         $request->limit && $this->limit = $request->limit;
         // $request->psize && $this->psize = $request->psize;
-        $this->token = empty($_SERVER['HTTP_KY_TOKEN']) ? '' : $_SERVER['HTTP_KY_TOKEN'];
+        $this->token = empty($_SERVER['HTTP_TOKEN']) ? '' : $_SERVER['HTTP_TOKEN'];
         $this->token && $this->userId = Redis::hget('token', $this->token);
         if ($this->userId) {
             $this->userIdent = User::find($this->userId);
-
         }
         $allowIp = ['218.17.209.172', '127.0.0.1'];
         if (in_array(Helper::getIP(), $allowIp)) {
@@ -103,6 +102,13 @@ class WebController extends Controller
         self::showMsg('需要登录', -100);
     }
 
+    /** 身份验证 */
+    public function auth()
+    {
+        if (empty($this->userId)) {
+            self::needLogin();
+        }
+    }
 
     /**
      * 解析并送出JSON

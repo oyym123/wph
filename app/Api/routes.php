@@ -39,6 +39,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('home/banner', 'HomeController@banner');
     Route::get('home/deal-end', 'HomeController@dealEnd');
     Route::get('home/hot-auction', 'HomeController@hotAuction');
+    Route::get('home/module', 'HomeController@module');
 
     //最新成交
     Route::get('latest-deal', 'LatestDealController@index');
