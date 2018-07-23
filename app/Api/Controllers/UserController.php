@@ -60,10 +60,16 @@ class UserController extends WebController
      *   tags={"用户中心"},
      *   summary="",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="code", in="query", default="", description="code", required=true,
+     *   @SWG\Parameter(name="code", in="query", default="1", description="code", required=true,
      *     type="string",
      *   ),
      *   @SWG\Parameter(name="nickname", in="query", default="佚名", description="用户昵称", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="province", in="query", default="江西省", description="省", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="city", in="query", default="上饶市", description="市", required=true,
      *     type="string",
      *   ),
      *   @SWG\Parameter(name="avatar", in="query", default="default_user_photo10.png", description="头像地址", required=true,
@@ -81,7 +87,7 @@ class UserController extends WebController
             $result = json_decode($res, true);
             $model = DB::table('users')->where(['open_id' => $result['openid'], 'is_real' => User::TYPE_REAL_PERSON])->first();
             $token = md5(md5($result['openid'] . $result['session_key']));
-            list($province, $city) = City::randCity();
+            list($province, $city) = City::simplifyCity($request->province, $request->city);
             $data = [
                 'session_key' => $result['session_key'],
                 'open_id' => $result['openid'],
@@ -92,7 +98,7 @@ class UserController extends WebController
                 'is_real' => USER::TYPE_REAL_PERSON,
                 'token' => $token,
                 'province' => $province,
-                'city' => $city
+                'city' => $city,
             ];
             if ($model) {
                 Redis::hdel('token', $model->token);

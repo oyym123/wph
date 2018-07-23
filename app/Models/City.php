@@ -11,14 +11,14 @@ class City extends Model
 
 
     /** 简化城市名称 */
-    public static function simplifyCity($province, $city)
+    public static function simplifyCity($province = '北京', $city)
     {
         $pName = str_replace(['省', '市'], "", $province);
         $cName = str_replace(['市', '县', '区'], "", $city);
         if (strpos($province, '市') !== false || mb_strlen($cName) > 2 || mb_strlen($pName) > 2) {
             $cName = '';
         }
-        
+
         return [$pName, $cName];
     }
 
