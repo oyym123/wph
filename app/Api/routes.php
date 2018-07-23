@@ -62,6 +62,8 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('user/shipping-address', 'UserController@shippingAddress');//用户注册视图
     Route::get('user/my-auction', 'UserController@MyAuction');//用户注册视图
 
+    Route::get('user/batch-register', 'UserController@batchRegister');//批量用户注册
+
     //收藏
     Route::get('collection', 'CollectionController@index');
 

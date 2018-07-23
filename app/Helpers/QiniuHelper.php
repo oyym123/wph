@@ -20,6 +20,17 @@ class QiniuHelper
         return $upToken;
     }
 
+    /** 传图 */
+    public static function fetchImg($url)
+    {
+        require_once __DIR__ . '/../sdk/qiniu/php-sdk/autoload.php';
+        //初始化Auth状态
+        $auth = new Auth(config('qiniu.access_key'), config('qiniu.secret_key'));
+        $bucketMgr = new BucketManager($auth);
+        $items = $bucketMgr->fetch($url, config('qiniu.bucket_images'));
+        return $items;
+    }
+
     /** 获取七牛图片存储地址 */
     public static function downloadImageUrl($url, $key)
     {

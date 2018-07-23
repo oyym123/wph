@@ -2,21 +2,20 @@
 namespace App\Api\components;
 
 use App\Helpers\Helper;
+use App\User;
 use EasyWeChat\Foundation\Application;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
-use App\UserInfo;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 
 class WebController extends Controller
 {
-
     public $enableCsrfValidation = false;
     public $offset = 0;
-    public $skip = 0;
+    public $limit = 0;
     public $psize = 10;
     public $userId = 0;
     public $userIdent = 0;
@@ -26,14 +25,14 @@ class WebController extends Controller
     public function __construct(Request $request)
     {
         $request->offset && $this->offset = $request->offset;
-        $request->skip && $this->skip = $request->skip;
-        $request->psize && $this->psize = $request->psize;
-        // $this->token = empty($_SERVER['HTTP_KY_TOKEN']) ? '' : $_SERVER['HTTP_KY_TOKEN'];
-        //  $this->token && $this->userId = Yii::$app->redis->hget('token', $this->token);
-//        if ($this->userId) {
-//            Yii::$app->user->identity = $this->getApiUser();
-//        }
-        echo $this->offset;exit;
+        $request->limit && $this->limit = $request->limit;
+        // $request->psize && $this->psize = $request->psize;
+        $this->token = empty($_SERVER['HTTP_KY_TOKEN']) ? '' : $_SERVER['HTTP_KY_TOKEN'];
+        $this->token && $this->userId = Redis::hget('token', $this->token);
+        if ($this->userId) {
+            $this->userIdent = User::find($this->userId);
+
+        }
         $allowIp = ['218.17.209.172', '127.0.0.1'];
         if (in_array(Helper::getIP(), $allowIp)) {
             $path = $this->isWindows() ? 'G:/logs/wph.log' : '/www/logs/wph.log';
@@ -44,26 +43,6 @@ class WebController extends Controller
                 Helper::writeLog($_GET, $path);
             }
         }
-    }
-
-    function init(Request $request)
-    {
-        $request->offset && $this->offset = $request->offset;
-        $request->skip && $this->skip = $request->skip;
-        $request->psize && $this->psize = $request->psize;
-        // $this->token = empty($_SERVER['HTTP_KY_TOKEN']) ? '' : $_SERVER['HTTP_KY_TOKEN'];
-        //  $this->token && $this->userId = Yii::$app->redis->hget('token', $this->token);
-//        if ($this->userId) {
-//            Yii::$app->user->identity = $this->getApiUser();
-//        }
-        //if (I::checkIP()) {
-        if ($this->isWindows()) {
-            file_put_contents('E:/logs/test.log', date('Y-m-d-H:i:s') . var_export($_GET, 1) . "\n", FILE_APPEND);
-        } else {
-
-        }
-
-        // }
     }
 
 
@@ -228,24 +207,30 @@ class WebController extends Controller
         session([$request->getClientIp() . $name => $params]);
     }
 
+    /** 获取图片 */
+    public function getImage($img)
+    {
+        return env('QINIU_URL_IMAGES') . $img;
+    }
 
     /** 获取微信授权 */
-    static function weixin($code)
+    public function weixin($code)
     {
         //声明CODE，获取小程序传过来的CODE
         $appid = env('WEIXIN_APP_ID');
         $secret = env('WEIXIN_SECRET');
-        //api接口
-        $api = "https://api.weixin.qq.com/sns/jscode2session?appid={$appid}&secret={$secret}&js_code={$code}&grant_type=authorization_code";
-        $res = json_decode(Helper::get($api), true);
-        session_start();
-        session(['']);
-        print_r($res);
-        exit;
-        return [
-            $res['session_key'],
-            $res['openid']
-        ];
+        if ($this->isWindows()) { //测试
+            $res = '{"session_key":"O+rLUsjqo2GsMX9G9Mt9pw==","openid":"oZ5zW5TnpqKWtmku1ZUiSO0yXiRU"}';
+        } else {
+            //api接口
+            $api = "https://api.weixin.qq.com/sns/jscode2session?appid={$appid}&secret={$secret}&js_code={$code}&grant_type=authorization_code";
+            $res = Helper::get($api);
+        }
+        if (strpos($res, 'openid') !== false) {
+            return $res;
+        } else {
+            return '';
+        }
     }
 }
 

@@ -3,13 +3,14 @@
 namespace App\Api\Controllers;
 
 use App\Api\components\WebController;
+use App\Models\Period;
 use Illuminate\Http\Request;
 
 class HomeController extends WebController
 {
     public function successView(Request $request)
     {
-       // echo encrypt(12321);
+        // echo encrypt(12321);
         return view('api.home.success', ['data' => $request->input()]);
     }
 
@@ -176,68 +177,34 @@ class HomeController extends WebController
     }
 
     /**
-     * /**
      * @SWG\Get(path="/api/home/deal-end",
      *   tags={"首页"},
-     *   summary="闪拍头条&已完成商品的接口数据，一次取多条，前端定时展示，展示完再调用该接口",
+     *   summary="闪拍头条&已完成商品的接口数据",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="name", in="query", default="", description="",
      *     type="string",
      *   ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *           [id] => 期数id
+     *           [period_code] => 期数代码
+     *           [bid_price] => 竞拍价格
+     *           [user_id] => 用户id
+     *           [nickname] => 用户昵称
+     *           [title] => 标题
+     *           [bid_step] => 竞拍单价
+     *           [end_time] => 成交时间
+     *           [img_cover] => 产品封面
+     *           [product_id] => 产品id
+     *           [sell_price] => 产品售价 "
      *   )
      * )
      */
     public function dealEnd()
     {
-        $data = array(
-            0 =>
-                array(
-                    'id' => 4487037,
-                    'title' => '大洋世家 阿根廷红虾L1 2kg盒 30-40只 海鲜大虾',
-                    'bid_step' => 1,
-                    'end_time' => 1530541509006.0,
-                    'img_cover' => '1529056468333',
-                    'period_code' => '201807020047',
-                    'product_id' => 1050,
-                    'sell_price' => '197.00',
-                    'bid_price' => '18.50',
-                    'user_id' => 1194971827,
-                    'nickname' => 'Andying',
-                ),
-            1 =>
-                array(
-                    'id' => 4487157,
-                    'title' => '金沙河 面粉5kg*2袋',
-                    'bid_step' => 1,
-                    'end_time' => 1530541505973.0,
-                    'img_cover' => '1499421562472',
-                    'period_code' => '201807020136',
-                    'product_id' => 528,
-                    'sell_price' => '70.00',
-                    'bid_price' => '8.80',
-                    'user_id' => 1361837785,
-                    'nickname' => '命里有时终有之',
-                ),
-            2 =>
-                array(
-                    'id' => 4486992,
-                    'title' => '可莱丝 水润保湿面膜20片',
-                    'bid_step' => 1,
-                    'end_time' => 1530541476438.0,
-                    'img_cover' => '1501837156838',
-                    'period_code' => '201807020041',
-                    'product_id' => 569,
-                    'sell_price' => '282.00',
-                    'bid_price' => '25.00',
-                    'user_id' => 1988396280,
-                    'nickname' => '我无为',
-                ),
-        );
-        self::showMsg($data);
+        $model = new Period();
+        self::showMsg($model->dealEnd());
     }
-
 
     /**
      * /**

@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Product;
+use App\User;
 use Encore\Admin\Widgets\InfoBox;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\Dashboard;
@@ -25,10 +27,12 @@ class HomeController extends Controller
             $content->row(function (Row $row) {
 
                 $row->column(4, function (Column $column) {
-                    $infoBox1 = new InfoBox('今日会员总数', 'user', 'aqua', '/admin/users', '1024');
-
+                    $start = date('Y-m-d', time()) . ' 00:00:00';
+                    $end = date('Y-m-d', time()) . ' 23:59:59';
+                    $infoBox1 = new InfoBox('今日真实会员总数', 'user', 'aqua',
+                        '/admin/users?is_real=1&created_at[start]=' . $start . '&created_at[end]=' . $end,
+                        User::counts(1));
                     $column->append($infoBox1);
-
                 });
 
                 $row->column(4, function (Column $column) {
@@ -46,14 +50,12 @@ class HomeController extends Controller
             $content->row(function (Row $row) {
 
                 $row->column(4, function (Column $column) {
-                    $infoBox1 = new InfoBox('会员总数', 'users', 'green', '/admin/users', '6624');
-
+                    $infoBox1 = new InfoBox('真实会员总数', 'users', 'green', '/admin/users?is_real=1', User::counts());
                     $column->append($infoBox1);
-
                 });
 
                 $row->column(4, function (Column $column) {
-                    $infoBox2 = new InfoBox('商品数量', 'th-large', 'yellow', '/admin/users', '1024');
+                    $infoBox2 = new InfoBox('商品数量', 'th-large', 'yellow', '/admin/users', Product::counts());
                     $column->append($infoBox2);
                 });
 

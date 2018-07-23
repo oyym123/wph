@@ -11,12 +11,14 @@ namespace App\Api\Controllers;
 
 use App\Api\components\WebController;
 use App\Models\Period;
+use App\Models\Product;
 use App\Models\ProductType;
 use Composer\DependencyResolver\Request;
 use Illuminate\Support\Facades\Input;
 
 class ProductController extends WebController
 {
+
     /**
      *
      * @SWG\Get(path="/api/product",
@@ -32,136 +34,14 @@ class ProductController extends WebController
      * )
      *
      */
-    public function index()
+    public function index(Request $request)
     {
-
-        $data = array(
-            0 =>
-                array(
-                    'id' => 4506124,
-                    'product_id' => 417,
-                    'period_code' => '201807040002',
-                    'title' => '2017款 Apple iPad Pro 10.5英寸 256GB WLAN版',
-                    'img_cover' => '1496734821836',
-                    'sell_price' => '7027.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-            1 =>
-                array(
-                    'id' => 4505810,
-                    'product_id' => 908,
-                    'period_code' => '201807040004',
-                    'title' => 'OPPO R15 全面屏手机 6G+128G 颜色随机',
-                    'img_cover' => '1521443309021',
-                    'sell_price' => '3299.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-            2 =>
-                array(
-                    'id' => 4508065,
-                    'product_id' => 316,
-                    'period_code' => '201807040123',
-                    'title' => '维他 柠檬茶250ml*24盒 整箱',
-                    'img_cover' => '1494588514551',
-                    'sell_price' => '73.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-            3 =>
-                array(
-                    'id' => 4508027,
-                    'product_id' => 523,
-                    'period_code' => '201807040073',
-                    'title' => '蓝月亮 洗衣液套装 14斤',
-                    'img_cover' => '1499421070152',
-                    'sell_price' => '110.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-            4 =>
-                array(
-                    'id' => 4504512,
-                    'product_id' => 1043,
-                    'period_code' => '201807040003',
-                    'title' => 'vivo X21 FIFA世界杯非凡版  6GB+128GB 颜色随机',
-                    'img_cover' => '1529055870429',
-                    'sell_price' => '4068.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-            5 =>
-                array(
-                    'id' => 4500844,
-                    'product_id' => 625,
-                    'period_code' => '201807040001',
-                    'title' => 'Apple iPhone 8 Plus 64G 颜色随机',
-                    'img_cover' => '1505284106037',
-                    'sell_price' => '7357.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-            6 =>
-                array(
-                    'id' => 4505126,
-                    'product_id' => 697,
-                    'period_code' => '201807040002',
-                    'title' => '华为 Mate 10 Pro 全网通 6GB+64GB 颜色随机',
-                    'img_cover' => '1508487287928',
-                    'sell_price' => '5389.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-            7 =>
-                array(
-                    'id' => 4503717,
-                    'product_id' => 596,
-                    'period_code' => '201807040001',
-                    'title' => '2017款 Apple MacBook 12英寸 1.2GHz 256GB 颜色随机',
-                    'img_cover' => '1503627268671',
-                    'sell_price' => '11317.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-            8 =>
-                array(
-                    'id' => 4506629,
-                    'product_id' => 909,
-                    'period_code' => '201807040005',
-                    'title' => 'vivo X21 全面屏 双摄美颜拍照手机 6GB+128GB 颜色随机',
-                    'img_cover' => '1521531050452',
-                    'sell_price' => '3518.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-            9 =>
-                array(
-                    'id' => 4508085,
-                    'product_id' => 213,
-                    'period_code' => '201807040373',
-                    'title' => 'Q 币20个（支持实时发货）',
-                    'img_cover' => '1491998401710',
-                    'sell_price' => '22.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-            10 =>
-                array(
-                    'id' => 4508030,
-                    'product_id' => 1049,
-                    'period_code' => '201807040056',
-                    'title' => '嘉士伯特醇 啤酒 限量版足球定制礼盒 500ml*24听整箱装',
-                    'img_cover' => '1529056389522',
-                    'sell_price' => '174.00',
-                    'bid_step' => 1,
-                    'is_favorite' => 0,
-                ),
-
-        );
-        self::showMsg($data);
+        $period = new Period();
+        $period->userId = $this->userId;
+        $period->limit = $this->limit;
+        $period->offset = $this->offset;
+        self::showMsg($period->getProductList());
     }
-
 
     /**
      * @SWG\Get(path="/api/product/detail",

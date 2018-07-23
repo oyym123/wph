@@ -256,7 +256,7 @@ class Helper
     /** 写入测试数据 */
     public static function writeLog($data, $path)
     {
-        file_put_contents($path, date('Y-m-d-H:i:s') . "\n" . var_export($data, 1) . "\n", FILE_APPEND);
+        file_put_contents($path, date('Y-m-d H:i:s') . "\n" . var_export($data, 1) . "\n", FILE_APPEND);
     }
 
     public static function errors()
@@ -505,6 +505,7 @@ class Helper
         }
         return $unistr;
     }
+
 
     /** png转jpg */
     public static function png2jpg($srcPathName, $delOri = true)

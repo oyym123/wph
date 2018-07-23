@@ -2,13 +2,17 @@
 
 namespace App\Api\Controllers;
 
+use App\Helpers\Helper;
+use App\Helpers\WXBizDataCrypt;
 use App\Http\Requests\BindMobilePost;
+use App\Models\City;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\RegisterUserPost;
 use App\User;
 use App\Api\components\WebController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Ramsey\Uuid\Uuid;
 
 class UserController extends WebController
 {
@@ -31,6 +35,7 @@ class UserController extends WebController
         self::showMsg($data);
     }
 
+
     /** 注册 */
     public function registerView(Request $request)
     {
@@ -50,10 +55,9 @@ class UserController extends WebController
         ]);
     }
 
-    /** 注册 */
-    public function registerSuccess()
+    public function login()
     {
-        return view('api.user.register_success');
+
     }
 
 
@@ -63,7 +67,13 @@ class UserController extends WebController
      *   tags={"用户中心"},
      *   summary="",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="code", in="query", default="", description="", required=true,
+     *   @SWG\Parameter(name="code", in="query", default="", description="code", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="nickname", in="query", default="佚名", description="用户昵称", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="avatar", in="query", default="default_user_photo10.png", description="头像地址", required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -73,10 +83,46 @@ class UserController extends WebController
      */
     public function info(Request $request)
     {
-        self::weixin($request->code);
-        exit;
+        $res = $this->weixin($request->code);
+        if (!empty($res)) {
+            $result = json_decode($res, true);
+            $model = DB::table('users')->where(['open_id' => $result['openid'], 'is_real' => User::TYPE_REAL_PERSON])->first();
+            $token = md5(md5($result['openid'] . $result['session_key']));
+            list($province, $city) = City::randCity();
+            $data = [
+                'session_key' => $result['session_key'],
+                'open_id' => $result['openid'],
+                'email' => rand(1000000, 999999999) . '@163.com',
+                'nickname' => $request->nickname ?: '佚名',
+                'name' => $request->nickname ?: '佚名',
+                'avatar' => $request->avatar ?: $this->getImage('default_user_photo10.png'),
+                'is_real' => USER::TYPE_REAL_PERSON,
+                'token' => $token,
+                'province' => $province,
+                'city' => $city
+            ];
+            if ($model) {
+                Redis::hdel('token', $model->token);
+                DB::table('users')->where('id', $model->id)->update($data);
+            } else {
+                $model = new User();
+                $model->saveData($data);
+            }
+            Redis::hset('token', $token, $model->id);
+            self::showMsg(['token' => $token]);
+        }
     }
 
+    /**
+     * 批量注册用户
+     */
+    public function batchRegister()
+    {
+        $model = new User();
+        for ($i = 0; $i < 1000; $i++) {
+            $model->rebotRegister();
+        }
+    }
 
     /** 修改用户信息 */
     public function update()
@@ -176,7 +222,41 @@ class UserController extends WebController
      *     type="string",
      *   ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *              period_id => 期数id
+     *              product_id => 产品id
+     *              period_code => 期数代码
+     *              title => 标题
+     *              img_cover => 封面url地址
+     *              bid_step => 竞拍步骤
+     *              product_type => 产品类型
+     *              is_purchase_enable => 是否可加价
+     *              sell_price => 售价
+     *              num => 数量
+     *              settlement_bid_price => 成交价
+     *              pay_real_price => 真正成交价格
+     *              end_time => 结束时间
+     *              is_long_history => 是否很长时间
+     *              id => 订单id
+     *              bid_type => 竞拍类型 （0 = 正常竞拍 , 1 = 差价购买）
+     *              order_type => 订单类型 （ 10 = 未支付 , 15 = 已付款 ,20 = 待发货 , 25 = 已发货 , 50 = 买家已签收 , 100 = 已完成）
+     *              result_status => 结果类型 [根据这个判断在哪块显示]（0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）
+     *              pay_status => 支付状态 （0=>未支付 , 1=已支付）
+     *              pay_time => 支付时间
+     *              pay_price => 支付价格
+     *              pay_shop_bids => 支付商铺竞价
+     *              order_time => 订单时间
+     *              check_status => 检查状态
+     *              return_voucher_bids => 返还的购物币
+     *              used_voucher_bids => 使用的真实购物币
+     *              nickname => 昵称
+     *              delivery_id => 交货id
+     *              delivery_mode => 交货模式
+     *              delivery_code => 交货代码
+     *              delivery_state => 交货状态
+     *              delivery_state_desc => 交货详情
+     *              show_confirm_trans => 是否展示确认收货按钮
+     *     "
      *   )
      * )
      */
@@ -207,13 +287,9 @@ class UserController extends WebController
             'pay_shop_bids' => 0,
             'order_time' => NULL,
             'check_status' => 0,
-            'return_real_bids' => 0,
             'return_voucher_bids' => 0,
-            'used_real_bids' => 0,
             'used_voucher_bids' => 5,
-            'return_shop_bids' => 0,
             'user_id' => 1328115335,
-            'category' => 1,
             'nickname' => '一心一意',
             'delivery_id' => NULL,
             'delivery_mode' => NULL,
@@ -222,8 +298,6 @@ class UserController extends WebController
             'delivery_state_desc' => NULL,
             'delivery_title' => '',
             'show_confirm_trans' => 0,
-            'proxy_all_times' => 0,
-            'proxy_bid_times' => 0,
         );
         self::showMsg($data);
 
@@ -234,7 +308,7 @@ class UserController extends WebController
      *   tags={"用户中心"},
      *   summary="收货地址",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
+     *   @SWG\Parameter(name="offset", in="query", default="", description="",
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -262,7 +336,6 @@ class UserController extends WebController
             'city_code' => '2605',
             'district_code' => '2607',
             'street_code' => '16694',
-
         );
         self::showMsg($data);
     }

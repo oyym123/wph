@@ -2,14 +2,13 @@
 
 namespace App\Admin\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\User;
-
+use Encore\Admin\Controllers\ModelForm;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\ModelForm;
 
 class UserController extends Controller
 {
@@ -29,7 +28,7 @@ class UserController extends Controller
             $content->body($this->grid());
         });
     }
-    
+
 
     /**
      * Edit interface.
@@ -58,7 +57,7 @@ class UserController extends Controller
         return Admin::content(function (Content $content) {
             $content->header('会员管理');
             $content->description('创建会员');
-            $content->body($this->form());
+            //  $content->body($this->form());
         });
     }
 
@@ -72,26 +71,33 @@ class UserController extends Controller
         return Admin::grid(User::class, function (Grid $grid) {
 
             $grid->actions(function ($actions) {
-
                 // 没有`delete-image`权限的角色不显示删除按钮
                 if (!Admin::user()->can('delete-image')) {
                     $actions->disableDelete();
                 }
             });
-
+            $grid->disableExport();
             $grid->id('ID')->sortable();
-
             $grid->name('名字');
             $grid->email('邮箱');
-            $grid->avatar('头像');
-            $grid->role_id('角色');
+            $grid->avatar('头像')->display(function ($released) {
+                return '<a href="' . env('QINIU_URL_IMAGES') . $released . '" target="_blank" ><img src="' .
+                    env('QINIU_URL_IMAGES') . $released . '?imageView/1/w/65/h/45" ></a>';
+            });
+
+            $grid->is_real('身份')->display(function ($released) {
+                return User::getIsReal($released);
+            });
+
+            $grid->province('省');
+            $grid->city('市');
+
             $grid->created_at('创建时间');
             $grid->updated_at('修改时间');
             // filter($callback)方法用来设置表格的简单搜索框
             $grid->filter(function ($filter) {
-
-                $filter->like('name', '名字');
-                // 设置created_at字段的范围查询
+                $filter->like('nickname', '名字');
+                $filter->in('is_real', '身份')->select(User::getIsReal());
                 $filter->between('created_at', '创建时间')->datetime();
                 $filter->between('updated_at', '修改时间')->datetime();
             });
@@ -109,19 +115,12 @@ class UserController extends Controller
             $form->display('id', 'ID');
             $form->text('name', '名字');
             $form->text('email', '邮箱');
-            $form->password('password', '密码')->rules('required', [
-                'required' => '密码不能为空',
-            ]);
-            $form->password('remember_token', '密码')->rules('required', [
-                'required' => '密码不能为空',
-            ]);
-
-            $form->image('avatar','头像');
+            $form->image('avatar', '头像');
             $disk = \Storage::disk('qiniu');
             $disk->getDriver()->downloadUrl('file.jpg');
-            $form->text('role_id', '角色');
-           // $form->text('created_at', '创建时间');
-            //$form->text('updated_at', '修改时间');
+            $form->display('created_at', '创建时间');
+            $form->display('updated_at', '修改时间');
+//            $form->text('role_id', '角色');
         });
     }
 }

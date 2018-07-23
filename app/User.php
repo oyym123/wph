@@ -2,10 +2,15 @@
 
 namespace App;
 
+use App\Helpers\Helper;
+use App\Helpers\QiniuHelper;
+use App\Models\City;
 use App\UserInfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Redis;
+use Qiniu\Storage\BucketManager;
 
 class User extends Authenticatable
 {
@@ -25,7 +30,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'session_key', 'open_id', 'token', 'nickname', 'avatar', 'is_real', 'status',
+        'province', 'city'
     ];
 
     /**
@@ -36,6 +42,47 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    const TYPE_REBOT = 0; //机器人
+    const TYPE_REAL_PERSON = 1; //真人
+
+    /** 获取身份 */
+    public static function getIsReal($key = 999)
+    {
+        $data = [
+            self::TYPE_REBOT => '电脑人',
+            self::TYPE_REAL_PERSON => '真人',
+        ];
+        return $key != 999 ? $data[$key] : $data;
+    }
+
+    public static function counts($today = 0)
+    {
+        if ($today) {
+            return DB::table('users')->where(['is_real' => self::TYPE_REAL_PERSON])
+                ->whereBetween('created_at', [date('Y-m-d', time()), date('Y-m-d', time()) . ' 23:59:59'])
+                ->count();
+        } else {
+            return DB::table('users')->where(['is_real' => self::TYPE_REAL_PERSON])->count();
+        }
+
+    }
+
+    public function setToken($openId, $sessionKey)
+    {
+        $this->token = md5($openId . $sessionKey);
+    }
+
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    public function saveData($data)
+    {
+        $model = self::create($data);
+        return [$model, $model->save()];
+    }
 
     /** 用户信息修改 */
     public function userUpdate($params, $userId)
@@ -65,39 +112,61 @@ class User extends Authenticatable
         }
     }
 
-    /** 注册用户 */
-    public function userRegister($params, $userId)
+
+    /**
+     * 机器用户注册
+     */
+    public function rebotRegister()
     {
-        DB::beginTransaction();
-        try {
-            $userInfo = DB::table('user')->where('user', $userId)->first();
-            $info = [];
-            $result = DB::table('user_info')->where('user_id', $userId)->update($info);
+        set_time_limit(0);
+        $randQQ = rand(1000000, 999999999);
+        //获取QQ信息api接口
+        $api = "http://users.qzone.qq.com/fcg-bin/cgi_get_portrait.fcg?uins=" . (string)($randQQ);
+        $res = Helper::get($api);
+        $res = mb_convert_encoding($res, "UTF-8", "GBK");
+        $str = substr($res, strpos($res, '(') + 1);
+        $qqInfo = json_decode(substr($str, 0, -1), true)[$randQQ];
 
-            if (!$result) {
-                throw new \Exception("更新用户信息数据出错");
+        $sessionKey = \Faker\Provider\Uuid::uuid();
+        $openId = \Faker\Provider\Uuid::uuid();
+        $token = md5(md5($openId . $sessionKey));
+        $user = DB::table('users')->where(['email' => $randQQ . '@qq.com', 'is_real' => User::TYPE_REBOT])->first();
+        $img = file_get_contents('C:\xampp\htdocs\100.png'); //测试图片
+        $img2 = file_get_contents('C:\xampp\htdocs\100.jpg'); //测试图片
+        $img3 = file_get_contents('C:\xampp\htdocs\100girl.jpg'); //测试图片
+        $imgQQ = Helper::get($qqInfo[0]);
+        $flag = 0;
+        if ($imgQQ != $img && $imgQQ != $img2 && $imgQQ != $img3) {
+            $flag = 1;
+        }
+
+        $nickname = $str = preg_replace("/(\s|\&nbsp\;|　|\xc2\xa0)/", "", $qqInfo[6]); //去除空格
+        if (empty($user) && !empty($nickname) && $flag) {  //判断是否真实存在或者重复
+            list($province, $city) = City::randCity();
+            $avatar = QiniuHelper::fetchImg($qqInfo[0])[0]['key'];
+            if (!empty($avatar)) {
+                $data = [
+                    'session_key' => $sessionKey,
+                    'email' => $randQQ . '@qq.com',
+                    'open_id' => $openId,
+                    'nickname' => $nickname,
+                    'name' => $nickname,
+                    'avatar' => $avatar,
+                    'is_real' => USER::TYPE_REBOT,
+                    'token' => $token,
+                    'province' => $province,
+                    'city' => $city
+                ];
+                $model = User::create($data);
+                if ($model->save()) {
+                    Redis::hset('token', $token, $model->id);
+                    echo $randQQ . '成功保存<br>';
+                }
             }
-
-            list($res, $code) = Invite::inviteCreate($params['invite_mobile'], $userId);
-
-            if (!$code) {
-                throw new \Exception("$res");
-            }
-
-            // 统计推荐关系送积分, 之前已经暗绑定,因为用户提交了资料,所以可以明绑定了
-            $userInfoModel = new UserInfo();
-            // $userInfoModel->bindMobileAndAwardInviter($userInfo);
-
-            session(['user_id' => $userId]);
-            session()->save();
-            DB::commit();
-            return ['注册成功', 1];
-        } catch (\Exception $e) {
-            DB::rollback();
-            return [$e->getMessage(), -1];
+        } else {
+            echo $randQQ . '失败!<br/>';
         }
     }
-
 
     /** 绑定手机 */
     public function bindMobile($params, $userId)
@@ -105,7 +174,6 @@ class User extends Authenticatable
         DB::beginTransaction();
         try {
             $userInfo = DB::table('user_info')->where('user_id', $userId)->first();
-
             list($msg, $status) = Sms::check([
                 'user_id' => $userInfo->user_id,
                 'type' => 1,

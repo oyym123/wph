@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
-class Product extends Model
+class Product extends Common
 {
     use SoftDeletes;
 
@@ -17,4 +18,12 @@ class Product extends Model
         self::BUY_BY_DIFF_NO => '不可差价购',
         self::BUY_BY_DIFF_YES => '可差价购',
     ];
+
+    /** 获取产品数量 */
+    public static function counts()
+    {
+        return DB::table('product')->where(['status' => 1])->count();
+    }
+
+
 }

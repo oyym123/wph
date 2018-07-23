@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\Helper;
 use App\UserInfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
@@ -25,9 +26,9 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'session_key', 'open_id', 'token', 'nickname', 'avatar', 'is_real', 'status',
+        'province', 'city'
     ];
-
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -131,6 +132,8 @@ class User extends Authenticatable
             return [$e->getMessage(), -1];
         }
     }
+
+
 
     /** 获取用户信息表 */
     public function UserInfo()
