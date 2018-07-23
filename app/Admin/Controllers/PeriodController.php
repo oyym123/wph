@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Auctioneer;
 use App\Models\Period;
 
 use Encore\Admin\Form;
@@ -76,6 +77,7 @@ class PeriodController extends Controller
             $grid->id('ID')->sortable();
             $grid->code('期数代码');
             $grid->product_id('产品id')->sortable();
+            $grid->product_id('产品id')->sortable();
             $grid->status('状态');
 
             $grid->created_at('创建时间');
@@ -95,6 +97,7 @@ class PeriodController extends Controller
             $form->display('code', '期数代码');
             $form->display('product_id', '产品ID');
             $form->select('status', '状态')->options(Period::getStatus());
+            $form->select('auctioneer_id', '拍卖师')->options(Auctioneer::getName());
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '修改时间');
         });

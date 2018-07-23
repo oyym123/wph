@@ -3,12 +3,8 @@ namespace App\Api\components;
 
 use App\Helpers\Helper;
 use App\User;
-use EasyWeChat\Foundation\Application;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 
 class WebController extends Controller
@@ -19,11 +15,13 @@ class WebController extends Controller
     public $psize = 10;
     public $userId = 0;
     public $userIdent = 0;
+    public $request;
     public $token;
     public $weixin;
 
     public function __construct(Request $request)
     {
+        $request && $this->request = $request;
         $request->offset && $this->offset = $request->offset;
         $request->limit && $this->limit = $request->limit;
         // $request->psize && $this->psize = $request->psize;
@@ -82,24 +80,12 @@ class WebController extends Controller
     }
 
 
-    /** 获取用户信息 */
-    function getUser_info()
-    {
-        if (!$this->isWindows()) {  //本地的时候不需要网页授权
-            $this->weixinWebOauth(); // 需要网页授权登录
-        } else {
-            session(['user_id' => 1]); //本地环境模拟用户id为1
-            session()->save();
-        }
-        $userInfo = DB::table('user_info')->where('user_id', session('user_id'))->first();
-    }
-
     public function needLogin()
     {
         if ($this->token) {
-            self::showMsg('登录已过期', -100);
+            self::showMsg('登录已过期', 1);
         }
-        self::showMsg('需要登录', -100);
+        self::showMsg('需要登录', 1);
     }
 
     /** 身份验证 */

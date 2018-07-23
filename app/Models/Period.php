@@ -79,10 +79,109 @@ class Period extends Common
                 'img_cover' => $product->img_cover,
                 'sell_price' => $product->sell_price,
                 'bid_step' => $product->bid_step,
-                'is_favorite' => $collection->isCollect($this->userId, $product->id),
+                'is_favorite' => $collection->isColl0ect($this->userId, $product->id),
             ];
         }
         return $data;
+    }
+
+    /** 获取产品详情 */
+    public function getProductDetail($id)
+    {
+        $period = $this->getPeriod($id);
+        $product = $period->product;
+        $auctioneer = $period->Auctioneer;
+        $collection = new Collection();
+        $data = [
+            'detail' => [
+                'id' => $period->id,
+                'period_status' => $period->status,
+                'product_id' => $period->product_id,
+                'period_code' => $period->code,
+                'title' => $product->title,
+                'product_type' => $product->type,
+                'img_cover' => $product->img_cover,
+                'imgs' => $product->imgs,
+                'sell_price' => $product->sell_price,
+                'bid_step' => $product->step,
+                'price_add_length' => $product->price_add_length,
+                'init_price' => $product->init_price,
+                'countdown_length' => $product->countdown_length,
+                'is_voucher_bids_enable' => 1,
+                'buy_by_diff' => $product->buy_by_diff,
+                'settlement_bid_id' => 'b1b7b2ae63f70ab2016465b1307b6061',
+                'auctioneer_id' => $period->auctioneer_id,
+                'is_favorite' => $collection->isCollect($this->userId, $product->id),
+                'product_status' => $product->status,
+                'default_offer' => 5,
+                'offer_ladder' => '10,20,50,66',
+                'have_show' => 0,
+                'auction_avatar' => Auctioneer::AUCTION_AVATAR,
+                'auction_id' => Auctioneer::AUCTION_ID,
+                'auction_name' => Auctioneer::AUCTION_NAME,
+                'auctioneer_avatar' => $auctioneer->image,
+                'auctioneer_license' => $auctioneer->number,
+                'auctioneer_name' => $auctioneer->name,
+            ],
+        ];
+        //  return $data;
+        $data = array(
+            'expended' =>
+                array(
+                    'used_real_bids' => 0,
+                    'used_voucher_bids' => 0,
+                    'used_money' => '0.00',
+                    'is_buy_differential_able' => 0,
+                    'buy_differential_money' => '0.00',
+                    'order_id' => NULL,
+                    'order_type' => NULL,
+                    'need_to_bided_pay' => 0,
+                    'need_to_bided_pay_price' => '0.00',
+                    'return_bids' => 0,
+                    'return_shop_bids' => 0,
+                    'pay_status' => 0,
+                    'pay_time' => 0,
+                ),
+
+            'proxy' =>
+                array(),
+            'price' =>
+                array(
+                    'c' => 0,
+                    'd' => '377.50',
+                    'h' => NULL,
+                    'g' => NULL,
+                    'b' => NULL,
+                    'e' => NULL,
+                    'f' => NULL,
+                    'a' => NULL,
+                ),
+            'bid_records' =>
+                array(
+                    0 =>
+                        array(
+                            'area' => '江西南昌',
+                            'bid_nickname' => '不可忽视的激情',
+                            'bid_no' => 3775,
+                            'bid_price' => '377.50',
+                        ),
+                    1 =>
+                        array(
+                            'area' => '陕西西安',
+                            'bid_nickname' => 'appouu',
+                            'bid_no' => 3774,
+                            'bid_price' => '377.40',
+                        ),
+                    2 =>
+                        array(
+                            'area' => '江西南昌',
+                            'bid_nickname' => '不可忽视的激情',
+                            'bid_no' => 3773,
+                            'bid_price' => '377.30',
+                        ),
+                ),
+        );
+
     }
 
     /**
@@ -105,6 +204,7 @@ class Period extends Common
 
         $data = [
             'product_id' => $product_id,
+            'auctioneer_id' => Auctioneer::randAuctioneer(),
             'code' => $code,
         ];
         $model = self::create($data);
@@ -121,5 +221,20 @@ class Period extends Common
     public function User()
     {
         return $this->hasOne('App\User', 'id', 'user_id');
+    }
+
+    /** 获取拍卖师表信息 */
+    public function Auctioneer()
+    {
+        return $this->hasOne('App\Models\Auctioneer', 'id', 'auctioneer_id');
+    }
+
+    public function getPeriod($id)
+    {
+        if ($model = Period::find($id)) {
+            return $model;
+        }
+        list($info, $status) = $this->returnRes('', self::CODE_NO_DATA);
+        self::showMsg($info, $status);
     }
 }

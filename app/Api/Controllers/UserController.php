@@ -109,6 +109,8 @@ class UserController extends WebController
             }
             Redis::hset('token', $token, $model->id);
             self::showMsg(['token' => $token]);
+        } else {
+            self::showMsg(['token' => '']);
         }
     }
 

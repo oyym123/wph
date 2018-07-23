@@ -16,11 +16,11 @@ use App\Models\ProductType;
 use Composer\DependencyResolver\Request;
 use Illuminate\Support\Facades\Input;
 
+
 class ProductController extends WebController
 {
 
     /**
-     *
      * @SWG\Get(path="/api/product",
      *   tags={"产品"},
      *   summary="产品列表",
@@ -37,7 +37,7 @@ class ProductController extends WebController
      * )
      *
      */
-    public function index(Request $request)
+    public function index()
     {
         $period = new Period();
         $period->userId = $this->userId;
@@ -51,103 +51,94 @@ class ProductController extends WebController
      *   tags={"产品"},
      *   summary="商品详情",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
+     *   @SWG\Parameter(name="period_id", in="query", default="", description="",required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="token", in="header", default="", description="用户token",
      *     type="string",
      *   ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *             [expended] => Array 用户消耗的
+     *                       (
+     *                          [used_real_bids] => 0
+     *                          [used_voucher_bids] => 0
+     *                          [used_money] => 0.00
+     *                          [is_buy_differential_able] => 0
+     *                          [buy_differential_money] => 0.00
+     *                          [order_id] =>
+     *                          [order_type] =>
+     *                          [need_to_bided_pay] => 0
+     *                          [need_to_bided_pay_price] => 0.00
+     *                          [return_bids] => 0
+     *                          [return_shop_bids] => 0
+     *                          [pay_status] => 0
+     *                          [pay_time] => 0
+     *                      )
+     *              [detail] => Array
+     *                      (
+     *                          [id] => 期数id
+     *                          [period_status] => 2
+     *                          [product_id] => 1042
+     *                          [period_code] => 期数代码
+     *                          [title] => 预售 三星 Galaxy A9 Star 4GB+64GB 颜色随机
+     *                          [product_type] => 0
+     *                          [img_cover] => 1529055804660
+     *                          [imgs] => 1529055809318,1529055809433,1529055809639,1529055809710,1529055809774
+     *                          [sell_price] =>3299.00
+     *                          [bid_step] => 1
+     *                          [price_add_length] => 0.1
+     *                          [init_price] => 0.00
+     *                          [countdown_length] => 10
+     *                          [is_voucher_bids_enable] => 1
+     *                          [buy_by_diff] => 1
+     *                          [settlement_bid_id] => b1b7b2ae63f70ab2016465b1307b6061
+     *                          [auctioneer_id] => 5
+     *                          [is_favorite] => 0
+     *                          [product_status] => 3
+     *                          [default_offer] => 5
+     *                          [offer_ladder] => 10,20,50,66
+     *                          [have_show] => 0
+     *                          [auction_avatar] => 1517297843391
+     *                          [auction_id] => 1
+     *                          [auction_name] => 诺诺拍卖行
+     *                          [auctioneer_avatar] => 1520580890766
+     *                          [auctioneer_license] => 2300410
+     *                          [auctioneer_name] => 陈英嫦
+     *                      )
+     *              [proxy] => Array
+     *                      (
+     *                      )
+     *
+     *              [price] => Array
+     *                      (
+     *                          [c] => 0
+     *                          [d] => 377.50
+     *                          [h] =>
+     *                          [g] =>
+     *                          [b] =>
+     *                          [e] =>
+     *                          [f] =>
+     *                          [a] =>
+     *                      )
+     *              [bid_records] => Array
+     *                      (
+     *                      [0] => Array
+     *                      (
+     *                          [area] => 江西南昌
+     *                          [bid_nickname] => 不可忽视的激情
+     *                          [bid_no] => 3775
+     *                          [bid_price] => 377.50
+     *                      )
+     *              )
+     *     "
      *   )
      * )
      */
     public function detail()
     {
-        $data = array(
-            'expended' =>
-                array(
-                    'used_real_bids' => 0,
-                    'used_voucher_bids' => 0,
-                    'used_money' => '0.00',
-                    'is_buy_differential_able' => 0,
-                    'buy_differential_money' => '0.00',
-                    'order_id' => NULL,
-                    'order_type' => NULL,
-                    'need_to_bided_pay' => 0,
-                    'need_to_bided_pay_price' => '0.00',
-                    'return_bids' => 0,
-                    'return_shop_bids' => 0,
-                    'pay_status' => 0,
-                    'pay_time' => 0,
-                ),
-            'detail' =>
-                array(
-                    'id' => 4505048,
-                    'period_status' => 2,
-                    'product_id' => 1042,
-                    'period_code' => '201807040003',
-                    'title' => '预售 三星 Galaxy A9 Star 4GB+64GB 颜色随机',
-                    'product_type' => 0,
-                    'img_cover' => '1529055804660',
-                    'imgs' => '1529055809318,1529055809433,1529055809639,1529055809710,1529055809774',
-                    'sell_price' => '3299.00',
-                    'bid_step' => 1,
-                    'price_add_length' => 0.10000000000000001,
-                    'init_price' => '0.00',
-                    'countdown_length' => 10,
-                    'is_voucher_bids_enable' => 1,
-                    'buy_by_diff' => 1,
-                    'settlement_bid_id' => 'b1b7b2ae63f70ab2016465b1307b6061',
-                    'auctioneer_id' => 5,
-                    'is_favorite' => 0,
-                    'product_status' => 3,
-                    'default_offer' => 5,
-                    'offer_ladder' => '10,20,50,66',
-                    'have_show' => 0,
-                    'auction_avatar' => '1517297843391',
-                    'auction_id' => 1,
-                    'auction_name' => '诺诺拍卖行',
-                    'auctioneer_avatar' => '1520580890766',
-                    'auctioneer_license' => '2300410',
-                    'auctioneer_name' => '陈英嫦',
-                ),
-            'proxy' =>
-                array(),
-            'price' =>
-                array(
-                    'c' => 0,
-                    'd' => '377.50',
-                    'h' => NULL,
-                    'g' => NULL,
-                    'b' => NULL,
-                    'e' => NULL,
-                    'f' => NULL,
-                    'a' => NULL,
-                ),
-            'bid_records' =>
-                array(
-                    0 =>
-                        array(
-                            'area' => '江西南昌',
-                            'bid_nickname' => '不可忽视的激情',
-                            'bid_no' => 3775,
-                            'bid_price' => '377.50',
-                        ),
-                    1 =>
-                        array(
-                            'area' => '陕西西安',
-                            'bid_nickname' => 'appouu',
-                            'bid_no' => 3774,
-                            'bid_price' => '377.40',
-                        ),
-                    2 =>
-                        array(
-                            'area' => '江西南昌',
-                            'bid_nickname' => '不可忽视的激情',
-                            'bid_no' => 3773,
-                            'bid_price' => '377.30',
-                        ),
-                ),
-        );
-        self::showMsg($data);
+        $period = new  Period();
+        self::showMsg($period->getProductDetail($this->request->period_id));
     }
 
 
