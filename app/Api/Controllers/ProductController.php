@@ -40,6 +40,7 @@ class ProductController extends WebController
      */
     public function index()
     {
+
         $period = new Period();
         $period->userId = $this->userId;
         $period->limit = $this->limit;

@@ -95,13 +95,13 @@ class Bid extends Common
             }
 
             $countdown = $redis->ttl('period@countdown' . $period->id);
-            //当倒计时结束时,机器人将不会竞拍
-            if ($countdown < 0) {
-                echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束，或者没有倒计时']);
-                continue;
-            }
-
+            
             if ($countdown == 3) {
+                //当倒计时结束时,机器人将不会竞拍
+                if ($countdown < 0) {
+                    echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束，或者没有倒计时']);
+                    continue;
+                }
                 $product = $products->getCacheProduct($period->product_id);
                 $robotPeriod = RobotPeriod::getInfo($period->id);
                 DB::table('period')->where(['id' => $period->id])->increment('bid_price', 0.1);//自增0.1
