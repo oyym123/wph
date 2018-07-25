@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class Period extends Common
 {
@@ -256,20 +257,21 @@ class Period extends Common
             ->first();
 
         $period = $check ? intval(substr($check->code, -4)) : 0;
-
         $code = date('Ymd', time()) . str_pad($period + 1, 4, '0', STR_PAD_LEFT);
-
         $data = [
             'product_id' => $productId,
             'auctioneer_id' => Auctioneer::randAuctioneer(),
             'status' => self::STATUS_IN_PROGRESS,
-            'robot_rate' => mt_rand(4, 20) / 100,
+            'robot_rate' => config('bid.robot_rate'),
             'person_rate' => mt_rand(100, 150) / 100,
             'code' => $code,
         ];
         $model = self::create($data);
+        $redis = app('redis')->connection('first');
+        $redis->setex('period@countdown' . $model->id, config('bid.init_countdown'), 1);
         RobotPeriod::batchSave($model->id, $productId);
     }
+
 
     /** 获取产品表信息 */
     public function Product()
