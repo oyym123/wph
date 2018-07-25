@@ -90,13 +90,13 @@ class Bid extends Common
         foreach ($periods->getAll() as $period) {
             //当有真人参与，且跟拍到平均价以上时，机器人将不跟拍
             if ($this->hasCache('realPersonBid@periodId' . $period->id)) {
-                $this->writeLog(['有真人参与，且跟拍到平均价以上，机器人将不跟拍']);
+                echo $this->writeLog(['有真人参与，且跟拍到平均价以上，机器人将不跟拍']);
                 continue;
             }
 
             //当倒计时结束时,机器人将不会竞拍
             if ($redis->ttl('period@countdown' . $period->id) < 0) {
-                $this->writeLog(['竞拍倒计时结束，或者没有倒计时']);
+                echo $this->writeLog(['竞拍倒计时结束，或者没有倒计时']);
                 continue;
             }
 
