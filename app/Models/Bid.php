@@ -101,10 +101,7 @@ class Bid extends Common
             }
 
             $robotPeriod = RobotPeriod::getInfo($period->id);
-            DB::table('period')->where(['id' => $period->id])->increment('bid_price', 0.1);//自增0.1
-
             $rate = $period->bid_price / $product->sell_price;
-
             $time = date('Y-m-d H:i:s', time());
             $data = [
                 'product_id' => $period->product_id,
@@ -119,7 +116,7 @@ class Bid extends Common
                 'updated_at' => $time,
                 'end_time' => $time
             ];
-
+            DB::table('period')->where(['id' => $period->id])->increment('bid_price', 0.1);//自增0.1
             if ($data['status'] == self::STATUS_SUCCESS) {
                 //竞拍成功则立即保存
                 Bid::create($data);
