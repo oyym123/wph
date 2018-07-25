@@ -95,50 +95,47 @@ class Bid extends Common
             }
 
             $countdown = $redis->ttl('period@countdown' . $period->id);
+            //当倒计时结束时,机器人将不会竞拍
+            if ($countdown < 0) {
+                echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束，或者没有倒计时']);
+                continue;
+            }
 
-            if ($countdown == 3) {
+            $product = $products->getCacheProduct($period->product_id);
+            $robotPeriod = RobotPeriod::getInfo($period->id);
+            DB::table('period')->where(['id' => $period->id])->increment('bid_price', 0.1);//自增0.1
+            $rate = $period->bid_price / $product->sell_price;
+
+            $time = date('Y-m-d H:i:s', time());
+            $data = [
+                'product_id' => $period->product_id,
+                'period_id' => $period->id,
+                'bid_price' => $period->bid_price + $product->bid_step,
+                'user_id' => $robotPeriod->user_id,
+                'status' => $this->isCanWinBid($period, $rate, $redis),
+                'bid_step' => 1,
+                'nickname' => $robotPeriod->nickname,
+                'product_title' => $product->title,
+                'created_at' => $time,
+                'updated_at' => $time,
+                'end_time' => $time
+            ];
+
+            if ($data['status'] == self::STATUS_SUCCESS) {
+                //竞拍成功则立即保存
+                Bid::create($data);
+                //转换状态
+                DB::table('period')->where(['id' => $period->id])->update(['status' => Period::STATUS_OVER]);
+                //新增该产品新的期数
+                $periods->saveData($period->product_id);
+                //同时清除期数缓存
+                $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
+            } else {
+                //重置倒计时
                 $redis->setex('period@countdown' . $period->id, 10, 1);
-                //当倒计时结束时,机器人将不会竞拍
-                if ($countdown < 0) {
-                    echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束，或者没有倒计时']);
-                    continue;
-                }
-                $product = $products->getCacheProduct($period->product_id);
-                $robotPeriod = RobotPeriod::getInfo($period->id);
-                DB::table('period')->where(['id' => $period->id])->increment('bid_price', 0.1);//自增0.1
-                $rate = $period->bid_price / $product->sell_price;
-
-                $time = date('Y-m-d H:i:s', time());
-                $data = [
-                    'product_id' => $period->product_id,
-                    'period_id' => $period->id,
-                    'bid_price' => $period->bid_price + $product->bid_step,
-                    'user_id' => $robotPeriod->user_id,
-                    'status' => $this->isCanWinBid($period, $rate, $redis),
-                    'bid_step' => 1,
-                    'nickname' => $robotPeriod->nickname,
-                    'product_title' => $product->title,
-                    'created_at' => $time,
-                    'updated_at' => $time,
-                    'end_time' => $time
-                ];
-
-                if ($data['status'] == self::STATUS_SUCCESS) {
-                    //竞拍成功则立即保存
-                    Bid::create($data);
-                    //转换状态
-                    DB::table('period')->where(['id' => $period->id])->update(['status' => Period::STATUS_OVER]);
-                    //新增该产品新的期数
-                    $periods->saveData($period->product_id);
-                    //同时清除期数缓存
-                    $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
-                } else {
-                    //重置倒计时
-                    $redis->setex('period@countdown' . $period->id, 10, 1);
-                    //加入竞拍队列，3秒之后进入数据库Bid表
-                    $model = (new BidTask($data))->delay(Carbon::now()->addSeconds(mt_rand(1, 4)));
-                    dispatch($model);
-                }
+                //加入竞拍队列，3秒之后进入数据库Bid表
+                $model = (new BidTask($data));
+                dispatch($model);
             }
         }
     }
