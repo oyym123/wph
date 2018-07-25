@@ -269,7 +269,7 @@ class Period extends Common
         $model = self::create($data);
         $redis = app('redis')->connection('first');
         //设置倒计时初始时间和初始价格
-        $redis->setex('period@countdown' . $model->id, config('bid.init_countdown'), 0);
+        $redis->setex('period@countdown' . $model->id, config('bid.init_countdown'), 1);
         RobotPeriod::batchSave($model->id, $productId);
     }
 

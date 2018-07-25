@@ -100,7 +100,7 @@ class Bid extends Common
                 echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束，或者没有倒计时']);
                 continue;
             }
-            
+
             if ($countdown == 3) {
                 $product = $products->getCacheProduct($period->product_id);
                 $robotPeriod = RobotPeriod::getInfo($period->id);
@@ -133,7 +133,7 @@ class Bid extends Common
                     $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
                 } else {
                     //重置倒计时
-                    $redis->setex('period@countdown' . $period->id, $product->countdown_length, 1);
+                    $redis->setex('period@countdown' . $period->id, 10, 1);
                     //加入竞拍队列，3秒之后进入数据库Bid表
                     $model = (new BidTask($data))->delay(Carbon::now()->addSeconds(mt_rand(1, 4)));
                     dispatch($model);
