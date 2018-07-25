@@ -213,6 +213,12 @@ class Common extends Model
         !empty($this->$attribute) && $this->$attribute = strtotime($this->$attribute);
     }
 
+    /** 写入日志的格式 */
+    public function writeLog($data)
+    {
+        return date('Y-m-d H:i:s') . "\n" . var_export($data, 1) . "\n";
+    }
+
     public static function p($data)
     {
         echo '<pre>';
