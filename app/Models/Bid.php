@@ -95,8 +95,9 @@ class Bid extends Common
             }
 
             $countdown = $redis->ttl('period@countdown' . $period->id);
-            
+
             if ($countdown == 3) {
+                $redis->setex('period@countdown' . $period->id, 10, 1);
                 //当倒计时结束时,机器人将不会竞拍
                 if ($countdown < 0) {
                     echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束，或者没有倒计时']);
