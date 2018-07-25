@@ -93,16 +93,16 @@ class Bid extends Common
                 echo $this->writeLog(['有真人参与，且跟拍到平均价以上，机器人将不跟拍']);
                 continue;
             }
-
+            $product = $products->getCacheProduct($period->product_id);
             //当倒计时结束时,机器人将不会竞拍
             if ($redis->ttl('period@countdown' . $period->id) < 0) {
-                echo $this->writeLog(['竞拍倒计时结束，或者没有倒计时']);
+                echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束，或者没有倒计时']);
                 continue;
             }
 
             $robotPeriod = RobotPeriod::getInfo($period->id);
             DB::table('period')->where(['id' => $period->id])->increment('bid_price', 0.1);//自增0.1
-            $product = $products->getCacheProduct($period->product_id);
+
             $rate = $period->bid_price / $product->sell_price;
 
             $time = date('Y-m-d H:i:s', time());
@@ -132,8 +132,7 @@ class Bid extends Common
             } else {
                 //重置倒计时
                 $redis->setex('period@countdown' . $period->id, $product->countdown_length, 1);
-                //加入竞拍队列，3秒之后进入数据库Bid表
-                $model = (new BidTask($data))->delay(Carbon::now()->addSeconds(3));
+                $model = (new BidTask($data));
                 dispatch($model);
             }
         }
