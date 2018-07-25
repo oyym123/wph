@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class Period extends Common
@@ -18,14 +19,19 @@ class Period extends Common
     protected $fillable = [
         'product_id',
         'code',
+        'status',
+        'robot_rate',
+        'person_rate',
     ];
 
     protected $table = 'period';
 
+    const STATUS_NOT_START = 10;
+    const STATUS_IN_PROGRESS = 20;
+    const STATUS_OVER = 30;
 
-    const STATUS_NOT_START = 0;
-    const STATUS_IN_PROGRESS = 1;
-    const STATUS_OVER = 2;
+    const REAL_PERSON_YES = 1;
+    const REAL_PERSON_NO = 0;
 
     public static function getStatus($key = 999)
     {
@@ -48,9 +54,10 @@ class Period extends Common
                 'id' => $period->id,
                 'period_code' => $period->code,
                 'bid_price' => $period->bid_price,
-                'user_id' => $period->user_id,
                 'nickname' => $period->user ? $period->user->nickname : '',
+                'avatar' => $period->user ? $period->user->getAvatar() : '',
                 'title' => $product->title,
+                'short_title' => $product->title,
                 'bid_step' => $product->bid_step,
                 'end_time' => $period->bid_end_time,
                 'img_cover' => $product->img_cover,
@@ -58,7 +65,7 @@ class Period extends Common
                 'sell_price' => $product->sell_price,
             ];
         }
-        return $data;
+        return $this->getCache('period@dealEnd', $data, 1);
     }
 
     /** 获取产品列表 */
@@ -79,10 +86,10 @@ class Period extends Common
                 'img_cover' => $product->img_cover,
                 'sell_price' => $product->sell_price,
                 'bid_step' => $product->bid_step,
-                'is_favorite' => $collection->isColl0ect($this->userId, $product->id),
+                'is_favorite' => $collection->isCollect($this->userId, $product->id),
             ];
         }
-        return $data;
+        return $this->getCache('period@getProductList', $data, 0.1);
     }
 
     /** 获取产品详情 */
@@ -109,7 +116,7 @@ class Period extends Common
                 'countdown_length' => $product->countdown_length,
                 'is_voucher_bids_enable' => 1,
                 'buy_by_diff' => $product->buy_by_diff,
-                'settlement_bid_id' => 'b1b7b2ae63f70ab2016465b1307b6061',
+                'settlement_bid_id' => $period->bid_id,
                 'auctioneer_id' => $period->auctioneer_id,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
                 'product_status' => $product->status,
@@ -123,26 +130,47 @@ class Period extends Common
                 'auctioneer_license' => $auctioneer->number,
                 'auctioneer_name' => $auctioneer->name,
             ],
+            'expended' => [
+                'used_real_bids' => 0,
+                'used_voucher_bids' => 0,
+                'used_money' => '0.00',
+                'is_buy_differential_able' => 0,
+                'buy_differential_money' => '0.00',
+                'order_id' => NULL,
+                'order_type' => NULL,
+                'need_to_bided_pay' => 0,
+                'need_to_bided_pay_price' => '0.00',
+                'return_bids' => 0,
+                'return_shop_bids' => 0,
+                'pay_status' => 0,
+                'pay_time' => 0,
+            ],
+            'bid_records' => [
+                0 =>
+                    array(
+                        'area' => '江西南昌',
+                        'bid_nickname' => '不可忽视的激情',
+                        'bid_no' => 3775,
+                        'bid_price' => '377.50',
+                    ),
+                1 =>
+                    array(
+                        'area' => '陕西西安',
+                        'bid_nickname' => 'appouu',
+                        'bid_no' => 3774,
+                        'bid_price' => '377.40',
+                    ),
+                2 =>
+                    array(
+                        'area' => '江西南昌',
+                        'bid_nickname' => '不可忽视的激情',
+                        'bid_no' => 3773,
+                        'bid_price' => '377.30',
+                    ),
+            ]
         ];
-        //  return $data;
+        return $data;
         $data = array(
-            'expended' =>
-                array(
-                    'used_real_bids' => 0,
-                    'used_voucher_bids' => 0,
-                    'used_money' => '0.00',
-                    'is_buy_differential_able' => 0,
-                    'buy_differential_money' => '0.00',
-                    'order_id' => NULL,
-                    'order_type' => NULL,
-                    'need_to_bided_pay' => 0,
-                    'need_to_bided_pay_price' => '0.00',
-                    'return_bids' => 0,
-                    'return_shop_bids' => 0,
-                    'pay_status' => 0,
-                    'pay_time' => 0,
-                ),
-
             'proxy' =>
                 array(),
             'price' =>
@@ -181,20 +209,43 @@ class Period extends Common
                         ),
                 ),
         );
+    }
 
+//    /** 是否有真人参与 */
+//    public function isRealPerson($bidPrice)
+//    {
+//        $period = DB::table('period')->where([
+//            'id' => $bidPrice,
+//            'real_person' => self::REAL_PERSON_YES
+//        ])->first();
+//        return $this->getCache('period@isRealPerson' . $bidPrice, $period, 1);
+//    }
+
+    /** 获取所有期数，默认进行中 */
+    public function getAll($status = self::STATUS_IN_PROGRESS)
+    {
+        if ($this->hasCache('period@allInProgress' . $status)) {
+            return $this->getCache('period@allInProgress' . $status);
+        } else {
+            $periods = DB::table('period')->where([
+                'status' => $status,
+                'deleted_at' => null
+            ])->get();
+            return $this->getCache('period@allInProgress' . $status, $periods, 0.1);
+        }
     }
 
     /**
      * 根据产品保存期数
      */
-    public function saveData($product_id)
+    public function saveData($productId)
     {
         $dayStart = date('Y-m-d', time()) . ' 00:00:00';
         $dayEnd = date('Y-m-d', time()) . ' 23:59:59';
 
         $check = DB::table('period')
             ->whereBetween('created_at', [$dayStart, $dayEnd])
-            ->where('product_id', '=', $product_id)
+            ->where('product_id', '=', $productId)
             ->orderBy('created_at', 'desc')
             ->first();
 
@@ -203,12 +254,15 @@ class Period extends Common
         $code = date('Ymd', time()) . str_pad($period + 1, 4, '0', STR_PAD_LEFT);
 
         $data = [
-            'product_id' => $product_id,
+            'product_id' => $productId,
             'auctioneer_id' => Auctioneer::randAuctioneer(),
+            'status' => self::STATUS_IN_PROGRESS,
+            'robot_rate' => mt_rand(4, 20) / 100,
+            'person_rate' => mt_rand(100, 150) / 100,
             'code' => $code,
         ];
         $model = self::create($data);
-        $model->save();
+        RobotPeriod::batchSave($model->id, $productId);
     }
 
     /** 获取产品表信息 */

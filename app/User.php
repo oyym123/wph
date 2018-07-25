@@ -5,6 +5,7 @@ namespace App;
 use App\Helpers\Helper;
 use App\Helpers\QiniuHelper;
 use App\Models\City;
+use App\Models\Common;
 use App\UserInfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
@@ -43,14 +44,22 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    const TYPE_REBOT = 0; //机器人
+    const STATUS_DISABLE = 0;   // 无效
+    const STATUS_ENABLE = 1;    // 有效
+
+    const TYPE_ROBOT = 0; //机器人
     const TYPE_REAL_PERSON = 1; //真人
+
+    public function getAvatar()
+    {
+        return env('QINIU_URL_IMAGES') . $this->avatar;
+    }
 
     /** 获取身份 */
     public static function getIsReal($key = 999)
     {
         $data = [
-            self::TYPE_REBOT => '电脑人',
+            self::TYPE_ROBOT => '电脑人',
             self::TYPE_REAL_PERSON => '真人',
         ];
         return $key != 999 ? $data[$key] : $data;
@@ -130,7 +139,7 @@ class User extends Authenticatable
         $sessionKey = \Faker\Provider\Uuid::uuid();
         $openId = \Faker\Provider\Uuid::uuid();
         $token = md5(md5($openId . $sessionKey));
-        $user = DB::table('users')->where(['email' => $randQQ . '@qq.com', 'is_real' => User::TYPE_REBOT])->first();
+        $user = DB::table('users')->where(['email' => $randQQ . '@qq.com', 'is_real' => User::TYPE_ROBOT])->first();
 
 //        $img = file_get_contents('C:\xampp\htdocs\100.png'); //测试图片
 //        $img2 = file_get_contents('C:\xampp\htdocs\100.jpg'); //测试图片
@@ -157,7 +166,7 @@ class User extends Authenticatable
                     'nickname' => $nickname,
                     'name' => $nickname,
                     'avatar' => $avatar,
-                    'is_real' => USER::TYPE_REBOT,
+                    'is_real' => USER::TYPE_ROBOT,
                     'token' => $token,
                     'province' => $province,
                     'city' => $city
@@ -171,6 +180,33 @@ class User extends Authenticatable
         } else {
             echo $randQQ . '失败!<br/>';
         }
+    }
+    
+    /**
+     * 获取随机用户
+     */
+    public static function randUser($limit = 100)
+    {
+        $model = DB::table('users')
+            ->where([
+                'is_real' => self::TYPE_ROBOT,
+                'status' => self::STATUS_ENABLE
+            ])
+            ->inRandomOrder()
+            ->limit($limit)
+            ->get();
+        return $model;
+    }
+
+    /** 获取所有用户,默认是机器人 */
+    public function getAll($status = self::TYPE_ROBOT)
+    {
+        $model = DB::table('period')->where([
+            'is_real' => $status,
+            'deleted_at' => null
+        ])->get();
+        //缓存一天
+        return (new Common())->getCache('user@getAll' . $status, $model, 60 * 24);
     }
 
     /** 绑定手机 */

@@ -9,7 +9,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class Common extends Model
 {
@@ -57,7 +57,31 @@ class Common extends Model
         }
     }
 
+    /** 缓存数据，默认1分钟 */
+    public function getCache($key, $value = '', $time = 1)
+    {
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        } else {
+            Cache::put($key, $value, $time);
+            return $value;
+        }
+    }
 
+    public function hasCache($key)
+    {
+        if (Cache::has($key)) {
+            return true;
+        }
+    }
+
+    /** 清除缓存 */
+    public function delCache($key)
+    {
+        if (Cache::has($key)) {
+            return Cache::forget($key);
+        }
+    }
 
     public static function commonStatus($key = 999)
     {

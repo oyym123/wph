@@ -9,7 +9,6 @@
 namespace App\Api\Controllers;
 
 use App\Models\Bid;
-use Illuminate\Http\Request;
 use App\Api\components\WebController;
 
 class BidController extends WebController
@@ -19,16 +18,16 @@ class BidController extends WebController
      *   tags={"竞拍"},
      *   summary="每个用户竞拍时的接口",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="formData", default="", description="", required=true,
+     *   @SWG\Parameter(name="name", in="formData", default="1", description="", required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="open_id", in="formData", default="", description="", required=true,
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="product_id", in="formData", default="", description="", required=true,
+     *   @SWG\Parameter(name="product_id", in="formData", default="1", description="", required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="period_id", in="formData", default="", description="", required=true,
+     *   @SWG\Parameter(name="period_id", in="formData", default="7", description="", required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -36,21 +35,9 @@ class BidController extends WebController
      *   )
      * )
      */
-    public function bidding(Request $request)
+    public function bidding()
     {
-        print_r($request->input('name'));
-        $data = [
-            'product_id',
-            'period_id',
-            'bid_price',
-            'user_id',
-            'status',
-            'bid_step',
-            'nickname',
-            'product_title',
-            'end_time',
-        ];
-        $model = new Bid();
-        $model->saveData($data);
+        $bid = new Bid();
+        $bid->saveData($this->request);
     }
 }

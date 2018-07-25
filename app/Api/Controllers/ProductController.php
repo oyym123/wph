@@ -13,6 +13,7 @@ use App\Api\components\WebController;
 use App\Models\Period;
 use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\RobotPeriod;
 use Composer\DependencyResolver\Request;
 use Illuminate\Support\Facades\Input;
 

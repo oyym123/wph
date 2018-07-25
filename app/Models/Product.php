@@ -26,4 +26,12 @@ class Product extends Common
     }
 
 
+    public function getProduct($id)
+    {
+        if ($model = Product::find($id)) {
+            return $model;
+        }
+        list($info, $status) = $this->returnRes('', self::CODE_NO_DATA);
+        self::showMsg($info, $status);
+    }
 }

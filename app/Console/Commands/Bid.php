@@ -2,17 +2,16 @@
 
 namespace App\Console\Commands;
 
-use App\User;
 use Illuminate\Console\Command;
 
-class test extends Command
+class bid extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'test';
+    protected $signature = 'bid';
 
     /**
      * The console command description.
@@ -38,7 +37,7 @@ class test extends Command
      */
     public function handle()
     {
-        $user = new User();
-        $user->rebotRegister();
+        $bid = new \App\Models\Bid();
+        $bid->robotBid();
     }
 }
