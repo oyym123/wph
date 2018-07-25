@@ -25,6 +25,16 @@ class Product extends Common
         return DB::table('product')->where(['status' => 1])->count();
     }
 
+    /** 获取缓存的产品信息 */
+    public function getCacheProduct($productId)
+    {
+        $key = 'product@find' . $productId;
+        if ($this->hasCache($key)) {
+            return $this->getCache($key);
+        } else {
+            return $this->putCache($key, Product::find($productId), 10);
+        }
+    }
 
     public function getProduct($id)
     {

@@ -71,6 +71,11 @@ class Period extends Common
     /** 获取产品列表 */
     public function getProductList()
     {
+        $cacheKey = 'period@getProductList';
+        if ($this->hasCache($cacheKey)) {
+            return $this->getCache($cacheKey);
+        }
+
         $data = [];
         $periods = DB::table('period')->where([
             'deleted_at' => null
@@ -89,7 +94,7 @@ class Period extends Common
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
             ];
         }
-        return $this->getCache('period@getProductList', $data, 0.1);
+        return $this->putCache($cacheKey, $data, 0.1);
     }
 
     /** 获取产品详情 */
@@ -224,14 +229,15 @@ class Period extends Common
     /** 获取所有期数，默认进行中 */
     public function getAll($status = self::STATUS_IN_PROGRESS)
     {
-        if ($this->hasCache('period@allInProgress' . $status)) {
-            return $this->getCache('period@allInProgress' . $status);
+        $cacheKey = 'period@allInProgress' . $status;
+        if ($this->hasCache($cacheKey)) {
+            return $this->getCache($cacheKey);
         } else {
             $periods = DB::table('period')->where([
                 'status' => $status,
                 'deleted_at' => null
             ])->get();
-            return $this->getCache('period@allInProgress' . $status, $periods, 0.1);
+            return $this->putCache($cacheKey, $periods, 0.1);
         }
     }
 

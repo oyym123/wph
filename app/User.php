@@ -198,16 +198,16 @@ class User extends Authenticatable
         return $model;
     }
 
-    /** 获取所有用户,默认是机器人 */
-    public function getAll($status = self::TYPE_ROBOT)
-    {
-        $model = DB::table('period')->where([
-            'is_real' => $status,
-            'deleted_at' => null
-        ])->get();
-        //缓存一天
-        return (new Common())->getCache('user@getAll' . $status, $model, 60 * 24);
-    }
+//    /** 获取所有用户,默认是机器人 */
+//    public function getAll($status = self::TYPE_ROBOT)
+//    {
+//        $model = DB::table('period')->where([
+//            'is_real' => $status,
+//            'deleted_at' => null
+//        ])->get();
+//        //缓存一天
+//        return (new Common())->getCache('user@getAll' . $status, $model, 60 * 24);
+//    }
 
     /** 绑定手机 */
     public function bindMobile($params, $userId)

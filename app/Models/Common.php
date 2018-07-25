@@ -58,20 +58,26 @@ class Common extends Model
     }
 
     /** 缓存数据，默认1分钟 */
-    public function getCache($key, $value = '', $time = 1)
+    public function getCache($key)
     {
         if (Cache::has($key)) {
             return Cache::get($key);
-        } else {
-            Cache::put($key, $value, $time);
-            return $value;
         }
+    }
+
+    /** 缓存数据，默认1分钟 */
+    public function putCache($key, $value, $time = 1)
+    {
+        Cache::put($key, $value, $time);
+        return $value;
     }
 
     public function hasCache($key)
     {
         if (Cache::has($key)) {
             return true;
+        } else {
+            return false;
         }
     }
 

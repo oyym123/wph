@@ -78,10 +78,11 @@ class Bid extends Common
     public function robotBid()
     {
         $periods = new Period();
+        $products = new Product();
         foreach ($periods->getAll() as $period) {
             $robotPeriod = RobotPeriod::getInfo($period->id);
             DB::table('period')->where(['id' => $period->id])->increment('bid_price', 0.1);//自增0.1
-            $product = $this->getCache('product@find' . $period->product_id, Product::find($period->product_id), 10);
+            $product = $products->getCacheProduct($period->product_id);
             $rate = $period->bid_price / $product->sell_price;
             $time = date('Y-m-d H:i:s', time());
             $data = [
@@ -103,7 +104,7 @@ class Bid extends Common
                 DB::table('period')->where(['id' => $period->id])->update(['status' => Period::STATUS_OVER]);//自增0.1
                 $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
             } else {
-                //加入竞拍队列，5秒之后进入数据库Bid表
+                //加入竞拍队列，3秒之后进入数据库Bid表
                 $model = (new BidTask($data))->delay(Carbon::now()->addSeconds(3));
                 dispatch($model);
             }
