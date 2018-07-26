@@ -68,7 +68,7 @@ class Bid extends Common
                 //当竞拍结束时
                 if ($redis->ttl('period@countdown' . $period->id) < 0) {
                     $redis->hdel('period@countdown' . $period->id);
-                    return self::STATUS_FAIL;
+                    return self::STATUS_SUCCESS;
                 }
             }
             return self::STATUS_FAIL;
@@ -95,11 +95,17 @@ class Bid extends Common
             }
 
             $countdown = $redis->ttl('period@countdown' . $period->id);
-            //当倒计时结束时,机器人将不会竞拍
-            if ($countdown < 0) {
-                echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束，或者没有倒计时']);
-                continue;
+
+            if ($countdown < 2) {
+                //重置倒计时
+                $redis->setex('period@countdown' . $period->id, 10, 1);
             }
+
+//            //当倒计时结束时,机器人将不会竞拍
+//            if ($countdown < 0) {
+//                echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束，或者没有倒计时']);
+//                continue;
+//            }
 
             $product = $products->getCacheProduct($period->product_id);
             $robotPeriod = RobotPeriod::getInfo($period->id);
