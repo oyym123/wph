@@ -67,14 +67,14 @@ class Bid extends Common
                 $this->putCache('realPersonBid@periodId' . $period->id, $period->id, 60 * 24 * 365);
                 //当竞拍结束时
                 if ($redis->ttl('period@countdown' . $period->id) < 0) {
-                    $redis->hdel('period@countdown' . $period->id);
+                    $redis->setex('period@countdown' . $period->id, 10000, 'success');
                     return self::STATUS_SUCCESS;
                 }
             }
             return self::STATUS_FAIL;
         } else { //当没有真人参与时，判断是否到达开奖值
             if ($rate >= $period->robot_rate) {
-                $redis->hdel('period@countdown' . $period->id);
+                $redis->setex('period@countdown' . $period->id, 10000, 'success');
                 return self::STATUS_SUCCESS;
             }
         }
@@ -94,20 +94,27 @@ class Bid extends Common
                 continue;
             }
 
-            $countdown = $redis->ttl('period@countdown' . $period->id);
 
-            if ($countdown < 2) {
-                //重置倒计时
-                $redis->setex('period@countdown' . $period->id, 10, 1);
+            $countdown = $redis->ttl('period@countdown' . $period->id);
+            $flag = $redis->get('period@countdown' . $period->id);
+
+            if ($countdown > 10) {
+                echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍还未开始']);
+                continue;
             }
 
-//            //当倒计时结束时,机器人将不会竞拍
-//            if ($countdown < 0) {
-//                echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束，或者没有倒计时']);
-//                continue;
-//            }
+            //当倒计时结束时,机器人将不会竞拍
+            if ($flag == 'success') {
+                echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束']);
+                continue;
+            }
 
             $product = $products->getCacheProduct($period->product_id);
+            if ($flag == $period->id . ($period->bid_price + $product->bid_step)) {
+                echo $this->writeLog(['period_id' => $period->id, 'info' => '该时段已经竞拍过一次啦，']);
+                continue;
+            }
+
             $robotPeriod = RobotPeriod::getInfo($period->id);
             DB::table('period')->where(['id' => $period->id])->increment('bid_price', 0.1);//自增0.1
             $rate = $period->bid_price / $product->sell_price;
@@ -138,7 +145,7 @@ class Bid extends Common
                 $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
             } else {
                 //重置倒计时
-                $redis->setex('period@countdown' . $period->id, 10, 1);
+                $redis->setex('period@countdown' . $period->id, 10, $period->id . $data['bid_price']);
                 //加入竞拍队列，3秒之后进入数据库Bid表
                 $model = (new BidTask($data));
                 dispatch($model);
