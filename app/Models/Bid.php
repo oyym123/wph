@@ -74,7 +74,7 @@ class Bid extends Common
             return self::STATUS_FAIL;
         } else { //当没有真人参与时，判断是否到达开奖值
             if ($rate >= $period->robot_rate) {
-                $redis->setex('period@countdown' . $period->id, 10000, 'success');
+                $redis->setex('period@robotSuccess' . $period->id, 10000, 'success');
                 return self::STATUS_SUCCESS;
             }
         }
@@ -97,6 +97,7 @@ class Bid extends Common
 
             $countdown = $redis->ttl('period@countdown' . $period->id);
             $flag = $redis->get('period@countdown' . $period->id);
+            $success = $redis->get('period@robotSuccess' . $period->id);
 
             if ($countdown > 10) {
                 echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍还未开始']);
@@ -104,7 +105,7 @@ class Bid extends Common
             }
 
             //当倒计时结束时,机器人将不会竞拍
-            if ($flag == 'success') {
+            if ($success == 'success') {
                 echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束']);
                 continue;
             }
