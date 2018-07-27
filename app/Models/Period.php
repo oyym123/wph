@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DeepCopy\f001\B;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
@@ -64,23 +65,47 @@ class Period extends Common
                 'img_cover' => $product->img_cover,
                 'product_id' => $product->id,
                 'sell_price' => $product->sell_price,
+                'product_type' => $product->type,
             ];
         }
-        return $this->getCache('period@dealEnd', $data, 1);
+        return $data;
     }
 
     /** 获取产品列表 */
-    public function getProductList()
+    public function getProductList($type = 1)
     {
         $cacheKey = 'period@getProductList';
         if ($this->hasCache($cacheKey)) {
             return $this->getCache($cacheKey);
         }
+        $where = [
+            'deleted_at' => null,
+            'status' => self::STATUS_IN_PROGRESS
+        ];
+
+        if ($type == 2) {
+            $periodIds = DB::table('bid')->select('period_id')->where([
+                'user_id' => $this->userId,
+                'status' => Bid::STATUS_FAIL
+            ])->get()->toArray();
+
+            $where = $where + [
+                    'id' => array_column($periodIds, 'period_id'),
+                ];
+
+        } elseif ($type == 3) {
+            $collectIds = DB::table('collection')->select('product_id')->where([
+                'user_id' => $this->userId,
+                'status' => Collection::STATUS_COLLECTION_YES
+            ])->get()->toArray();
+
+            $where = $where + [
+                    'product_id' => array_column($collectIds, 'product_id'),
+                ];
+        }
 
         $data = [];
-        $periods = DB::table('period')->where([
-            'deleted_at' => null
-        ])->offset($this->offset)->limit($this->limit)->get();
+        $periods = DB::table('period')->where($where)->offset($this->offset)->limit($this->limit)->get();
         $collection = new Collection();
         foreach ($periods as $period) {
             $product = Product::find($period->product_id);
@@ -292,9 +317,9 @@ class Period extends Common
         return $this->hasOne('App\Models\Auctioneer', 'id', 'auctioneer_id');
     }
 
-    public function getPeriod($id)
+    public function getPeriod($id, $where = [])
     {
-        if ($model = Period::find($id)) {
+        if ($model = Period::where($where + ['id' => $id])->first()) {
             return $model;
         }
         list($info, $status) = $this->returnRes('', self::CODE_NO_DATA);

@@ -11,7 +11,7 @@ class WebController extends Controller
 {
     public $enableCsrfValidation = false;
     public $offset = 0;
-    public $limit = 10;
+    public $limit = 20;
     public $psize = 10;
     public $userId = 0;
     public $userIdent = 0;
@@ -24,6 +24,9 @@ class WebController extends Controller
         $request && $this->request = $request;
         $request->offset && $this->offset = $request->offset;
         $request->limit && $this->limit = $request->limit;
+        if ($this->limit > 100) { //防止过度查询
+            $this->limit = 100;
+        }
         // $request->psize && $this->psize = $request->psize;
         $this->token = empty($_SERVER['HTTP_TOKEN']) ? '' : $_SERVER['HTTP_TOKEN'];
         $this->token && $this->userId = Redis::hget('token', $this->token);

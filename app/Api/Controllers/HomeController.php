@@ -4,6 +4,7 @@ namespace App\Api\Controllers;
 
 use App\Api\components\WebController;
 use App\Models\Period;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class HomeController extends WebController
@@ -15,110 +16,40 @@ class HomeController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/api/home/banner",
-     *   tags={"首页"},
-     *   summary="首页banner",
-     *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
-     *     type="string",
-     *   ),
-     *   @SWG\Response(
-     *       response=200,description="successful operation"
-     *   )
-     * )
-     */
-    public function banner()
-    {
-        $data = array(
-            0 =>
-                array(
-                    'id' => 5,
-                    'title' => '新手指引',
-                    'img' => env('QINIU_URL_IMAGES') . '1485314751522.jpg',
-                    'function' => 'html',
-                    'params' =>
-                        array(
-                            0 =>
-                                array(
-                                    'key' => 'url',
-                                    'type' => 'String',
-                                    'value' => $_SERVER["HTTP_HOST"] . '/api/newbie-guide',
-                                ),
-                            1 =>
-                                array(
-                                    'key' => 'to_promotion_status',
-                                    'type' => 'string',
-                                    'value' => 0,
-                                ),
-                        ),
-                    'to_promotion_status' => 0,
-                ),
-        );
-        self::showMsg($data);
-    }
-
-    /**
-     * @SWG\Get(path="/api/home/module",
-     *   tags={"首页"},
-     *   summary="",
-     *   description="Author: OYYM",
-     *   @SWG\Response(
-     *       response=200,description="
-     *              [id] => id
-     *              [title] => 标题
-     *              [img] => 封面图片
-     *              [url] => 地址
-     *     "
-     *   )
-     * )
-     */
-    public function module()
-    {
-        $data = array(
-            0 =>
-                array(
-                    'id' => 11,
-                    'title' => '充值',
-                    'img' => '1490015569219',
-                    'url' => 'recharge.html',
-                ),
-            1 =>
-                array(
-                    'id' => 13,
-                    'title' => '10元专区',
-                    'img' => '1490015605523',
-                    'url' => 'goods_list.html',
-                ),
-            2 =>
-                array(
-                    'id' => 14,
-                    'title' => '晒单',
-                    'img' => '1490015587751',
-                    'url' => 'share.html',
-
-                ),
-            3 =>
-                array(
-                    'id' => 12,
-                    'title' => '常见问题',
-                    'img' => '1490015634162',
-                    'url' => 'html',
-                ),
-        );
-        self::showMsg($data);
-    }
-
-    /**
      *
      * @SWG\Get(path="/api/home",
      *   tags={"首页"},
-     *   summary="",
+     *   summary="主页数据",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
-     *     type="string",
-     *   ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *           [banner] => Array
+     *                    (
+     *                        [0] => Array
+     *                           (
+     *                             [id] => 5
+     *                             [title] => 标题
+     *                             [img] => 图片地址
+     *                             [function] => html = url跳转类型
+     *                             [params] => Array
+     *                              (
+     *                                  [key] => url表示地址
+     *                                  [type] => String(类型)
+     *                                  [value] => 跳转的地址（根据这个跳转）
+     *                               )
+     *                           )
+     *                      )
+     *           [display_module] => Array
+     *                     (
+     *                          [0] => Array
+     *                             (
+     *                              [id] => 1
+     *                              [title] => 标题
+     *                              [img] => 图片地址
+     *                              [url] => 跳转的地址
+     *                              )
+     *                      )
+     *     "
      *   )
      * )
      *
@@ -127,33 +58,47 @@ class HomeController extends WebController
     {
         $data = [
             'banner' => [
-                'http://od83l5fvw.bkt.clouddn.com/1485314751522.jpg',
-                'http://od83l5fvw.bkt.clouddn.com/1485314751522.jpg'
+                [
+                    'id' => 1,
+                    'title' => '新手指引',
+                    'img' => env('QINIU_URL_IMAGES') . '1485314751522.jpg',
+                    'function' => 'html',
+                    'params' => [
+                        'key' => 'url',
+                        'type' => 'String',
+                        'value' => $_SERVER["HTTP_HOST"] . '/api/newbie-guide',
+                    ],
+                ],
             ],
             'display_module' => [
                 [
-                    'img' => 'http://od83l5fvw.bkt.clouddn.com/1499684610679.jpg',
-                    'title' => '签到'
+                    'id' => 1,
+                    'title' => '充值',
+                    'img' => env('QINIU_URL_IMAGES') . 'chongzhi2018.png',
+                    'url' => 'recharge.html',
                 ],
                 [
-                    'img' => 'http://od83l5fvw.bkt.clouddn.com/1499684610679.jpg',
-                    'title' => '充值'
+
+                    'id' => 2,
+                    'title' => '10元专区',
+                    'img' => env('QINIU_URL_IMAGES') . 'shiyuanzuanqv2018.png',
+                    'url' => 'goods_list.html',
+                ], [
+
+                    'id' => 3,
+                    'title' => '晒单',
+                    'img' => env('QINIU_URL_IMAGES') . 'shaidan2018.png',
+                    'url' => 'share.html',
+
                 ],
                 [
-                    'img' => 'http://od83l5fvw.bkt.clouddn.com/1499684610679.jpg',
-                    'title' => '10元专区'
-                ],
-                [
-                    'img' => 'http://od83l5fvw.bkt.clouddn.com/1499684610679.jpg',
-                    'title' => '晒单'
-                ],
-                [
-                    'img' => 'http://od83l5fvw.bkt.clouddn.com/1499684610679.jpg',
-                    'title' => '常见问题'
-                ],
+                    'id' => 4,
+                    'title' => '常见问题',
+                    'img' => env('QINIU_URL_IMAGES') . 'changjianwenti2018.png',
+                    'url' => 'html',
+                ]
             ]
         ];
-
         self::showMsg($data);
     }
 
@@ -162,9 +107,6 @@ class HomeController extends WebController
      *   tags={"首页"},
      *   summary="闪拍头条&已完成商品的接口数据",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
-     *     type="string",
-     *   ),
      *   @SWG\Response(
      *       response=200,description="
      *           [id] => 期数id
@@ -172,12 +114,14 @@ class HomeController extends WebController
      *           [bid_price] => 竞拍价格
      *           [user_id] => 用户id
      *           [nickname] => 用户昵称
+     *           [avatar] => 用户头像
      *           [title] => 标题
      *           [bid_step] => 竞拍单价
      *           [end_time] => 成交时间
      *           [img_cover] => 产品封面
      *           [product_id] => 产品id
-     *           [sell_price] => 产品售价 "
+     *           [sell_price] => 产品售价
+     *           [product_type] => 产品类型，当product_type=1时，表示为10元专区的产品，加上10元专区的logo "
      *   )
      * )
      */
@@ -189,148 +133,50 @@ class HomeController extends WebController
 
     /**
      * /**
-     * @SWG\Get(path="/api/home/hot-auction",
+     * @SWG\Get(path="/api/home/get-period",
      *   tags={"首页"},
-     *   summary="正在热拍",
+     *   summary="正在热拍|我在拍|我收藏",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="offset", in="query", default="0", description="游标",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="type", in="query", default="1", description="1 = 正在热拍(默认) | 2 = 我在拍 | 3 = 我收藏",
      *     type="string",
      *   ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+     *                  [id] => period_id（期数id）
+     *                  [product_id] => 产品id
+     *                  [period_code] => 期数代码
+     *                  [title] => 标题
+     *                  [img_cover] => 产品封面
+     *                  [sell_price] => 市场价
+     *                  [bid_step] => 竞价
+     *                  [is_favorite] => 是否收藏 1 = 已收藏 | 0 = 未收藏
+     *     "
      *   )
      * )
      */
-    public function hotAuction()
+    public function getPeriod()
     {
+        $type = $this->request->type;
 
-        $data = array(
-            'code' => '0000',
-            'message' => '成功',
-            'data' =>
-                array(
-                    0 =>
-                        array(
-                            'a' => 4477599,
-                            'c' => 7660,
-                            'd' => '1353.20',
-                            'h' => '卡西欧',
-                            'g' => 1252796071,
-                            'b' => 1,
-                            'i' => 10,
-                            'e' => 0,
-                            'f' => 0,
-                        ),
-                    1 =>
-                        array(
-                            'a' => 4478576,
-                            'c' => 7203,
-                            'd' => '1211.60',
-                            'h' => 'mc乐少',
-                            'g' => 1960617520,
-                            'b' => 1,
-                            'i' => 10,
-                            'e' => 0,
-                            'f' => 0,
-                        ),
-                    2 =>
-                        array(
-                            'a' => 4486960,
-                            'c' => 2649,
-                            'd' => '13.90',
-                            'h' => '聪明阿呆',
-                            'g' => 1940412557,
-                            'b' => 1,
-                            'i' => 10,
-                            'e' => 0,
-                            'f' => 0,
-                        ),
-                    3 =>
-                        array(
-                            'a' => 4486818,
-                            'c' => 6533,
-                            'd' => '31.20',
-                            'h' => '不会唱情歌',
-                            'g' => 1643758403,
-                            'b' => 1,
-                            'i' => 10,
-                            'e' => 0,
-                            'f' => 0,
-                        ),
-                    4 =>
-                        array(
-                            'a' => 4483224,
-                            'c' => 3809,
-                            'd' => '341.10',
-                            'h' => '辉A哥',
-                            'g' => 1041285855,
-                            'b' => 1,
-                            'i' => 10,
-                            'e' => 0,
-                            'f' => 0,
-                        ),
-                    5 =>
-                        array(
-                            'a' => 4478786,
-                            'c' => 4058,
-                            'd' => '840.80',
-                            'h' => '踏取',
-                            'g' => 1235053492,
-                            'b' => 1,
-                            'i' => 10,
-                            'e' => 0,
-                            'f' => 0,
-                        ),
-                    6 =>
-                        array(
-                            'a' => 4483621,
-                            'c' => 3308,
-                            'd' => '389.70',
-                            'h' => '鹏鹏',
-                            'g' => 1319687339,
-                            'b' => 1,
-                            'i' => 10,
-                            'e' => 0,
-                            'f' => 0,
-                        ),
-                    7 =>
-                        array(
-                            'a' => 4486002,
-                            'c' => 4447,
-                            'd' => '122.90',
-                            'h' => '浩辰潮鞋',
-                            'g' => 1283653549,
-                            'b' => 1,
-                            'i' => 10,
-                            'e' => 0,
-                            'f' => 0,
-                        ),
-                    8 =>
-                        array(
-                            'a' => 4486054,
-                            'c' => 7136,
-                            'd' => '89.90',
-                            'h' => '靠山',
-                            'g' => 1118111351,
-                            'b' => 1,
-                            'i' => 10,
-                            'e' => 0,
-                            'f' => 0,
-                        ),
-                    9 =>
-                        array(
-                            'a' => 4487097,
-                            'c' => 7588,
-                            'd' => '1.30',
-                            'h' => '丹妞高傲与生俱来',
-                            'g' => 1656370338,
-                            'b' => 1,
-                            'i' => 10,
-                            'e' => 0,
-                            'f' => 0,
-                        )
-                ),
-        );
-        self::showMsg($data);
+        if (in_array($type, [2, 3])) {
+            $this->auth();
+        } elseif (!in_array($type, [1, 2, 3])) {
+            $type = 1;
+        }
+
+        $period = new Period();
+        $period->userId = $this->userId;
+        $period->limit = $this->limit;
+        $period->offset = $this->offset;
+        self::showMsg($period->getProductList($type));
     }
 }

@@ -36,10 +36,8 @@ Route::group(['middleware' => 'web'], function () {
 
     //首页
     Route::get('home', 'HomeController@index');
-    Route::get('home/banner', 'HomeController@banner');
+    Route::get('home/get-period', 'HomeController@getPeriod');
     Route::get('home/deal-end', 'HomeController@dealEnd');
-    Route::get('home/hot-auction', 'HomeController@hotAuction');
-    Route::get('home/module', 'HomeController@module');
 
     //最新成交
     Route::get('latest-deal', 'LatestDealController@index');
@@ -49,7 +47,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('product/type', 'ProductController@type');
     Route::post('product/type-product-list', 'ProductController@typeProductList');
     Route::get('product/detail', 'ProductController@detail');
-    Route::get('product/bid-record', 'ProductController@bidRecord');
+
     Route::get('product/bid-rules', 'ProductController@bidRules');
     Route::get('product/past-deals', 'ProductController@pastDeals');
     Route::get('product/share-order', 'ProductController@shareOrder');
@@ -58,6 +56,7 @@ Route::group(['middleware' => 'web'], function () {
 
     //竞拍
     Route::post('bid/bidding', 'BidController@bidding');
+    Route::get('bid/bid-record', 'BidController@bidRecord');
 
     /** 用户中心 */
     Route::get('user/shipping-address', 'UserController@shippingAddress');//用户注册视图

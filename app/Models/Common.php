@@ -42,7 +42,7 @@ class Common extends Model
         $data = [
             self::CODE_NORMAL => '数据正常',
             self::CODE_NEED_LOGIN => '需要登入才能获取',
-            self::CODE_NO_DATA => '没有该数据',
+            self::CODE_NO_DATA => '该数据不存在',
         ];
         return $key != 999 ? $data[$key] : $data;
     }
