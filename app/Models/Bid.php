@@ -149,7 +149,7 @@ class Bid extends Common
 
             $product = $products->getCacheProduct($period->product_id);
 
-            if ($flag == $period->id . ($period->bid_price + $product->bid_step)) {
+            if ($flag == $period->bid_price + $product->bid_step) {
                 //减少竞拍次数
                 echo $this->writeLog(['period_id' => $period->id, 'info' => '该时段已经竞拍过一次啦']);
                 continue;

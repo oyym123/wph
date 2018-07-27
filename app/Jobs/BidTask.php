@@ -20,7 +20,7 @@ class BidTask implements ShouldQueue
     public function __construct($data)
     {
         // 队列任务构造器中接收了 Eloquent 模型，将会只序列化模型的 ID
-      //  $this->bid = $bid;
+        //  $this->bid = $bid;
         $this->data = $data;
         //print_r($data);exit;
     }
