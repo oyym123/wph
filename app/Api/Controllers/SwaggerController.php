@@ -15,7 +15,7 @@ class SwaggerController extends WebController
      *     title="《微排行》API文档",
      *     version="1.0.0",
      *      description="
-    [code] => 0=正常; 1=需要登入; 2=没有数据
+    [code] => 0=正常; 1=需要登入; 2=没有数据;3=账号已被冻结
     [message] => 返回的报错信息
     [data] => 返回的数据",
      *   )

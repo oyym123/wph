@@ -35,6 +35,7 @@ class Common extends Model
     const CODE_NORMAL = 0; //数据正常
     const CODE_NEED_LOGIN = 1; //需要登入
     const CODE_NO_DATA = 2; //没有数据
+    const CODE_FREEZE_ACCOUNT = 3; //账号冻结
 
     /** 获取返回状态提示 */
     public function codeStr($key = 999)
@@ -43,6 +44,7 @@ class Common extends Model
             self::CODE_NORMAL => '数据正常',
             self::CODE_NEED_LOGIN => '需要登入才能获取',
             self::CODE_NO_DATA => '该数据不存在',
+            self::CODE_FREEZE_ACCOUNT => '该账号已被冻结',
         ];
         return $key != 999 ? $data[$key] : $data;
     }

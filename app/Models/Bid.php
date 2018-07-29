@@ -201,7 +201,7 @@ class Bid extends Common
     public function bidRecord($periodId)
     {
         $data = [];
-        $bids = Bid::has('user')->where(['period_id' => $periodId])->limit(100)->orderBy('end_time', 'desc')->get();
+        $bids = Bid::has('user')->where(['period_id' => $periodId])->limit(100)->orderBy('bid_price', 'desc')->get();
         foreach ($bids as $key => $bid) {
             $user = $bid->user;
             $data[] = [

@@ -2,6 +2,7 @@
 namespace App\Api\components;
 
 use App\Helpers\Helper;
+use App\Models\Common;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -24,15 +25,21 @@ class WebController extends Controller
         $request && $this->request = $request;
         $request->offset && $this->offset = $request->offset;
         $request->limit && $this->limit = $request->limit;
-        if ($this->limit > 100) { //防止过度查询
+        if ($this->limit > 100) {
             $this->limit = 100;
         }
         // $request->psize && $this->psize = $request->psize;
         $this->token = empty($_SERVER['HTTP_TOKEN']) ? '' : $_SERVER['HTTP_TOKEN'];
         $this->token && $this->userId = Redis::hget('token', $this->token);
-        if ($this->userId) {
-            $this->userIdent = User::find($this->userId);
-        }
+//        if ($this->userId) {
+//            $this->userIdent = User::find($this->userId);
+//            //判断账号是否可用
+//            if ($this->userIdent->status == User::STATUS_DISABLE) {
+//                list($info, $status) = (new Common())->returnRes('', Common::CODE_FREEZE_ACCOUNT);
+//                self::showMsg($info, $status);
+//            }
+//        }
+
         $allowIp = ['218.17.209.172', '127.0.0.1'];
         if (in_array(Helper::getIP(), $allowIp)) {
             $path = $this->isWindows() ? 'G:/logs/wph.log' : '/www/logs/wph.log';

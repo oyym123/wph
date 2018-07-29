@@ -13,6 +13,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
@@ -149,6 +150,8 @@ class ProductController extends Controller
                     $period = new Period();
                     $period->saveData($form->model()->id);
                 }
+                //清除产品缓存
+                Cache::forget('product@find' . $form->model()->id);
             });
         });
 
