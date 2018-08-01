@@ -142,7 +142,7 @@ class HomeController extends WebController
      *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="offset", in="query", default="0", description="游标",
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
      *     type="string",
      *   ),
      *   @SWG\Parameter(name="type", in="query", default="1", description="1 = 正在热拍(默认) | 2 = 我在拍 | 3 = 我收藏",
