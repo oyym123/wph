@@ -120,7 +120,7 @@ class Period extends Common
                 'product_id' => $product->id,
                 'period_code' => $period->code,
                 'title' => $product->title,
-                'img_cover' => $product->img_cover,
+                'img_cover' => env('QINIU_URL_IMAGES') . $product->img_cover,
                 'sell_price' => $product->sell_price,
                 'bid_step' => $product->bid_step,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
