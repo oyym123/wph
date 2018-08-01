@@ -292,6 +292,41 @@ class Bid extends Common
         return $data;
     }
 
+    /** 竞拍最新的状态 */
+    public function newestBid($periodIds)
+    {
+        $ids = explode(',', $periodIds);
+        if (count($ids) > 500) {
+            self::showMsg('请求数据过多！', self::CODE_ERROR);
+        }
+
+        $model = DB::table('bid')
+            ->select(DB::raw('max(bid_price) as bid_price,period_id'))
+            ->whereIn('period_id', $ids)
+            ->groupBy(['period_id'])
+            ->orderBy('bid_price', 'desc')
+            ->get();
+        $res = [];
+        foreach ($model as $item) {
+            $bid = DB::table('bid')
+                ->select('status', 'period_id', 'nickname', 'bid_price', 'status', 'pay_type', 'end_time', 'pay_amount')
+                ->where([
+                    'bid_price' => $item->bid_price,
+                    'period_id' => $item->period_id
+                ])->first();
+            $res[] = [
+                'a' => $bid->period_id,
+                'b' => $bid->pay_amount,
+                'c' => $bid->bid_price,
+                'd' => $bid->nickname,
+                'e' => $bid->pay_type,
+                'f' => $bid->status,
+                'g' => $bid->end_time
+            ];
+        }
+        return $res;
+    }
+
     /** 获取用户表信息 */
     public function User()
     {

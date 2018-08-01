@@ -19,10 +19,10 @@ class CollectionController extends WebController
      *   tags={"收藏"},
      *   summary="收藏或者取消收藏",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token", required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="product_id", in="query", default="", description="",
+     *   @SWG\Parameter(name="product_id", in="query", default="", description="", required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(

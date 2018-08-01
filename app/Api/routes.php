@@ -58,6 +58,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('bid/bidding', 'BidController@bidding');
     Route::get('bid/record', 'BidController@record');
     Route::get('bid/auto', 'BidController@auto');
+    Route::post('bid/newest-bid', 'BidController@newestBid');
 
     /** 用户中心 */
     Route::post('user/address', 'UserController@address'); //用户收货地址

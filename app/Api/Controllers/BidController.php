@@ -27,7 +27,7 @@ class BidController extends WebController
      *   ),
      *   @SWG\Response(
      *       response=200,description="
-     *              [status] => 10 = 请求成功,但是竞拍失败，当获取到这个状态时，刷新倒计时为10秒 |  20 = 请求成功，且竞拍也成功 ，获取到这个状态时，表示竞拍结束
+     *              [status] => 10 = 请求成功,但是竞拍失败，当获取到这个状态时，刷新倒计时为10秒
      *              "
      *   )
      * )
@@ -96,6 +96,32 @@ class BidController extends WebController
         self::showMsg($autoBid->submitInfo($this->request));
     }
 
+
+    /**
+     * @SWG\Post(path="/api/bid/newest-bid",
+     *   tags={"竞拍"},
+     *   summary="最新竞拍数据",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="periods", in="formData", default="15,16,17,18,19,20,21,22", description="period_id集合，逗号隔开", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *                  a => period_id期数id
+     *                  b => 支付的拍币金额（分1拍币和10拍币）
+     *                  c => 投标的价格
+     *                  d => 昵称
+     *                  e => 拍币类型（1=赠币，2=拍币）
+     *                  f => 状态（1=竞拍成功【按钮需要调整为本期结束】，0=竞拍未成功）
+     *                  g => 2018-07-27 16:30:04
+     *     "
+     *   )
+     * )
+     */
+    public function newestBid()
+    {
+        self::showMsg((new Bid())->newestBid($this->request->periods));
+    }
 
     public function autoBidStatus()
     {
