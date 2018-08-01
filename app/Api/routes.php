@@ -66,7 +66,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('user/batch-register', 'UserController@batchRegister');//批量用户注册
 
     //收藏
-    Route::get('collection', 'CollectionController@index');
+    Route::get('collection/collect', 'CollectionController@collect');
 
 
     Route::get('user/register-view', 'UserController@registerView');//用户注册视图

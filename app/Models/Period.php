@@ -93,7 +93,9 @@ class Period extends Common
             $where = $where + [
                     'id' => array_column($periodIds, 'period_id'),
                 ];
-
+            if (empty($periodIds)) {
+                self::showMsg('没有数据', self::CODE_NO_DATA);
+            }
         } elseif ($type == 3) {
             $collectIds = DB::table('collection')->select('product_id')->where([
                 'user_id' => $this->userId,
@@ -103,6 +105,9 @@ class Period extends Common
             $where = $where + [
                     'product_id' => array_column($collectIds, 'product_id'),
                 ];
+            if (empty($collectIds)) {
+                self::showMsg('没有数据', self::CODE_NO_DATA);
+            }
         }
 
         $data = [];
