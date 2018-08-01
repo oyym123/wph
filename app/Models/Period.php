@@ -110,8 +110,26 @@ class Period extends Common
             }
         }
 
+        if ($type == 4) {
+            $where = [];
+            if (!empty($this->request->type)) {
+                $where = ['product.type' => $this->request->type];
+            }
+            $periods = DB::table('period')
+                ->join('product', 'product.id', '=', 'period.product_id')
+                ->where([
+                        'period.deleted_at' => null,
+                        'period.status' => self::STATUS_IN_PROGRESS
+                    ] + $where)->offset($this->offset)->limit($this->limit)->get();
+        } else {
+            $periods = DB::table('period')->where($where)->offset($this->offset)->limit($this->limit)->get();
+        }
+
+        if (count($periods) == 0) {
+            self::showMsg('没有数据', self::CODE_NO_DATA);
+        }
+
         $data = [];
-        $periods = DB::table('period')->where($where)->offset($this->offset)->limit($this->limit)->get();
         $collection = new Collection();
         foreach ($periods as $period) {
             $product = Product::find($period->product_id);

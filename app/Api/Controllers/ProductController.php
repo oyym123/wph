@@ -23,6 +23,34 @@ class ProductController extends WebController
 {
 
     /**
+     * @SWG\Get(path="/api/product",
+     *   tags={"产品"},
+     *   summary="产品列表",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="type", in="query", default="", description="类型",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="token", in="header", default="", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     *
+     */
+    public function index()
+    {
+        $period = new Period();
+        $period->request = $this->request;
+        $period->userId = $this->userId;
+        $period->limit = $this->limit;
+        $period->offset = $this->offset;
+        self::showMsg($period->getProductList(4));
+    }
+
+
+    /**
      * @SWG\Get(path="/api/product/detail",
      *   tags={"产品"},
      *   summary="商品详情",
