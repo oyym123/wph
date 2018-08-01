@@ -36,6 +36,11 @@ class Common extends Model
     const CODE_NEED_LOGIN = 1; //需要登入
     const CODE_NO_DATA = 2; //没有数据
     const CODE_FREEZE_ACCOUNT = 3; //账号冻结
+    const CODE_ERROR = 4; //数据错误
+
+    const TYPE_GIFT_CURRENCY = 1;       //赠币
+    const TYPE_BID_CURRENCY = 2;        //拍币
+    const TYPE_SHOPPING_CURRENCY = 3;   //购物币
 
     /** 获取返回状态提示 */
     public function codeStr($key = 999)
@@ -45,6 +50,7 @@ class Common extends Model
             self::CODE_NEED_LOGIN => '需要登入才能获取',
             self::CODE_NO_DATA => '该数据不存在',
             self::CODE_FREEZE_ACCOUNT => '该账号已被冻结',
+            self::CODE_ERROR => '数据错误',
         ];
         return $key != 999 ? $data[$key] : $data;
     }

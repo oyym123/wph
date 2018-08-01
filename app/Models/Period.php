@@ -22,6 +22,7 @@ class Period extends Common
         'product_id',
         'code',
         'status',
+        'auctioneer_id',
         'robot_rate',
         'person_rate',
     ];
@@ -62,7 +63,7 @@ class Period extends Common
                 'short_title' => $product->title,
                 'bid_step' => $product->bid_step,
                 'end_time' => $period->bid_end_time,
-                'img_cover' => $product->img_cover,
+                'img_cover' => env('QINIU_URL_IMAGES') . $product->img_cover,
                 'product_id' => $product->id,
                 'sell_price' => $product->sell_price,
                 'product_type' => $product->type,
@@ -297,7 +298,6 @@ class Period extends Common
         $redis->setex('period@countdown' . $model->id, config('bid.init_countdown'), 1);
         RobotPeriod::batchSave($model->id, $productId);
     }
-
 
     /** 获取产品表信息 */
     public function Product()

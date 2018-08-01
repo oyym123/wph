@@ -36,6 +36,12 @@ class Product extends Common
         }
     }
 
+    /** 判断是否是10元专区 */
+    public function isTen()
+    {
+        return $this->type == 1 ? 1 : 0;
+    }
+
     public function getProduct($id)
     {
         if ($model = Product::find($id)) {

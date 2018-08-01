@@ -56,11 +56,12 @@ Route::group(['middleware' => 'web'], function () {
 
     //竞拍
     Route::post('bid/bidding', 'BidController@bidding');
-    Route::get('bid/bid-record', 'BidController@bidRecord');
+    Route::get('bid/record', 'BidController@record');
+    Route::get('bid/auto', 'BidController@auto');
 
     /** 用户中心 */
-    Route::get('user/shipping-address', 'UserController@shippingAddress');//用户注册视图
-    Route::get('user/my-auction', 'UserController@MyAuction');//用户注册视图
+    Route::post('user/address', 'UserController@address'); //用户收货地址
+    Route::get('user/my-auction', 'UserController@MyAuction'); //我的竞拍
 
     Route::get('user/batch-register', 'UserController@batchRegister');//批量用户注册
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Jobs\BidTask;
 use App\User;
 use Carbon\Carbon;
+use EasyWeChat\Core\Exception;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
@@ -21,6 +22,8 @@ class Bid extends Common
         'product_id',
         'period_id',
         'bid_price',
+        'pay_amount',
+        'pay_type',
         'user_id',
         'status',
         'bid_step',
@@ -38,25 +41,27 @@ class Bid extends Common
     protected $table = 'bid';
 
     /** 真人竞拍 */
-    public function personBid($request)
+    public function personBid($periodId, $auto = 0)
     {
-        $redis = app('redis')->connection('first');
-        DB::table('period')->where(['id' => $request->period_id])->increment('bid_price', 0.1);//自增0.1
-        DB::table('period')->where(['id' => $request->period_id])->update(['real_person' => Period::REAL_PERSON_YES]);//有真人参与
-        $products = new Product();
         $periods = new Period();
-        $period = $periods->getPeriod($request->period_id, ['status' => Period::STATUS_IN_PROGRESS]);
+        $period = $periods->getPeriod($periodId, ['status' => Period::STATUS_IN_PROGRESS]);
+        $products = new Product();
+        $redis = app('redis')->connection('first');
+        DB::table('period')->where(['id' => $periodId])->increment('bid_price', 0.1);//自增0.1
+        DB::table('period')->where(['id' => $periodId])->update(['real_person' => Period::REAL_PERSON_YES]);//有真人参与
         $product = $products->getCacheProduct($period->product_id);
         $countdown = $redis->ttl('period@countdown' . $period->id);
         $rate = $period->bid_price / $product->sell_price;
         $time = date('Y-m-d H:i:s', time());
         $data = [
             'product_id' => $period->product_id,
-            'period_id' => $request->period_id,
-            'bid_price' => $period->bid_price,
-            'user_id' => $this->userIdent->id,
+            'period_id' => $periodId,
+            'bid_price' => $period->bid_price + $product->bid_step,
+            'user_id' => $this->userId,
             'status' => $this->isCanWinBid($period, $rate, $redis),
-            'bid_step' => 1,
+            'bid_step' => $product->bid_step,
+            'pay_amount' => $product->pay_amount, //判断是否是10元专区
+            'pay_type' => $this->amount_type ?: Income::TYPE_BID_CURRENCY,
             'nickname' => $this->userIdent->nickname,
             'product_title' => $product->title,
             'created_at' => $time,
@@ -65,28 +70,38 @@ class Bid extends Common
             'is_real' => User::TYPE_REAL_PERSON
         ];
 
-        if ($data['status'] == self::STATUS_SUCCESS) {
-            //竞拍成功则立即保存
-            $bid = Bid::create($data);
-            //转换状态
-            DB::table('period')->where(['id' => $period->id])->update([
-                'status' => Period::STATUS_OVER,
+        if ($auto == 0) { //表示没有自动竞拍，则记录支出,进行正常收费
+            //判断消耗的金额类型
+            if ($this->userIdent->gift_currency >= $data['pay_amount']) {
+                $data['pay_type'] = self::TYPE_GIFT_CURRENCY; //当有赠币时，优先使用
+                DB::table('users')->where(['id' => $this->userId])->decrement('gift_currency', $data['pay_amount']);
+            } elseif ($this->userIdent->bid_currency >= $data['pay_amount']) {
+                DB::table('users')->where(['id' => $this->userId])->decrement('bid_currency', $data['pay_amount']);
+            } else {
+                return [
+                    'status' => 30, //余额不足，需要充值
+                    'pay_amount' => $data['pay_amount'] - $this->userIdent->bid_currency
+                ];
+            }
+
+            $expend = [
+                'type' => $data['pay_type'],
                 'user_id' => $this->userId,
-                'bid_id' => $bid->id
-            ]);
-            //新增该产品新的期数
-            $periods->saveData($period->product_id);
-            //同时清除期数缓存
-            $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
-            $res = [
-                'status' => 20,
+                'amount' => $data['pay_amount'],
+                'pay_amount' => $data['pay_amount'],
+                'name' => '竞拍消费',
+                'product_id' => $product->id,
+                'period_id' => $periodId,
             ];
-        } else {
+            (new Expend())->bidPay($expend);
+        }
+
+        if ($data['status'] == self::STATUS_FAIL) {
             //重置倒计时
             if ($countdown <= 10) {
                 $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
             }
-            //加入竞拍队列，3秒之后进入数据库Bid表
+            //加入竞拍队列，进入数据库Bid表
             $model = (new BidTask($data));
             dispatch($model);
             $res = [
@@ -96,19 +111,76 @@ class Bid extends Common
         return $res;
     }
 
+    /** 每3秒检验，是否有中标的用户 */
+    public function checkoutBid()
+    {
+        $redis = app('redis')->connection('first');
+        $periods = new Period();
+        $products = new Product();
+        foreach ($periods->getAll() as $period) {
+            $bid = DB::table('bid')->where([
+                'status' => self::STATUS_FAIL,
+                'is_real' => User::TYPE_REAL_PERSON,
+                'period_id' => $period->id
+            ])->orderBy('bid_price', 'desc')->first();
+            if ($bid) {
+                $product = $products->getCacheProduct($period->product_id);
+                //当投标的价格小于售价时 , 则一直都不能竞拍成功
+                if (($bid->bid_price / $product->sell_price) < 1) {
+                    continue;
+                }
+                //到达平均售价时，机器人将不再参与竞拍,设置一个一年时间的key,当机器人参与的时候，判断是不是存在这个
+                $redis->setex('realPersonBid@periodId' . $period->id, 60 * 24 * 365, $period->id);
+                //当竞拍结束时
+                if ($redis->ttl('period@countdown' . $period->id) < 0) {
+                    $redis->setex('period@countdown' . $period->id, 10000, 'success');
+                    //竞拍成功则立即保存
+                    DB::table('bid')->where([
+                        'id' => $bid->id
+                    ])->update(['status' => self::STATUS_SUCCESS]);
+                    //转换状态
+                    DB::table('period')->where(['id' => $period->id])->update([
+                        'status' => Period::STATUS_OVER,
+                        'user_id' => $bid->user_id,
+                        'bid_id' => $bid->id
+                    ]);
+                    //新增该产品新的期数
+                    $periods->saveData($period->product_id);
+                    //同时清除期数缓存
+                    $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
+                    //购物币返还结算
+                    Income::settlement($period->id, $bid->user_id);
+                    //自动拍币返还
+                    (new AutoBid())->back($period->id, $bid->user_id);
+                    //生成一个订单
+                    $order = new Order();
+                    $address = UserAddress::defaultAddress($bid->user_id);
+                    $orderInfo = [
+                        'sn' => $order->createSn(),
+                        'pay_type' => Pay::TYPE_WEI_XIN,
+                        'pay_amount' => $bid->bid_price,
+                        'product_amount' => $product->sell_price,
+                        'product_id' => $product->id,
+                        'period_id' => $bid->period_id,
+                        'status' => Order::STATUS_WAIT_PAY,
+                        'buyer_id' => $bid->user_id,
+                        'address_id' => $address->id, //收货人地址
+                        'str_address' => str_replace('||', ' ', $address->str_address) . $address->detail_address,
+                        'str_username' => $address->user_name, //收货人姓名
+                        'str_phone_number' => $address->telephone, //手机号
+                        'expired_at' => config('bid.order_expired_at'), //过期时间
+                    ];
+                    $order->createOrder($orderInfo);
+                }
+            }
+        }
+    }
+
     /** 判断是否可以中标 */
     public function isCanWinBid($period, $rate, $redis)
     {
         //当有真人参与时，机器人则一直跟拍
         if ($period->real_person) {
-            if ($rate >= 1) { //到达平均售价时，机器人将不再参与竞拍,设置一个一年时间的key,当机器人参与的时候，判断是不是存在这个
-                $redis->setex('realPersonBid@periodId' . $period->id, 60 * 24 * 365, $period->id);
-                //当竞拍结束时
-                if ($redis->ttl('period@countdown' . $period->id) < 0) {
-                    $redis->setex('period@countdown' . $period->id, 10000, 'success');
-                    return self::STATUS_SUCCESS;
-                }
-            }
             return self::STATUS_FAIL;
         } else { //当没有真人参与时，判断是否到达开奖值
             if ($rate >= $period->robot_rate) {
@@ -167,6 +239,8 @@ class Bid extends Common
                 'user_id' => $robotPeriod->user_id,
                 'status' => $this->isCanWinBid($period, $rate, $redis),
                 'bid_step' => 1,
+                'pay_amount' => $product->isTen() ? 10 : 1,//判断是否是10元专区
+                'pay_type' => self::TYPE_BID_CURRENCY,
                 'nickname' => $robotPeriod->nickname,
                 'product_title' => $product->title,
                 'created_at' => $time,
@@ -188,6 +262,8 @@ class Bid extends Common
                 $periods->saveData($period->product_id);
                 //同时清除期数缓存
                 $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
+                //购物币返还结算
+                Income::settlement($data['period_id'], $robotPeriod->user_id);
             } else {
                 $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
                 //加入竞拍队列，3秒之后进入数据库Bid表

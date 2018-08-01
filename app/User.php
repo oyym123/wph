@@ -181,7 +181,7 @@ class User extends Authenticatable
             echo $randQQ . '失败!<br/>';
         }
     }
-    
+
     /**
      * 获取随机用户
      */

@@ -14,6 +14,7 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -144,12 +145,15 @@ class ProductController extends Controller
             $form->switch('status', '状态')->states(Base::getStates())->default(1);
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '修改时间');
+
             $form->saved(function (Form $form) {
                 $diff = strtotime($form->model()->updated_at) - strtotime($form->model()->created_at);
                 if (abs($diff) < 3) { //表示只在创建的时候增加期数
                     $period = new Period();
                     $period->saveData($form->model()->id);
                 }
+                $payAmount = $form->model()->type == 1 ? 10 : 1;
+                DB::table('product')->where(['id' => $form->model()->id])->update(['pay_amount' => $payAmount]);
                 //清除产品缓存
                 Cache::forget('product@find' . $form->model()->id);
             });

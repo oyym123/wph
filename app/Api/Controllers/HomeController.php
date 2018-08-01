@@ -3,16 +3,15 @@
 namespace App\Api\Controllers;
 
 use App\Api\components\WebController;
+use App\Models\Income;
 use App\Models\Period;
-use App\Models\Product;
-use Illuminate\Http\Request;
+
 
 class HomeController extends WebController
 {
-    public function successView(Request $request)
+    public function successView()
     {
-        // echo encrypt(12321);
-        return view('api.home.success', ['data' => $request->input()]);
+        return view('api.home.success');
     }
 
     /**

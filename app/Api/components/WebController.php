@@ -31,14 +31,14 @@ class WebController extends Controller
         // $request->psize && $this->psize = $request->psize;
         $this->token = empty($_SERVER['HTTP_TOKEN']) ? '' : $_SERVER['HTTP_TOKEN'];
         $this->token && $this->userId = Redis::hget('token', $this->token);
-//        if ($this->userId) {
-//            $this->userIdent = User::find($this->userId);
-//            //判断账号是否可用
-//            if ($this->userIdent->status == User::STATUS_DISABLE) {
-//                list($info, $status) = (new Common())->returnRes('', Common::CODE_FREEZE_ACCOUNT);
-//                self::showMsg($info, $status);
-//            }
-//        }
+        if ($this->userId) {
+            $this->userIdent = User::find($this->userId);
+            //判断账号是否可用
+            if ($this->userIdent->status == User::STATUS_DISABLE) {
+                list($info, $status) = (new Common())->returnRes('', Common::CODE_FREEZE_ACCOUNT);
+                self::showMsg($info, $status);
+            }
+        }
 
         $allowIp = ['218.17.209.172', '127.0.0.1'];
         if (in_array(Helper::getIP(), $allowIp)) {

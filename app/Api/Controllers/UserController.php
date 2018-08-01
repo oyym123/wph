@@ -5,7 +5,10 @@ namespace App\Api\Controllers;
 use App\Helpers\Helper;
 use App\Helpers\WXBizDataCrypt;
 use App\Http\Requests\BindMobilePost;
+use App\Models\Bid;
 use App\Models\City;
+use App\Models\Period;
+use App\Models\UserAddress;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\RegisterUserPost;
 use App\User;
@@ -65,12 +68,6 @@ class UserController extends WebController
      *   @SWG\Parameter(name="nickname", in="query", default="佚名", description="用户昵称", required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="province", in="query", default="江西省", description="省", required=true,
-     *     type="string",
-     *   ),
-     *   @SWG\Parameter(name="city", in="query", default="上饶市", description="市", required=true,
-     *     type="string",
-     *   ),
      *   @SWG\Parameter(name="avatar", in="query", default="default_user_photo10.png", description="头像地址", required=true,
      *     type="string",
      *   ),
@@ -86,7 +83,7 @@ class UserController extends WebController
             $result = json_decode($res, true);
             $model = DB::table('users')->where(['open_id' => $result['openid'], 'is_real' => User::TYPE_REAL_PERSON])->first();
             $token = md5(md5($result['openid'] . $result['session_key']));
-            list($province, $city) = City::simplifyCity($request->province, $request->city);
+            //   list($province, $city) = City::simplifyCity($request->province, $request->city);
             $data = [
                 'session_key' => $result['session_key'],
                 'open_id' => $result['openid'],
@@ -96,8 +93,8 @@ class UserController extends WebController
                 'avatar' => $request->avatar ?: $this->getImage('default_user_photo10.png'),
                 'is_real' => USER::TYPE_REAL_PERSON,
                 'token' => $token,
-                'province' => $province,
-                'city' => $city,
+                'province' => '',
+                'city' => '',
             ];
             if ($model) {
                 Redis::hdel('token', $model->token);
@@ -218,10 +215,10 @@ class UserController extends WebController
      *   tags={"用户中心"},
      *   summary="我的竞拍",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="token", in="header", default="", description="用户token" ,required=true,
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="type", in="query", default="", description="（0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）" ,required=true,
+     *   @SWG\Parameter(name="type", in="query", default="0", description="（0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）" ,required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -266,6 +263,9 @@ class UserController extends WebController
     public function MyAuction()
     {
         $this->auth();
+        $request = $this->request;
+        $period = new Period();
+
         $data = array(
             'period_id' => 4372346,
             'product_id' => 626,
@@ -303,15 +303,97 @@ class UserController extends WebController
             'delivery_title' => '',
             'show_confirm_trans' => 0,
         );
+
+        switch ($request->type) {
+            case 0: //我在拍
+                $result = DB::table('period')
+                    ->join('bid', 'period.id', '=', 'bid.period_id')
+                    ->join('product', 'product.id', '=', 'period.product_id')
+                    ->select('product.*', 'period.*', 'bid.end_time', 'bid.bid_price')
+                    ->where([
+                        'bid.user_id' => $this->userId,
+                        'bid.status' => Bid::STATUS_FAIL,
+                        'bid.is_real' => User::TYPE_REAL_PERSON
+                    ])
+                    ->orderBy('bid.bid_price')
+                    ->get();
+                print_r($result);
+                foreach ($result as $item) {
+                    $data['period_id'] = $item->id;
+                    $data['product_id'] = $item->product_id;
+                    $data['period_code'] = $item->code;
+                    $data['title'] = $item->title;
+                    $data['img_cover'] = $item->img_cover;
+                    $data['bid_step'] = $item->bid_step;
+                    $data['type'] = $item->type;
+                    $data['sell_price'] = $item->sell_price;
+                    $data['settlement_bid_price'] = $item->bid_price;
+                    $data['end_time'] = $item->end_time;
+                    $data['result_status'] = $request->type;
+                    $data['period_code'] = $item->code;
+                    $data['period_code'] = $item->code;
+                }
+
+                exit;
+                break;
+            case 1: //我拍中
+
+                break;
+            case 2: //差价购
+
+
+                break;
+            case 3: //待付款
+
+
+                break;
+            case 4: //待签收
+
+
+                break;
+            case 5: //待晒单
+
+
+                break;
+        }
+
         self::showMsg($data);
     }
 
+
     /**
-     * @SWG\Get(path="/api/user/shipping-address",
+     * @SWG\Post(path="/api/user/address",
      *   tags={"用户中心"},
      *   summary="收货地址",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="offset", in="query", default="", description="",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *    @SWG\Parameter(name="address_id", in="formData", default="1", description="地址id,当传过来时表示修改",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="user_name", in="formData", default="王小明", description="", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="telephone", in="formData", default="18779284935", description="", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="province", in="formData", default="吉林省", description="", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="city", in="formData", default="通化市", description="", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="area", in="formData", default="东昌区", description="", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="detail_address", in="formData", default="西路103号", description="详细地址", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="postal", in="formData", default="134200", description="邮编", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="is_default", in="formData", default="1", description="是否默认 1=是 ，0= 否", required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -319,28 +401,32 @@ class UserController extends WebController
      *   )
      * )
      */
-    public function shippingAddress()
+    public function address()
     {
-        $data = array(
-            'id' => 61303,
-            'user_id' => 1328115335,
-            'true_name' => '张三',
-            'address' => '青海 果洛州 甘德县',
-            'address_street' => '江千乡',
-            'address_detail' => '四巷胡同1008号',
-            'mobile_num' => '18779284965',
-            'alipay_name' => '张文吉',
-            'alipay_num' => '187792948@163.com',
-            'qq_num' => '1052156115',
-            'is_default' => 1,
-            'remark' => '胡同',
-            'address_type' => 2,
-            'province_code' => '29',
-            'city_code' => '2605',
-            'district_code' => '2607',
-            'street_code' => '16694',
-        );
-        self::showMsg($data);
+        $this->auth();
+        $request = $this->request;
+        $data = [
+            'user_id' => $this->userId,
+            'is_default' => $request->is_default,
+            'user_name' => $request->user_name,
+            'telephone' => $request->telephone,
+            'postal' => $request->postal,
+            'detail_address' => $request->detail_address,
+            'str_address' => $request->province . '||' . $request->city . '||' . $request->area,
+        ];
+        if ($request->address_id) {
+            $data['id'] = $request->address_id;
+            if ((new UserAddress())->updateData($data)) {
+                self::showMsg('保存成功！');
+            } else {
+                self::showMsg('保存失败！', 2);
+            }
+        } else {
+            if ((new UserAddress())->saveData($data)) {
+                self::showMsg('保存成功！');
+            } else {
+                self::showMsg('保存失败！', 2);
+            }
+        }
     }
-
 }

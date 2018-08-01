@@ -8,6 +8,7 @@
 
 namespace App\Api\Controllers;
 
+use App\Models\AutoBid;
 use App\Models\Bid;
 use App\Api\components\WebController;
 
@@ -21,7 +22,7 @@ class BidController extends WebController
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="period_id", in="formData", default="7", description="", required=true,
+     *   @SWG\Parameter(name="period_id", in="formData", default="16", description="", required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -36,12 +37,13 @@ class BidController extends WebController
         $this->auth();
         $bid = new Bid();
         $bid->userIdent = $this->userIdent;
-        self::showMsg($bid->personBid($this->request));
+        $bid->userId = $this->userId;
+        self::showMsg($bid->personBid($this->request->period_id));
     }
 
 
     /**
-     * @SWG\Get(path="/api/bid/bid-record",
+     * @SWG\Get(path="/api/bid/record",
      *   tags={"竞拍"},
      *   summary="出价记录",
      *   description="Author: OYYM",
@@ -60,11 +62,43 @@ class BidController extends WebController
      *   )
      * )
      */
-    public function bidRecord()
+    public function record()
     {
         $bid = new Bid();
         self::showMsg($bid->bidRecord($this->request->period_id));
     }
 
+    /**
+     * @SWG\Get(path="/api/bid/auto",
+     *   tags={"竞拍"},
+     *   summary="自动竞拍提交数据",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="period_id", in="query", default="16", description="期数id", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="times", in="query", default="6", description="次数", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function auto()
+    {
+        $this->auth();
+        $autoBid = new AutoBid();
+        $autoBid->userIdent = $this->userIdent;
+        $autoBid->userId = $this->userId;
+        self::showMsg($autoBid->submitInfo($this->request));
+    }
 
+
+    public function autoBidStatus()
+    {
+
+    }
 }
