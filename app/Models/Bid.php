@@ -174,29 +174,31 @@ class Bid extends Common
                     $periods->saveData($period->product_id);
                     //同时清除期数缓存
                     $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
-                    //购物币返还结算
-                    Income::settlement($period->id, $bid->user_id);
-                    //自动拍币返还
-                    (new AutoBid())->back($period->id, $bid->user_id);
-                    //生成一个订单
-                    $order = new Order();
-                    $address = UserAddress::defaultAddress($bid->user_id);
-                    $orderInfo = [
-                        'sn' => $order->createSn(),
-                        'pay_type' => Pay::TYPE_WEI_XIN,
-                        'pay_amount' => $bid->bid_price,
-                        'product_amount' => $product->sell_price,
-                        'product_id' => $product->id,
-                        'period_id' => $bid->period_id,
-                        'status' => Order::STATUS_WAIT_PAY,
-                        'buyer_id' => $bid->user_id,
-                        'address_id' => $address->id, //收货人地址
-                        'str_address' => str_replace('||', ' ', $address->str_address) . $address->detail_address,
-                        'str_username' => $address->user_name, //收货人姓名
-                        'str_phone_number' => $address->telephone, //手机号
-                        'expired_at' => config('bid.order_expired_at'), //过期时间
-                    ];
-                    $order->createOrder($orderInfo);
+                    if ($bid->is_real == User::TYPE_REAL_PERSON) { //只有真人才需要走结算、订单流程
+                        //购物币返还结算
+                        Income::settlement($period->id, $bid->user_id);
+                        //自动拍币返还
+                        (new AutoBid())->back($period->id, $bid->user_id);
+                        //生成一个订单
+                        $order = new Order();
+                        $address = UserAddress::defaultAddress($bid->user_id);
+                        $orderInfo = [
+                            'sn' => $order->createSn(),
+                            'pay_type' => Pay::TYPE_WEI_XIN,
+                            'pay_amount' => $bid->bid_price,
+                            'product_amount' => $product->sell_price,
+                            'product_id' => $product->id,
+                            'period_id' => $bid->period_id,
+                            'status' => Order::STATUS_WAIT_PAY,
+                            'buyer_id' => $bid->user_id,
+                            'address_id' => $address->id, //收货人地址
+                            'str_address' => str_replace('||', ' ', $address->str_address) . $address->detail_address,
+                            'str_username' => $address->user_name, //收货人姓名
+                            'str_phone_number' => $address->telephone, //手机号
+                            'expired_at' => config('bid.order_expired_at'), //过期时间
+                        ];
+                        $order->createOrder($orderInfo);
+                    }
                 }
             }
         }
