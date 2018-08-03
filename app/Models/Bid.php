@@ -108,9 +108,8 @@ class Bid extends Common
             $res = [
                 'status' => 10,
             ];
+            return $res;
         }
-
-        //  return $res;
     }
 
     /** 设置最后一个竞拍人的id */
@@ -260,8 +259,8 @@ class Bid extends Common
                 'bid_price' => $period->bid_price + $product->bid_step,
                 'user_id' => $robotPeriod->user_id,
                 'status' => $this->isCanWinBid($period, $rate, $redis),
-                'bid_step' => 1,
-                'pay_amount' => $product->isTen() ? 10 : 1,//判断是否是10元专区
+                'bid_step' => $product->bid_step,
+                'pay_amount' => $product->pay_amount, //判断是否是10元专区
                 'pay_type' => self::TYPE_BID_CURRENCY,
                 'nickname' => $robotPeriod->nickname,
                 'product_title' => $product->title,
