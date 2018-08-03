@@ -76,14 +76,16 @@ class UserController extends WebController
      *   )
      * )
      */
-    public function info(Request $request)
+    public function info()
     {
+        $request = $this->request;
+        $address = Helper::ipToAddress($request->getClientIp());
         $res = $this->weixin($request->code);
         if (!empty($res)) {
             $result = json_decode($res, true);
             $model = DB::table('users')->where(['open_id' => $result['openid'], 'is_real' => User::TYPE_REAL_PERSON])->first();
             $token = md5(md5($result['openid'] . $result['session_key']));
-            //   list($province, $city) = City::simplifyCity($request->province, $request->city);
+            list($province, $city) = City::simplifyCity($address['region'], $address['city']);
             $data = [
                 'session_key' => $result['session_key'],
                 'open_id' => $result['openid'],
@@ -93,8 +95,10 @@ class UserController extends WebController
                 'avatar' => $request->avatar ?: $this->getImage('default_user_photo10.png'),
                 'is_real' => USER::TYPE_REAL_PERSON,
                 'token' => $token,
-                'province' => '',
-                'city' => '',
+                'ip' => $address['ip'],
+                'country' => $address['country'],
+                'province' => $province,
+                'city' => $city,
             ];
             if ($model) {
                 Redis::hdel('token', $model->token);

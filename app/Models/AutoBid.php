@@ -103,7 +103,7 @@ class AutoBid extends Common
         $bid = new Bid();
         $redis = app('redis')->connection('first');
         foreach ($autoBids as $item) {
-            if ($bid->getLastPersonId($redis, $item->period_id) != $item->user_id) { //当最后一个竞拍人的id不是自己的时候，才可以自动竞拍
+            if ($bid->getLastBidInfo($redis, $item->period_id) != $item->user_id) { //当最后一个竞拍人的id不是自己的时候，才可以自动竞拍
                 $bid->userIdent = User::find($item->user_id);
                 $bid->userId = $item->user_id;
                 $bid->amount_type = $item->amount_type;

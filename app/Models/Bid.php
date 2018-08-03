@@ -101,7 +101,7 @@ class Bid extends Common
             if ($countdown <= 10) {
                 $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
             }
-            $this->setLastPersonId($redis, $period->id, $this->userId);
+            $this->setLastPersonId($redis, $period->id, $this->userId, $data['bid_price']);
             //加入竞拍队列，进入数据库Bid表
             $model = (new BidTask($data));
             dispatch($model);
@@ -113,21 +113,32 @@ class Bid extends Common
     }
 
     /** 设置最后一个竞拍人的id */
-    public function setLastPersonId($redis, $periodId, $userId)
+    public function setLastPersonId($redis, $periodId, $userId, $bidPrice)
     {
         $lastPersonIds = json_decode($redis->get('bid@lastPersonId'), true);
-        $lastPersonIds[$periodId] = $userId;
+        $lastPersonIds[$periodId] = [
+            'user_id' => $userId,
+            'bid_price' => round($bidPrice, 2)
+        ];
         $redis->setex('bid@lastPersonId', 60 * 24 * 365, json_encode($lastPersonIds));
     }
 
     /** 获取最后一个竞拍人的id */
-    public function getLastPersonId($redis, $periodId)
+    public function getLastBidInfo($redis, $periodId, $type = 'user_id')
     {
         $lastPersonIds = json_decode($redis->get('bid@lastPersonId'), true);
         if (empty($lastPersonIds[$periodId])) {
-            return '没有id';
+            if ($type == 'user_id') {
+                return '没有id';
+            } elseif ($type == 'bid_price') {
+                return 0;
+            }
         } else {
-            return $lastPersonIds[$periodId];
+            if ($type == 'user_id') {
+                return $lastPersonIds[$periodId]['user_id'];
+            } elseif ($type == 'bid_price') {
+                return $lastPersonIds[$periodId]['bid_price'];
+            }
         }
     }
 
@@ -147,7 +158,7 @@ class Bid extends Common
             if ($bid) {
                 $product = $products->getCacheProduct($period->product_id);
                 //当投标的价格小于售价时 , 则一直都不能竞拍成功
-                if (($bid->bid_price / $product->sell_price) < 1) {
+                if ($this->getLastBidInfo($redis, $period->id, 'bid_price') / $product->sell_price < 1) {
                     continue;
                 }
                 //到达平均售价时，机器人将不再参与竞拍,设置一个一年时间的key,当机器人参与的时候，判断是不是存在这个
@@ -269,7 +280,7 @@ class Bid extends Common
                 'end_time' => $time,
                 'is_real' => User::TYPE_ROBOT
             ];
-            $this->setLastPersonId($redis, $period->id, $data['user_id']);
+            $this->setLastPersonId($redis, $period->id, $data['user_id'], $data['bid_price']);
             if ($data['status'] == self::STATUS_SUCCESS) {
                 //竞拍成功则立即保存
                 $bid = Bid::create($data);

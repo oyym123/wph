@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\DB;
 class City extends Model
 {
     protected $table = 'city';
-
-
+    
     /** 简化城市名称 */
     public static function simplifyCity($province = '北京', $city)
     {
@@ -18,7 +17,6 @@ class City extends Model
         if (strpos($province, '市') !== false || mb_strlen($cName) > 2 || mb_strlen($pName) > 2) {
             $cName = '';
         }
-
         return [$pName, $cName];
     }
 
