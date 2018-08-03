@@ -56,7 +56,7 @@ class Bid extends Common
         $data = [
             'product_id' => $period->product_id,
             'period_id' => $periodId,
-            'bid_price' => $period->bid_price + $product->bid_step,
+            'bid_price' => round($period->bid_price + $product->bid_step, 2),
             'user_id' => $this->userId,
             'status' => $this->isCanWinBid($period, $rate, $redis),
             'bid_step' => $product->bid_step,
@@ -101,10 +101,10 @@ class Bid extends Common
             if ($countdown <= 10) {
                 $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
             }
-            $this->setLastPersonId($redis, $period->id, $this->userId, $data['bid_price']);
-            //加入竞拍队列，进入数据库Bid表
-            $model = (new BidTask($data));
-            dispatch($model);
+            $data['id'] = DB::table('bid')->insertGetId($data);
+            $this->setLastPersonId($redis, $data);
+            //加入竞拍队列，进入数据库Bid表,暂时不启用redis队列
+            //dispatch(new BidTask($redis, $data));
             $res = [
                 'status' => 10,
             ];
@@ -113,32 +113,28 @@ class Bid extends Common
     }
 
     /** 设置最后一个竞拍人的id */
-    public function setLastPersonId($redis, $periodId, $userId, $bidPrice)
+    public function setLastPersonId($redis, $data)
     {
         $lastPersonIds = json_decode($redis->get('bid@lastPersonId'), true);
-        $lastPersonIds[$periodId] = [
-            'user_id' => $userId,
-            'bid_price' => round($bidPrice, 2)
-        ];
-        $redis->setex('bid@lastPersonId', 60 * 24 * 365, json_encode($lastPersonIds));
+        $lastPersonIds[$data['period_id']] = $data;
+        $redis->setex('bid@lastPersonId', 3600 * 24 * 365, json_encode($lastPersonIds));
     }
 
     /** 获取最后一个竞拍人的id */
-    public function getLastBidInfo($redis, $periodId, $type = 'user_id')
+    public function getLastBidInfo($redis, $periodId, $type = false)
     {
-        $lastPersonIds = json_decode($redis->get('bid@lastPersonId'), true);
-        if (empty($lastPersonIds[$periodId])) {
-            if ($type == 'user_id') {
-                return '没有id';
-            } elseif ($type == 'bid_price') {
-                return 0;
+        $lastPersonIds = json_decode($redis->get('bid@lastPersonId'));
+
+        if (!empty($lastPersonIds->$periodId)) {
+
+            if (!empty($type)) {
+
+                return $lastPersonIds->$periodId->$type;
+            } else {
+                return $lastPersonIds->$periodId;
             }
         } else {
-            if ($type == 'user_id') {
-                return $lastPersonIds[$periodId]['user_id'];
-            } elseif ($type == 'bid_price') {
-                return $lastPersonIds[$periodId]['bid_price'];
-            }
+            return 0;
         }
     }
 
@@ -148,13 +144,8 @@ class Bid extends Common
         $redis = app('redis')->connection('first');
         $periods = new Period();
         $products = new Product();
-
         foreach ($periods->getAll() as $period) {
-            $bid = DB::table('bid')->where([
-                'status' => self::STATUS_FAIL,
-                'is_real' => User::TYPE_REAL_PERSON,
-                'period_id' => $period->id
-            ])->orderBy('bid_price', 'desc')->first();
+            $bid = $this->getLastBidInfo($redis, $period->id);
             if ($bid) {
                 $product = $products->getCacheProduct($period->product_id);
                 //当投标的价格小于售价时 , 则一直都不能竞拍成功
@@ -170,6 +161,9 @@ class Bid extends Common
                     DB::table('bid')->where([
                         'id' => $bid->id
                     ])->update(['status' => self::STATUS_SUCCESS]);
+                    //redis缓存也改变
+                    $bid->status = self::STATUS_SUCCESS;
+                    $this->setLastPersonId($redis, json_decode(json_encode($bid), true));
                     //转换状态
                     DB::table('period')->where(['id' => $period->id])->update([
                         'status' => Period::STATUS_OVER,
@@ -298,9 +292,10 @@ class Bid extends Common
                 Income::settlement($data['period_id'], $robotPeriod->user_id);
             } else {
                 $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
+                $data['id'] = DB::table('bid')->insertGetId($data);
+                $this->setLastPersonId($redis, $data);
                 //加入竞拍队列，3秒之后进入数据库Bid表
-                $model = (new BidTask($data));
-                dispatch($model);
+                //dispatch(new BidTask($data));
             }
         }
     }
