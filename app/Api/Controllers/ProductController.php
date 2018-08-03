@@ -30,7 +30,7 @@ class ProductController extends WebController
      *   @SWG\Parameter(name="type", in="query", default="", description="类型",
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="token", in="header", default="", description="用户token" ,required=true,
+     *   @SWG\Parameter(name="token", in="header", default="", description="用户token" ,
      *     type="string",
      *   ),
      *   @SWG\Response(

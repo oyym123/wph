@@ -101,16 +101,19 @@ class AutoBid extends Common
         ])->where('remain_times', '>', 0)->get();
 
         $bid = new Bid();
+        $redis = app('redis')->connection('first');
         foreach ($autoBids as $item) {
-            $bid->userIdent = User::find($item->user_id);
-            $bid->userId = $item->user_id;
-            $bid->amount_type = $item->amount_type;
-            $res = $bid->personBid($item->period_id, 1);
-            if ($res['status'] == 10) { //竞拍失败，减少次数
-                if ($item->remain_times == 1) {//表示剩最后一次的时候，转换状态
-                    DB::table('auto_bid')->where(['id' => $item->id])->update(['status' => self::STATUS_OVER]);
+            if ($bid->getLastPersonId($redis, $item->period_id) != $item->user_id) { //当最后一个竞拍人的id不是自己的时候，才可以自动竞拍
+                $bid->userIdent = User::find($item->user_id);
+                $bid->userId = $item->user_id;
+                $bid->amount_type = $item->amount_type;
+                $res = $bid->personBid($item->period_id, 1);
+                if ($res['status'] == 10) { //竞拍失败，减少次数
+                    if ($item->remain_times == 1) {//表示剩最后一次的时候，转换状态
+                        DB::table('auto_bid')->where(['id' => $item->id])->update(['status' => self::STATUS_OVER]);
+                    }
+                    DB::table('auto_bid')->where(['id' => $item->id])->decrement('remain_times', 1);
                 }
-                DB::table('auto_bid')->where(['id' => $item->id])->decrement('remain_times', 1);
             }
         }
     }

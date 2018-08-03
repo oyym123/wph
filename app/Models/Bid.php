@@ -101,6 +101,7 @@ class Bid extends Common
             if ($countdown <= 10) {
                 $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
             }
+            $this->setLastPersonId($redis, $period->id, $this->userId);
             //加入竞拍队列，进入数据库Bid表
             $model = (new BidTask($data));
             dispatch($model);
@@ -108,7 +109,27 @@ class Bid extends Common
                 'status' => 10,
             ];
         }
-        return $res;
+
+        //  return $res;
+    }
+
+    /** 设置最后一个竞拍人的id */
+    public function setLastPersonId($redis, $periodId, $userId)
+    {
+        $lastPersonIds = json_decode($redis->get('bid@lastPersonId'), true);
+        $lastPersonIds[$periodId] = $userId;
+        $redis->setex('bid@lastPersonId', 60 * 24 * 365, json_encode($lastPersonIds));
+    }
+
+    /** 获取最后一个竞拍人的id */
+    public function getLastPersonId($redis, $periodId)
+    {
+        $lastPersonIds = json_decode($redis->get('bid@lastPersonId'), true);
+        if (empty($lastPersonIds[$periodId])) {
+            return '没有id';
+        } else {
+            return $lastPersonIds[$periodId];
+        }
     }
 
     /** 每3秒检验，是否有中标的用户 */
@@ -117,6 +138,7 @@ class Bid extends Common
         $redis = app('redis')->connection('first');
         $periods = new Period();
         $products = new Product();
+
         foreach ($periods->getAll() as $period) {
             $bid = DB::table('bid')->where([
                 'status' => self::STATUS_FAIL,
@@ -248,7 +270,7 @@ class Bid extends Common
                 'end_time' => $time,
                 'is_real' => User::TYPE_ROBOT
             ];
-
+            $this->setLastPersonId($redis, $period->id, $data['user_id']);
             if ($data['status'] == self::STATUS_SUCCESS) {
                 //竞拍成功则立即保存
                 $bid = Bid::create($data);
