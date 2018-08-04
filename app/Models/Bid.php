@@ -117,7 +117,8 @@ class Bid extends Common
     {
         $lastPersonIds = json_decode($redis->get('bid@lastPersonId'), true);
         $lastPersonIds[$data['period_id']] = $data;
-        $redis->setex('bid@lastPersonId', 3600 * 24 * 365, json_encode($lastPersonIds));
+        //设置1年的存储期限，但会不断刷新
+        $redis->setex('bid@lastPersonId', 86400 * 365, json_encode($lastPersonIds));
     }
 
     /** 获取最后一个竞拍人的id */
@@ -330,11 +331,9 @@ class Bid extends Common
         }
         //redis搜索
         $redis = app('redis')->connection('first');
-        $periods = (new Period())->getAll([Period::STATUS_IN_PROGRESS, Period::STATUS_OVER]);
         $res = [];
-        foreach ($periods as $period) {
-            $bid = $this->getLastBidInfo($redis, $period->id);
-            if ($bid) {
+        foreach ($ids as $id) {
+            if ($bid = $this->getLastBidInfo($redis, $id)) {
                 $res[] = [
                     'a' => $bid->period_id,
                     'b' => $bid->pay_amount,
