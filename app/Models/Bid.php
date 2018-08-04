@@ -293,6 +293,8 @@ class Bid extends Common
                 $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
                 //购物币返还结算
                 Income::settlement($data['period_id'], $robotPeriod->user_id);
+                //redis缓存也改变
+                $this->setLastPersonId($redis, $data);
             } else {
                 $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
                 $data['id'] = DB::table('bid')->insertGetId($data);
