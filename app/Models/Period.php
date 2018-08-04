@@ -277,16 +277,15 @@ class Period extends Common
 //    }
 
     /** 获取所有期数，默认进行中 */
-    public function getAll($status = self::STATUS_IN_PROGRESS)
+    public function getAll($status = [self::STATUS_IN_PROGRESS])
     {
-        $cacheKey = 'period@allInProgress' . $status;
+        $cacheKey = 'period@allInProgress' . json_encode($status);
         if ($this->hasCache($cacheKey)) {
             return $this->getCache($cacheKey);
         } else {
             $periods = DB::table('period')->where([
-                'status' => $status,
                 'deleted_at' => null
-            ])->get();
+            ])->whereIn('status', $status)->get();
             return $this->putCache($cacheKey, $periods, 0.1);
         }
     }

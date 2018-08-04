@@ -328,32 +328,51 @@ class Bid extends Common
         if (count($ids) > 500) {
             self::showMsg('请求数据过多！', self::CODE_ERROR);
         }
-
-        $model = DB::table('bid')
-            ->select(DB::raw('max(bid_price) as bid_price,period_id'))
-            ->whereIn('period_id', $ids)
-            ->groupBy(['period_id'])
-            ->orderBy('bid_price', 'desc')
-            ->get();
+        //redis搜索
+        $redis = app('redis')->connection('first');
+        $periods = (new Period())->getAll([Period::STATUS_IN_PROGRESS, Period::STATUS_OVER]);
         $res = [];
-        foreach ($model as $item) {
-            $bid = DB::table('bid')
-                ->select('status', 'period_id', 'nickname', 'bid_price', 'status', 'pay_type', 'end_time', 'pay_amount')
-                ->where([
-                    'bid_price' => $item->bid_price,
-                    'period_id' => $item->period_id
-                ])->first();
-            $res[] = [
-                'a' => $bid->period_id,
-                'b' => $bid->pay_amount,
-                'c' => $bid->bid_price,
-                'd' => $bid->nickname,
-                'e' => $bid->pay_type,
-                'f' => $bid->status,
-                'g' => $bid->end_time
-            ];
+        foreach ($periods as $period) {
+            $bid = $this->getLastBidInfo($redis, $period->id);
+            if ($bid) {
+                $res[] = [
+                    'a' => $bid->period_id,
+                    'b' => $bid->pay_amount,
+                    'c' => $bid->bid_price,
+                    'd' => $bid->nickname,
+                    'e' => $bid->pay_type,
+                    'f' => $bid->status,
+                    'g' => $bid->end_time
+                ];
+            }
         }
         return $res;
+        //mysql数据库搜索
+        /*        $model = DB::table('bid')
+                    ->select(DB::raw('max(bid_price) as bid_price,period_id'))
+                    ->whereIn('period_id', $ids)
+                    ->groupBy(['period_id'])
+                    ->orderBy('bid_price', 'desc')
+                    ->get();
+
+
+                foreach ($model as $item) {
+                    $bid = DB::table('bid')
+                        ->select('status', 'period_id', 'nickname', 'bid_price', 'status', 'pay_type', 'end_time', 'pay_amount')
+                        ->where([
+                            'bid_price' => $item->bid_price,
+                            'period_id' => $item->period_id
+                        ])->first();
+                    $res[] = [
+                        'a' => $bid->period_id,
+                        'b' => $bid->pay_amount,
+                        'c' => $bid->bid_price,
+                        'd' => $bid->nickname,
+                        'e' => $bid->pay_type,
+                        'f' => $bid->status,
+                        'g' => $bid->end_time
+                    ];
+                }*/
     }
 
     /** 获取用户表信息 */
