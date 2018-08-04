@@ -277,7 +277,7 @@ class Bid extends Common
                 'end_time' => $time,
                 'is_real' => User::TYPE_ROBOT
             ];
-            $this->setLastPersonId($redis, $period->id, $data['user_id'], $data['bid_price']);
+            $this->setLastPersonId($redis, $data);
             if ($data['status'] == self::STATUS_SUCCESS) {
                 //竞拍成功则立即保存
                 $bid = Bid::create($data);
@@ -294,6 +294,7 @@ class Bid extends Common
                 //购物币返还结算
                 Income::settlement($data['period_id'], $robotPeriod->user_id);
                 //redis缓存也改变
+                $data['id'] = $bid->id;
                 $this->setLastPersonId($redis, $data);
             } else {
                 $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
