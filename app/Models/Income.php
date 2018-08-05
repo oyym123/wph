@@ -20,6 +20,7 @@ class Income extends Common
         'return_proportion', //返还比例
         'used_amount', //使用的金额
         'name',
+        'voucher_id',
         'product_id',
         'expired_at',
         'period_id',
@@ -38,6 +39,7 @@ class Income extends Common
             ])->where('user_id', '<>', $userId)//竞拍成功者没有返回购物币
             ->groupBy(['user_id', 'pay_amount', 'product_id'])
             ->get();
+        $vouchers = new  Vouchers();
         foreach ($bids as $bid) {
             $data = [
                 'user_id' => $bid->user_id,
@@ -50,9 +52,33 @@ class Income extends Common
                 'product_id' => $bid->product_id,
                 'period_id' => $periodId
             ];
+            list($amount, $count) = self::getAmountSum($bid->user_id, $bid->product_id);
+            $vou = [
+                'product_id' => $bid->product_id,
+                'status' => Vouchers::STATUS_ENABLE,
+                'user_id' => $bid->user_id,
+                'expired_at' => config('bid.bid_currency_expired_at'),
+                'content' => '',
+                'amount' => $amount + $data['amount'],
+                'count' => $count,
+            ];
+            $res = $vouchers->saveData($vou);
+            $data['voucher_id'] = $res;
             self::create($data);//保存记录
             DB::table('users')->where(['id' => $bid->user_id])->increment('shopping_currency', $data['amount']);
         }
+    }
+
+    /** 获取可用的购物币总和 */
+    public static function getAmountSum($userId, $productId)
+    {
+        $query = Income::where([
+            'type' => self::TYPE_SHOPPING_CURRENCY,
+            'user_id' => $userId,
+            'product_id' => $productId,
+            'status' => self::STATUS_ENABLE,
+        ])->where('expired_at', '>', date('Y-m-d H:i:s'));
+        return [$query->sum('amount'), $query->count('id')];
     }
 
     /** 自动竞拍成功，返回剩余拍币 */
@@ -63,6 +89,144 @@ class Income extends Common
             DB::table('users')->where(['id' => $userId])->increment('gift_currency', $data['amount']);
         } elseif ($data['type'] == self::TYPE_BID_CURRENCY) {
             DB::table('users')->where(['id' => $userId])->increment('bid_currency', $data['amount']);
+        }
+    }
+
+    /** 收入明细 */
+    public function detail($userId)
+    {
+        $incomes = Income::where([
+            'user_id' => $userId
+        ])->offset($this->offset)->limit($this->limit)->orderBy('created_at', 'desc')->get();
+        $data = [];
+        foreach ($incomes as $income) {
+            $data[] = [
+                'title' => $income->name,
+                'created_at' => $income->created_at,
+                'amount' => '+' . round($income->amount) . $this->getCurrencyStr($income->type),
+            ];
+        }
+        return $data;
+    }
+
+    /** 查看是否有返还的购物币 */
+    public function shoppingCurrency($userId, $getOne = false)
+    {
+        //查询可用的购物币
+        if ($getOne) {
+            $income = Income::where([
+                'type' => self::TYPE_SHOPPING_CURRENCY,
+                'status' => self::STATUS_ENABLE,
+                'user_id' => $userId
+            ])->first();
+            return count($income) > 0 ? 1 : 0;
+        } else {
+            $usable = $disable = [];
+            $vouchers = Vouchers::where([
+                'user_id' => $userId,
+            ])->get();
+            $products = new Product();
+
+            foreach ($vouchers as $voucher) {
+                $expired_at = strtotime($voucher->expired_at) - time();
+                $product = $products->getCacheProduct($voucher->product_id);
+                if ($voucher->status == Vouchers::STATUS_ENABLE && $expired_at > 0) {
+                    $usableDetail = [];
+                    $usableIncome = Income::where([
+                        'user_id' => $userId,
+                        'voucher_id' => $voucher->id,
+                        'status' => Income::STATUS_ENABLE
+                    ])->where('expired_at', '>', date('Y-m-d H:i:s'))->select('created_at', 'expired_at', 'amount')->get();
+                    foreach ($usableIncome as $item) {
+                        $usableDetail[] = [
+                            'id' => $voucher->id,
+                            'title' => $product->title,
+                            'img' => env('QINIU_URL_IMAGES') . $product->img_cover,
+                            'created_at' => $item->created_at,
+                            'expired_at' => round((strtotime($item->expired_at) - time()) / 86400) . '天后过期',
+                            'amount' => round($item->amount)
+                        ];
+                    }
+                    $usable[] = [
+                        'id' => $voucher->id,
+                        'product_id' => $product->id,
+                        'title' => $product->title,
+                        'img' => env('QINIU_URL_IMAGES') . $product->img_cover,
+                        'created_at' => $voucher->created_at,
+                        'expired_at' => round($expired_at / 86400) . '天后过期',
+                        'count' => count($usableDetail),
+                        'amount' => round($voucher->amount),
+                        'detail' => $usableDetail
+                    ];
+                } elseif ($voucher->status == Vouchers::STATUS_ALREADY_USED) {
+                    $disable = [];
+                    $disableDetail = [];
+                    $disableIncome = Income::where([
+                        'user_id' => $userId,
+                        'voucher_id' => $voucher->id,
+                    ])->get();
+                    foreach ($disableIncome as $item) {
+                        $disableDetail[] = [
+                            'id' => $voucher->id,
+                            'title' => $product->title,
+                            'img' => env('QINIU_URL_IMAGES') . $product->img_cover,
+                            'created_at' => $item->created_at,
+                            'expired_at' => $item->expired_at,
+                            'amount' => round($item->amount),
+                            'type' => 2 //表示已使用
+                        ];
+                    }
+                    $disable[] = [
+                        'id' => $voucher->id,
+                        'product_id' => $product->id,
+                        'title' => $product->title,
+                        'img' => env('QINIU_URL_IMAGES') . $product->img_cover,
+                        'created_at' => $voucher->created_at,
+                        'expired_at' => round($expired_at / 86400) . '天后过期',
+                        'count' => count($disableDetail),
+                        'amount' => round($voucher->amount),
+                        'detail' => $disableDetail,
+                        'type' => 2
+                    ];
+                } else {
+                    $disable = [];
+                    $disableDetail = [];
+                    $disableIncome = Income::where([
+                        'user_id' => $userId,
+                        'voucher_id' => $voucher->id,
+                    ])->where('expired_at', '<', date('Y-m-d H:i:s'))->select('created_at', 'expired_at', 'amount')->get();
+                    foreach ($disableIncome as $item) {
+                        $disableDetail[] = [
+                            'id' => $voucher->id,
+                            'title' => $product->title,
+                            'img' => env('QINIU_URL_IMAGES') . $product->img_cover,
+                            'created_at' => $item->created_at,
+                            'expired_at' => $item->expired_at,
+                            'amount' => round($item->amount),
+                            'type' => 3
+                        ];
+                    }
+
+                    $disable[] = [
+                        'id' => $voucher->id,
+                        'product_id' => $product->id,
+                        'title' => $product->title,
+                        'img' => env('QINIU_URL_IMAGES') . $product->img_cover,
+                        'created_at' => $voucher->created_at,
+                        'expired_at' => $voucher->expired_at,
+                        'count' => count($disableDetail),
+                        'amount' => round($voucher->amount),
+                        'type' => 3, //表示已过期
+                        'detail' => $disableDetail
+                    ];
+                }
+            }
+
+            $data = [
+                'usable' => $usable,
+                'disable' => $disable
+            ];
+            return $data;
         }
     }
 }

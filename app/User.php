@@ -7,6 +7,7 @@ use App\Helpers\QiniuHelper;
 use App\Models\City;
 use App\Models\Common;
 use App\UserInfo;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -18,6 +19,11 @@ class User extends Authenticatable
     protected $table = 'users';
     use Notifiable;
 
+    /** 转换日期格式 */
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::createFromFormat('Y-m-d H:i:s', $value)->toDateTimeString();
+    }
     /**
      * 模型日期列的存储格式
      *
@@ -49,6 +55,8 @@ class User extends Authenticatable
 
     const TYPE_ROBOT = 0; //机器人
     const TYPE_REAL_PERSON = 1; //真人
+
+    const REGISTER_TYPE_WEI_XIN = 1;
 
     public function getAvatar()
     {
@@ -198,16 +206,6 @@ class User extends Authenticatable
         return $model;
     }
 
-//    /** 获取所有用户,默认是机器人 */
-//    public function getAll($status = self::TYPE_ROBOT)
-//    {
-//        $model = DB::table('period')->where([
-//            'is_real' => $status,
-//            'deleted_at' => null
-//        ])->get();
-//        //缓存一天
-//        return (new Common())->getCache('user@getAll' . $status, $model, 60 * 24);
-//    }
 
     /** 绑定手机 */
     public function bindMobile($params, $userId)

@@ -45,13 +45,15 @@ Route::group(['middleware' => 'web'], function () {
     //产品
     Route::get('product', 'ProductController@index');
     Route::get('product/type', 'ProductController@type');
-    Route::post('product/type-product-list', 'ProductController@typeProductList');
     Route::get('product/detail', 'ProductController@detail');
 
     Route::get('product/bid-rules', 'ProductController@bidRules');
     Route::get('product/past-deals', 'ProductController@pastDeals');
-    Route::get('product/share-order', 'ProductController@shareOrder');
     Route::get('product/period', 'ProductController@period');
+    Route::get('product/history-trend', 'ProductController@historyTrend');
+    Route::get('product/shop-list', 'ProductController@shopList');
+    Route::get('product/shop-detail', 'ProductController@shopDetail');
+    Route::get('product/history-trend', 'ProductController@historyTrend');
 
 
     //竞拍
@@ -62,9 +64,25 @@ Route::group(['middleware' => 'web'], function () {
 
     /** 用户中心 */
     Route::post('user/address', 'UserController@address'); //用户收货地址
-    Route::get('user/my-auction', 'UserController@MyAuction'); //我的竞拍
 
+    Route::get('user/property', 'UserController@property'); //我的竞拍
     Route::get('user/batch-register', 'UserController@batchRegister');//批量用户注册
+    Route::get('user/shopping-currency', 'UserController@shoppingCurrency');//批量用户注册
+    Route::get('user/evaluate', 'UserController@evaluate');//批量用户注册
+    Route::get('/balance-desc', function () {
+        return view('api.user.balance-desc');
+    });
+
+
+    /** 订单中心 */
+    Route::get('order/my-auction', 'OrderController@MyAuction'); //我的竞拍
+    Route::get('order/confirm-receipt', 'OrderController@confirmReceipt'); //确认收货
+    Route::get('order/transport-detail', 'OrderController@transportDetail'); //运输详情
+
+
+    /** 晒单 */
+    Route::post('evaluate/submit', 'EvaluateController@submit'); //提交晒单
+    Route::get('evaluate', 'EvaluateController@index'); //晒单列表
 
     //收藏
     Route::get('collection/collect', 'CollectionController@collect');

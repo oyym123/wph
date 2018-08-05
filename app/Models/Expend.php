@@ -28,4 +28,20 @@ class Expend extends Common
         self::create($data);
     }
 
+    /** 支出明细 */
+    public function detail($userId)
+    {
+        $expends = Expend::where([
+            'user_id' => $userId
+        ])->offset($this->offset)->limit($this->limit)->orderBy('created_at', 'desc')->get();
+        $data = [];
+        foreach ($expends as $expend) {
+            $data[] = [
+                'title' => $expend->name,
+                'created_at' => $expend->created_at,
+                'amount' => '-' . round($expend->amount) . $this->getCurrencyStr($expend->type),
+            ];
+        }
+        return $data;
+    }
 }

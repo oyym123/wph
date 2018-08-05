@@ -8,6 +8,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
@@ -21,7 +22,7 @@ class Common extends Model
     //   protected $dateFormat = 'U';
 
     public $offset = 0; // 分页
-    public $limit = 10; // 分页
+    public $limit = 20; // 分页
     public $userEntity = null; // 用户实体
     public $psize = 20;
     public $params = [];
@@ -41,6 +42,16 @@ class Common extends Model
     const TYPE_GIFT_CURRENCY = 1;       //赠币
     const TYPE_BID_CURRENCY = 2;        //拍币
     const TYPE_SHOPPING_CURRENCY = 3;   //购物币
+
+    public function getCurrencyStr($key = 999)
+    {
+        $data = [
+            self::TYPE_GIFT_CURRENCY => '赠币',
+            self::TYPE_BID_CURRENCY => '拍币',
+            self::TYPE_SHOPPING_CURRENCY => '购物币',
+        ];
+        return $key != 999 ? $data[$key] : $data;
+    }
 
     /** 获取返回状态提示 */
     public function codeStr($key = 999)
@@ -192,6 +203,12 @@ class Common extends Model
             $data[$item->$key] = $item->$value;
         }
         return $data;
+    }
+
+    /** 转换日期格式 */
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::createFromFormat('Y-m-d H:i:s', $value)->toDateTimeString();
     }
 
     public function createdAt($format = 'Y-m-d H:i:s')

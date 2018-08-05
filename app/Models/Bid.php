@@ -169,15 +169,20 @@ class Bid extends Common
                     DB::table('period')->where(['id' => $period->id])->update([
                         'status' => Period::STATUS_OVER,
                         'user_id' => $bid->user_id,
+                        'bid_end_time' => date('Y-m-d H:i:s', time()),
                         'bid_id' => $bid->id
                     ]);
                     //新增该产品新的期数
                     $periods->saveData($period->product_id);
                     //同时清除期数缓存
                     $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
-                    if ($bid->is_real == User::TYPE_REAL_PERSON) { //只有真人才需要走结算、订单流程
+
+                    if ($period->real_person == User::TYPE_REAL_PERSON) { //有真人参与则结算
                         //购物币返还结算
                         Income::settlement($period->id, $bid->user_id);
+                    }
+
+                    if ($bid->is_real == User::TYPE_REAL_PERSON) { //只有真人才需要走结算、订单流程
                         //自动拍币返还
                         (new AutoBid())->back($period->id, $bid->user_id);
                         //生成一个订单
@@ -198,7 +203,11 @@ class Bid extends Common
                             'str_phone_number' => $address->telephone, //手机号
                             'expired_at' => config('bid.order_expired_at'), //过期时间
                         ];
-                        $order->createOrder($orderInfo);
+                        $order = $order->createOrder($orderInfo);
+                        //转换状态
+                        DB::table('period')->where(['id' => $period->id])->update([
+                            'order_id' => $order->id,
+                        ]);
                     }
                 }
             }
@@ -291,8 +300,6 @@ class Bid extends Common
                 $periods->saveData($period->product_id);
                 //同时清除期数缓存
                 $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
-                //购物币返还结算
-                Income::settlement($data['period_id'], $robotPeriod->user_id);
                 //redis缓存也改变
                 $data['id'] = $bid->id;
                 $this->setLastPersonId($redis, $data);
@@ -328,14 +335,10 @@ class Bid extends Common
     /** 竞拍最新的状态 */
     public function newestBid($periodIds)
     {
-        $ids = explode(',', $periodIds);
-        if (count($ids) > 500) {
-            self::showMsg('请求数据过多！', self::CODE_ERROR);
-        }
         //redis搜索
         $redis = app('redis')->connection('first');
         $res = [];
-        foreach ($ids as $id) {
+        foreach (explode(',', $periodIds) as $id) {
             if ($bid = $this->getLastBidInfo($redis, $id)) {
                 $res[] = [
                     'a' => $bid->period_id,
@@ -356,8 +359,6 @@ class Bid extends Common
                     ->groupBy(['period_id'])
                     ->orderBy('bid_price', 'desc')
                     ->get();
-
-
                 foreach ($model as $item) {
                     $bid = DB::table('bid')
                         ->select('status', 'period_id', 'nickname', 'bid_price', 'status', 'pay_type', 'end_time', 'pay_amount')
@@ -381,5 +382,10 @@ class Bid extends Common
     public function User()
     {
         return $this->hasOne('App\User', 'id', 'user_id');
+    }
+
+    public function period()
+    {
+        return $this->belongsTo('App\Models\Period');
     }
 }

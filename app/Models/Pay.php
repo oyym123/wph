@@ -28,4 +28,7 @@ class Pay extends Common
         'paid_at', //支付时间
     ];
     const TYPE_WEI_XIN = 1;
+
+    const STATUS_UNPAID = 10;//未支付
+    const STATUS_ALREADY_PAY = 20;//已支付
 }

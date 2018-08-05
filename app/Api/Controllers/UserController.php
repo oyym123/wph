@@ -3,10 +3,16 @@
 namespace App\Api\Controllers;
 
 use App\Helpers\Helper;
+use App\Helpers\QiniuHelper;
 use App\Helpers\WXBizDataCrypt;
 use App\Http\Requests\BindMobilePost;
 use App\Models\Bid;
 use App\Models\City;
+use App\Models\Evaluate;
+use App\Models\Expend;
+use App\Models\Income;
+use App\Models\Order;
+use App\Models\Pay;
 use App\Models\Period;
 use App\Models\UserAddress;
 use Illuminate\Support\Facades\DB;
@@ -86,13 +92,14 @@ class UserController extends WebController
             $model = DB::table('users')->where(['open_id' => $result['openid'], 'is_real' => User::TYPE_REAL_PERSON])->first();
             $token = md5(md5($result['openid'] . $result['session_key']));
             list($province, $city) = City::simplifyCity($address['region'], $address['city']);
+            $avatar = QiniuHelper::fetchImg($request->avatar)[0]['key'];
             $data = [
                 'session_key' => $result['session_key'],
                 'open_id' => $result['openid'],
                 'email' => rand(1000000, 999999999) . '@163.com',
                 'nickname' => $request->nickname ?: '佚名',
                 'name' => $request->nickname ?: '佚名',
-                'avatar' => $request->avatar ?: $this->getImage('default_user_photo10.png'),
+                'avatar' => $avatar ?: $this->getImage('default_user_photo10.png'),
                 'is_real' => USER::TYPE_REAL_PERSON,
                 'token' => $token,
                 'ip' => $address['ip'],
@@ -183,7 +190,46 @@ class UserController extends WebController
      *   tags={"用户中心"},
      *   summary="用户中心",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *                  [avatar] => 头像
+     *                  [nickname] => 佚名
+     *                  [created_at] => 2018-07-21 00:42:40
+     *                  [status] => 状态
+     *                  [register_type] => 注册类型
+     *                  [bid_currency] => 254.00 （拍币）
+     *                  [gift_currency] => 0.00   （赠币）
+     *                  [shopping_currency] => 256.00  （购物币）
+     *     "
+     *   )
+     * )
+     */
+    public function center()
+    {
+        $this->auth();
+        $user = $this->userIdent;
+        $data = array(
+            'avatar' => $user->getAvatar(),
+            'nickname' => $user->nickname,
+            'created_at' => $user->created_at,
+            'status' => $user->status,
+            'register_type' => User::REGISTER_TYPE_WEI_XIN,
+            'bid_currency' => $this->userIdent->bid_currency,
+            'gift_currency' => $this->userIdent->gift_currency,
+            'shopping_currency' => $this->userIdent->shopping_currency,
+        );
+        self::showMsg($data);
+    }
+
+    /**
+     * @SWG\Get(path="/api/user/shopping-currency",
+     *   tags={"用户中心"},
+     *   summary="我的购物币",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -191,179 +237,64 @@ class UserController extends WebController
      *   )
      * )
      */
-    public function center()
+    public function shoppingCurrency()
     {
-        $data = array(
-            'id' => 1328115335,
-            'avatar' => 'https://qnimg.gogobids.com/avatar/default_user_avatar.png',
-            'nickname' => '131****7904',
-            'mobile_num' => '13161057904',
-            'create_time' => 1529628433047.0,
-            'type' => 0,
-            'status' => 1,
-            'app_id' => 1003,
-            'register_type' => 1,
-            'real_bids' => 0,
-            'voucher_bids' => 0,
-            'shop_bids' => 0,
-            'integration' => 5,
-            'is_black' => NULL,
-            'qq_num' => '1052156115',
-            'discounts' => 0,
-        );
-        self::showMsg($data);
+        $this->auth();
+        $income = new Income();
+        self::showMsg($income->shoppingCurrency($this->userId));
     }
 
+
+
     /**
-     * @SWG\Get(path="/api/user/my-auction",
+     * @SWG\Get(path="/api/user/property",
      *   tags={"用户中心"},
-     *   summary="我的竞拍",
+     *   summary="我的财产",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="type", in="query", default="0", description="（0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）" ,required=true,
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
      *     type="string",
      *   ),
      *   @SWG\Response(
-     *       response=200,description="
-     *              period_id => 期数id
-     *              product_id => 产品id
-     *              period_code => 期数代码
-     *              title => 标题
-     *              img_cover => 封面url地址
-     *              bid_step => 竞拍步骤
-     *              product_type => 产品类型
-     *              is_purchase_enable => 是否可加价
-     *              sell_price => 售价
-     *              num => 数量
-     *              settlement_bid_price => 成交价
-     *              pay_real_price => 真正成交价格
-     *              end_time => 结束时间
-     *              is_long_history => 是否很长时间
-     *              id => 订单id
-     *              bid_type => 竞拍类型 （0 = 正常竞拍 , 1 = 差价购买）
-     *              order_type => 订单类型 （ 10 = 未支付 , 15 = 已付款 ,20 = 待发货 , 25 = 已发货 , 50 = 买家已签收 , 100 = 已完成）
-     *              result_status => 结果类型 （0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）
-     *              pay_status => 支付状态 （0=>未支付 , 1=已支付）
-     *              pay_time => 支付时间
-     *              pay_price => 支付价格
-     *              pay_shop_bids => 支付商铺竞价
-     *              order_time => 订单时间
-     *              check_status => 检查状态
-     *              return_voucher_bids => 返还的购物币
-     *              used_voucher_bids => 使用的真实购物币
-     *              nickname => 昵称
-     *              delivery_id => 交货id
-     *              delivery_mode => 交货模式
-     *              delivery_code => 交货代码
-     *              delivery_state => 交货状态
-     *              delivery_state_desc => 交货详情
-     *              show_confirm_trans => 是否展示确认收货按钮
-     *     "
+     *       response=200,description="successful operation"
      *   )
      * )
      */
-    public function MyAuction()
+    public function property()
     {
         $this->auth();
-        $request = $this->request;
-        $period = new Period();
+        $expend = new Expend();
+        $expend->limit = $this->limit;
+        $expend->offset = $this->offset;
 
-        $data = array(
-            'period_id' => 4372346,
-            'product_id' => 626,
-            'period_code' => '201806210002',
-            'title' => 'Apple iPhone 8 Plus 256G 颜色随机',
-            'img_cover' => '1505284333822',
-            'bid_step' => 1,
-            'product_type' => 0,
-            'is_purchase_enable' => 1,
-            'sell_price' => '8787.00',
-            'num' => 1,
-            'settlement_bid_price' => '862.00',
-            'pay_real_price' => '862.00',
-            'end_time' => 1529635328574.0,
-            'is_long_history' => 0,
-            'id' => 'b1b7b2ae63f70914016424fa59fc0d53',
-            'bid_type' => 0,
-            'order_type' => 4,
-            'result_status' => 2,
-            'pay_status' => 1,
-            'pay_time' => NULL,
-            'pay_price' => 0,
-            'pay_shop_bids' => 0,
-            'order_time' => NULL,
-            'check_status' => 0,
-            'return_voucher_bids' => 0,
-            'used_voucher_bids' => 5,
-            'user_id' => 1328115335,
-            'nickname' => '一心一意',
-            'delivery_id' => NULL,
-            'delivery_mode' => NULL,
-            'delivery_code' => NULL,
-            'delivery_state' => NULL,
-            'delivery_state_desc' => NULL,
-            'delivery_title' => '',
-            'show_confirm_trans' => 0,
-        );
-
-        switch ($request->type) {
-            case 0: //我在拍
-                $result = DB::table('period')
-                    ->join('bid', 'period.id', '=', 'bid.period_id')
-                    ->join('product', 'product.id', '=', 'period.product_id')
-                    ->select('product.*', 'period.*', 'bid.end_time', 'bid.bid_price')
-                    ->where([
-                        'bid.user_id' => $this->userId,
-                        'bid.status' => Bid::STATUS_FAIL,
-                        'bid.is_real' => User::TYPE_REAL_PERSON
-                    ])
-                    ->orderBy('bid.bid_price')
-                    ->get();
-                print_r($result);
-                foreach ($result as $item) {
-                    $data['period_id'] = $item->id;
-                    $data['product_id'] = $item->product_id;
-                    $data['period_code'] = $item->code;
-                    $data['title'] = $item->title;
-                    $data['img_cover'] = $item->img_cover;
-                    $data['bid_step'] = $item->bid_step;
-                    $data['type'] = $item->type;
-                    $data['sell_price'] = $item->sell_price;
-                    $data['settlement_bid_price'] = $item->bid_price;
-                    $data['end_time'] = $item->end_time;
-                    $data['result_status'] = $request->type;
-                    $data['period_code'] = $item->code;
-                    $data['period_code'] = $item->code;
-                }
-
-                exit;
-                break;
-            case 1: //我拍中
-
-                break;
-            case 2: //差价购
-
-
-                break;
-            case 3: //待付款
-
-
-                break;
-            case 4: //待签收
-
-
-                break;
-            case 5: //待晒单
-
-
-                break;
-        }
-
+        $income = new Income();
+        $income->limit = $this->limit;
+        $income->offset = $this->offset;
+        $data = [
+            'balance_desc' => [
+                'id' => 1,
+                'title' => '余额说明',
+                'img' => '',
+                'function' => 'html',
+                'params' => [
+                    'key' => 'url',
+                    'type' => 'String',
+                    'value' => $_SERVER["HTTP_HOST"] . '/api/balance-desc',
+                ],
+            ],
+            'bid_currency' => $this->userIdent->bid_currency,
+            'gift_currency' => $this->userIdent->gift_currency,
+            'shopping_currency' => $this->userIdent->shopping_currency,
+            'expend' => $expend->detail($this->userId),
+            'income' => $income->detail($this->userId),
+        ];
         self::showMsg($data);
     }
-
 
     /**
      * @SWG\Post(path="/api/user/address",
@@ -432,5 +363,25 @@ class UserController extends WebController
                 self::showMsg('保存失败！', 2);
             }
         }
+    }
+
+
+    /**
+     * @SWG\Get(path="/api/user/evaluate",
+     *   tags={"用户中心"},
+     *   summary="我的晒单",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function evaluate()
+    {
+        $this->auth();
+        self::showMsg((new Evaluate())->getList(['user_id' => $this->userId]));
     }
 }

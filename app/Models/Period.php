@@ -47,10 +47,10 @@ class Period extends Common
     }
 
     /** 获取闪拍头条数据 */
-    public function dealEnd()
+    public function dealEnd($where = [])
     {
         $data = [];
-        $periods = Period::has('product')->where(['status' => self::STATUS_OVER])->limit(3)->orderBy('updated_at', 'desc')->get();
+        $periods = Period::has('product')->where($where + ['status' => self::STATUS_OVER])->limit($this->limit)->orderBy('updated_at', 'desc')->get();
         foreach ($periods as $period) {
             $product = $period->product;
             $data[] = [
@@ -321,6 +321,42 @@ class Period extends Common
         RobotPeriod::batchSave($model->id, $productId);
     }
 
+
+    /** 历史成交走势图 */
+    public function historyTrend($productId)
+    {
+        $periods = Period::where([
+            'product_id' => $productId,
+            'status' => self::STATUS_OVER
+        ])->offset($this->offset)->limit($this->limit)->orderBy('created_at', 'desc')->get();
+        $list = $bidPrices = $data = [];
+        $products = new Product();
+        $product = $products->getCacheProduct($productId);
+        foreach ($periods as $period) {
+            $bidPrices[] = $period->bid_price;
+            $list[] = [
+                'code' => $period->code,
+                'price' => $period->bid_price,
+            ];
+            $data[] = [
+                'end_time' => $period->bid_end_time,
+                'bid_price' => $period->bid_price,
+                'nickname' => $period->user ? $period->user->nickname : '',
+            ];
+        }
+        $res = [
+            'img' => $product->getImgCover(),
+            'title' => $product->title,
+            'present_price' => $data[0]['bid_price'],
+            'max_price' => min($bidPrices),
+            'min_price' => max($bidPrices),
+            'average_price' => round(array_sum($bidPrices) / count($bidPrices), 2),
+            'detail' => $data,
+            'list' => $list
+        ];
+        return $res;
+    }
+
     /** 获取产品表信息 */
     public function Product()
     {
@@ -338,6 +374,19 @@ class Period extends Common
     {
         return $this->hasOne('App\Models\Auctioneer', 'id', 'auctioneer_id');
     }
+
+
+    /** 获取拍卖师表信息 */
+    public function Order()
+    {
+        return $this->hasOne('App\Models\Order', 'id', 'order_id');
+    }
+
+
+//    public function bid()
+//    {
+//        return $this->hasMany('App\Models\Bid', 'period_id', 'id');
+//    }
 
     public function getPeriod($id, $where = [])
     {

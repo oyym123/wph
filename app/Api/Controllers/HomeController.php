@@ -127,6 +127,7 @@ class HomeController extends WebController
     public function dealEnd()
     {
         $model = new Period();
+        $model->limit = 3;
         self::showMsg($model->dealEnd());
     }
 

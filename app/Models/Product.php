@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
@@ -14,10 +13,24 @@ class Product extends Common
 
     const BUY_BY_DIFF_NO = 0;
     const BUY_BY_DIFF_YES = 1;
+
+    const SHOPPING_YES = 1; //加入购物币专区
+    const SHOPPING_NO = 0;  //不加入购物币专区
+
     public static $buyByDiff = [
         self::BUY_BY_DIFF_NO => '不可差价购',
         self::BUY_BY_DIFF_YES => '可差价购',
     ];
+
+    /** 加入购物币专区 */
+    public static function getIsShop($key = 999)
+    {
+        $data = [
+            self::SHOPPING_YES => '加入购物币专区',
+            self::SHOPPING_NO => '不加入购物币专区',
+        ];
+        return $key != 999 ? $data[$key] : $data;
+    }
 
     /** 获取产品数量 */
     public static function counts()
@@ -32,8 +45,14 @@ class Product extends Common
         if ($this->hasCache($key)) {
             return $this->getCache($key);
         } else {
-            return $this->putCache($key, Product::find($productId), 10);
+            $data = $this->getProduct($productId);
+            return $this->putCache($key, $data, 10);
         }
+    }
+
+    public function getImgCover()
+    {
+        return env('QINIU_URL_IMAGES') . $this->img_cover;
     }
 
     /** 判断是否是10元专区 */
@@ -47,7 +66,42 @@ class Product extends Common
         if ($model = Product::find($id)) {
             return $model;
         }
-        list($info, $status) = $this->returnRes('', self::CODE_NO_DATA);
-        self::showMsg($info, $status);
+        self::showMsg('该产品不存在!', self::CODE_NO_DATA);
+    }
+
+    /** 购物币专区 */
+    public function shopList()
+    {
+        $products = Product::where([
+            'is_shop' => self::SHOPPING_YES,
+            'status' => self::STATUS_ENABLE
+        ])->offset($this->offset)->limit($this->limit)->get();
+        $data = [];
+        foreach ($products as $product) {
+            $data[] = [
+                'title' => $product->title,
+                'sell_price' => $product->sell_price,
+                'img_cover' => $product->getImgCover(),
+            ];
+        }
+        return $data;
+    }
+
+
+    /** 购物币专区详情 */
+    public function shopDetail($productId)
+    {
+        $product = $this->getCacheProduct($productId);
+        if ($product->is_shop == self::SHOPPING_YES) {
+            return [
+                'title' => $product->title,
+                'sell_price' => $product->sell_price,
+                'img_cover' => $product->getImgCover(),
+                'imgs' => json_decode($product->imgs, true),
+                'evaluate' => (new Evaluate())->getList(['product_id' => $productId])
+            ];
+        } else {
+            return [];
+        }
     }
 }

@@ -33,6 +33,12 @@ class ProductController extends WebController
      *   @SWG\Parameter(name="token", in="header", default="", description="用户token" ,
      *     type="string",
      *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
+     *     type="string",
+     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -145,13 +151,18 @@ class ProductController extends WebController
         self::showMsg($period->getProductDetail($this->request->period_id));
     }
 
-
     /**
      * @SWG\Get(path="/api/product/past-deals",
      *   tags={"产品"},
      *   summary="往期成交",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
+     *   @SWG\Parameter(name="product_id", in="query", default="2", description="产品id",required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -161,192 +172,17 @@ class ProductController extends WebController
      */
     public function pastDeals()
     {
-        $data = array(
-            0 =>
-                array(
-                    'id' => 4505048,
-                    'product_id' => 1042,
-                    'period_id' => 4505048,
-                    'period_code' => '201807040003',
-                    'title' => '预售 三星 Galaxy A9 Star 4GB+64GB 颜色随机',
-                    'img_cover' => '1529055804660',
-                    'end_time' => 1530714478410.0,
-                    'sell_price' => '3299.00',
-                    'bid_price' => '377.50',
-                    'user_id' => 1485069167,
-                    'nickname' => '不可忽视的激情',
-                    'avatar' => 'https://qnimg.gogobids.com/avatar/b1b0aeb05bae50bb015bae5bd35c3bf6',
-                ),
-            1 =>
-                array(
-                    'id' => 4502791,
-                    'product_id' => 1042,
-                    'period_id' => 4502791,
-                    'period_code' => '201807040002',
-                    'title' => '预售 三星 Galaxy A9 Star 4GB+64GB 颜色随机',
-                    'img_cover' => '1529055804660',
-                    'end_time' => 1530692501807.0,
-                    'sell_price' => '3299.00',
-                    'bid_price' => '250.70',
-                    'user_id' => 1561020566,
-                    'nickname' => 'Neednah',
-                    'avatar' => 'https://qnimg.gogobids.com/avatar/b1b0aeb05be5e077015be5e4d1974a12',
-                ),
-            2 =>
-                array(
-                    'id' => 4500065,
-                    'product_id' => 1042,
-                    'period_id' => 4500065,
-                    'period_code' => '201807040001',
-                    'title' => '预售 三星 Galaxy A9 Star 4GB+64GB 颜色随机',
-                    'img_cover' => '1529055804660',
-                    'end_time' => 1530677752097.0,
-                    'sell_price' => '3299.00',
-                    'bid_price' => '317.00',
-                    'user_id' => 1977635926,
-                    'nickname' => '杨大善人',
-                    'avatar' => 'https://qnimg.gogobids.com/avatar/b1b0aeb05be5e077015be5e90d69125a',
-                ),
-        );
-        self::showMsg($data);
+        $model = new Period();
+        $model->limit = $this->limit;
+        $model->offset = $this->offset;
+        self::showMsg($model->dealEnd(['product_id' => $this->request->product_id]));
     }
-
-
-    /**
-     * @SWG\Get(path="/api/product/share-order",
-     *   tags={"产品"},
-     *   summary="晒单",
-     *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
-     *     type="string",
-     *   ),
-     *   @SWG\Response(
-     *       response=200,description="successful operation"
-     *   )
-     * )
-     */
-    public function shareOrder()
-    {
-        $data = array(
-            0 =>
-                array(
-                    'id' => 37993,
-                    'status' => 2,
-                    'user_id' => 1818755979,
-                    'nickname' => '刘吵吵',
-                    'avatar' => 'https://qnimg.gogobids.com/avatar/b1b0aeb05b55c4e3015b55c6828f18b2',
-                    'title' => '燕之屋 即食冰糖燕窝 滋补品礼盒 70g*3瓶',
-                    'content' => '吃了几次了，感觉味道甜了些，味道清淡点更好',
-                    'imgs' => 'FkNWMA2OD5ZpOyg_6qF4BIyOvMwl,FvCsBA82t6hZ69kK5AUoH_7pYLNe,FrbKni301qaoSLWNfi7v-TNGL3D_',
-                    'remark' => 'NULL',
-                    'product_title' => '燕之屋 即食冰糖燕窝 滋补品礼盒 70g*3瓶',
-                    'product_type' => 0,
-                    'img_cover' => '1509075921774',
-                    'product_id' => 724,
-                    'is_long_history' => 1,
-                    'review_time' => 1528869623245.0,
-                    'show_time' => 1528826479000.0,
-                    'update_time' => 1528869623245.0,
-                    'create_time' => 1528869623245.0,
-                ),
-            1 =>
-                array(
-                    'id' => 37987,
-                    'status' => 2,
-                    'user_id' => 1901982292,
-                    'nickname' => '厃殽',
-                    'avatar' => 'https://qnimg.gogobids.com/avatar/b1b0aeb05d77c897015d77d141d37799',
-                    'title' => '燕之屋 即食冰糖燕窝 滋补品礼盒 70g*3瓶',
-                    'content' => '感觉还行吧，挺好喝的。喝完再拍啊',
-                    'imgs' => 'FpMJ5KAFcfPnZ8My2bWlrYUMjHtl,FtOJIBxCg3sdtnY8iDNX9mHU_974,Fl7tJh-EkrsxxB-V8i5u0udcgeNT',
-                    'remark' => 'NULL',
-                    'product_title' => '燕之屋 即食冰糖燕窝 滋补品礼盒 70g*3瓶',
-                    'product_type' => 0,
-                    'img_cover' => '1509075921774',
-                    'product_id' => 724,
-                    'is_long_history' => 1,
-                    'review_time' => 1528869609144.0,
-                    'show_time' => 1528769633000.0,
-                    'update_time' => 1528869609144.0,
-                    'create_time' => 1528869609144.0,
-                ),
-            2 =>
-                array(
-                    'id' => 37995,
-                    'status' => 2,
-                    'user_id' => 1979803935,
-                    'nickname' => 'anson',
-                    'avatar' => 'https://qnimg.gogobids.com/avatar/b1b0aeb05b5ab106015b5ab35ac9214d',
-                    'title' => '燕之屋 即食冰糖燕窝 滋补品礼盒 70g*3瓶',
-                    'content' => '好喝，真的好喝。胶原蛋白补起来啊',
-                    'imgs' => 'FkX0-ODwMG9LKtQkhMNkdvERAYhV,FlzoIWV5xSSFRkwXnT4JTLpMpiZa,FqPKGXUVjNuwesYMli4bHZD2oIhN,FoyTvqErAdK8sIrwo0k1D613HOqe,FtZB7jBM1M1y8lQ3lzSKiyCiD3NJ',
-                    'remark' => 'NULL',
-                    'product_title' => '燕之屋 即食冰糖燕窝 滋补品礼盒 70g*3瓶',
-                    'product_type' => 0,
-                    'img_cover' => '1509075921774',
-                    'product_id' => 724,
-                    'is_long_history' => 1,
-                    'review_time' => 1528869630547.0,
-                    'show_time' => 1528714317000.0,
-                    'update_time' => 1528869630547.0,
-                    'create_time' => 1528869630547.0,
-                ),
-            3 =>
-                array(
-                    'id' => 37994,
-                    'status' => 2,
-                    'user_id' => 1731860911,
-                    'nickname' => 'aking',
-                    'avatar' => 'https://qnimg.gogobids.com/avatar/b1b0aeb05b55c4e3015b55cddb4105a6',
-                    'title' => '燕之屋 即食冰糖燕窝 滋补品礼盒 70g*3瓶',
-                    'content' => '第一次拍的，包装精美，口感滑滑的，口味偏甜，好吃',
-                    'imgs' => 'FgyQpwO1fZKqO2lbbByT2fjxrCII,Fmnb0o-4-nRppBhFxvbThb5syJa_,FiTmBCNrsjhmNBkDDzZ_gBXXhQmu',
-                    'remark' => 'NULL',
-                    'product_title' => '燕之屋 即食冰糖燕窝 滋补品礼盒 70g*3瓶',
-                    'product_type' => 0,
-                    'img_cover' => '1509075921774',
-                    'product_id' => 724,
-                    'is_long_history' => 1,
-                    'review_time' => 1528869626065.0,
-                    'show_time' => 1528581843000.0,
-                    'update_time' => 1528869626065.0,
-                    'create_time' => 1528869626065.0,
-                ),
-            4 =>
-                array(
-                    'id' => 37990,
-                    'status' => 2,
-                    'user_id' => 1991151083,
-                    'nickname' => '萌男哟',
-                    'avatar' => 'https://qnimg.gogobids.com/avatar/b1b0aeb05bdd01d0015bdd0cae830a97',
-                    'title' => '燕之屋 即食冰糖燕窝 滋补品礼盒 70g*3瓶',
-                    'content' => '多次来拍了，效果及口感好得不用说了。',
-                    'imgs' => 'FjXgzaUBlF-ftHQq2oiNOcUwSvT7,Fr5wjf0WXa-ZK2NBFvgfFfv24u9w,FhvqEgbVUAmiIiu-NBTWw6aIMCK7',
-                    'remark' => 'NULL',
-                    'product_title' => '燕之屋 即食冰糖燕窝 滋补品礼盒 70g*3瓶',
-                    'product_type' => 0,
-                    'img_cover' => '1509075921774',
-                    'product_id' => 724,
-                    'is_long_history' => 1,
-                    'review_time' => 1528869615914.0,
-                    'show_time' => 1528549903000.0,
-                    'update_time' => 1528869615914.0,
-                    'create_time' => 1528869615914.0,
-                ),
-        );
-        self::showMsg($data);
-
-    }
-
 
     /**
      * @SWG\Get(path="/api/product/bid-rules",
      *   tags={"产品"},
      *   summary="竞价规则",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
-     *     type="string",
-     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -355,7 +191,7 @@ class ProductController extends WebController
     public function bidRules()
     {
         $data = array(
-            'value' => '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px; color: rgb(89, 89, 89);"></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);"></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);">(1) 所有商品竞拍初始价均为0元起，每出一次出价会消耗一定数量的拍币，同时商品价格以0.1元递增。</span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);"><br/></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="color: rgb(89, 89, 89); font-family: 微软雅黑; font-size: 14px;">(2) 在初始倒计时内即可出价，初始倒计时后进入竞拍倒计时，当您出价后，该件商品的计时器将被自动重置，以便其他用户进行出价竞争。如果没有其他用户对该件商品出价，计时器归零时，您便成功拍得了该商品。</span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);"><br/></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);">(3) 若拍卖成功，请在30天内以成交价购买竞拍商品，超过30天未下单，视为放弃，不返拍币。</span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);"><br/></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);">(4) <span style="font-size:14px;font-family:&#39;微软雅黑&#39;,sans-serif">若拍卖失败，将返还所消耗拍币的30%作为购物币，可用于差价购买当期商品，赠币除外。</span></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);"><br/></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);">(5) 平台严禁违规操作，最终解释权归闪电拍卖所有。</span></p><p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px; color: rgb(89, 89, 89);"><br/></span></p>',
+            'value' => '<p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px; color: rgb(89, 89, 89);"></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);"></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);">(1) 所有商品竞拍初始价均为0元起，每出一次出价会消耗一定数量的拍币，同时商品价格以0.1元递增。</span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);"><br/></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="color: rgb(89, 89, 89); font-family: 微软雅黑; font-size: 14px;">(2) 在初始倒计时内即可出价，初始倒计时后进入竞拍倒计时，当您出价后，该件商品的计时器将被自动重置，以便其他用户进行出价竞争。如果没有其他用户对该件商品出价，计时器归零时，您便成功拍得了该商品。</span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);"><br/></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);">(3) 若拍卖成功，请在30天内以成交价购买竞拍商品，超过30天未下单，视为放弃，不返拍币。</span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);"><br/></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);">(4) <span style="font-size:14px;font-family:&#39;微软雅黑&#39;,sans-serif">若拍卖失败，将返还所消耗拍币的30%作为购物币，可用于差价购买当期商品，赠币除外。</span></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);"><br/></span></p><p style="margin-top:0;margin-bottom:0;padding:0 0 0 0 ;line-height:28px"><span style="font-family: 微软雅黑; font-size: 14px; color: rgb(89, 89, 89);">(5) 平台严禁违规操作，最终解释权归微排行所有。</span></p><p><span style="font-family: 微软雅黑, &quot;Microsoft YaHei&quot;; font-size: 14px; color: rgb(89, 89, 89);"><br/></span></p>',
         );
         self::showMsg($data);
     }
@@ -380,11 +216,59 @@ class ProductController extends WebController
     }
 
     /**
-     * @SWG\Post(path="/api/product/type-product-list",
+     * @SWG\Get(path="/api/product/history-trend",
      *   tags={"产品"},
-     *   summary="分类产品列表",
+     *   summary="历史成交走势",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="type_id", in="formData", default="1", description="类型id",
+     *   @SWG\Parameter(name="product_id", in="query", default="2", description="", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *                  [img] => 产品图片地址
+     *                  [title] => 标题
+     *                  [present_price] => 当前成交价
+     *                  [max_price] => 最大价格
+     *                  [min_price] => 最低价格
+     *                  [average_price] => 平均价格
+     *                  [detail] => Array
+     *                      (
+     *                          [0] => Array
+     *                               (
+     *                                  [end_time] => 拍中时间
+     *                                  [bid_price] => 成交价
+     *                                  [nickname] => 昵称
+     *                               )
+     *                      )
+     *                  [list] =>  Array
+     *                      (
+     *                          [0] => Array
+     *                              (
+     *                                  [code] => 201808040007 成交期数代码
+     *                                  [price] => 成交价格
+     *                               )
+     *                      )
+     *     "
+     *   )
+     * )
+     */
+    public function historyTrend()
+    {
+        $period = new Period();
+        $period->limit = $this->limit;
+        $period->offset = $this->offset;
+        self::showMsg($period->historyTrend($this->request->product_id));
+    }
+
+    /**
+     * @SWG\Get(path="/api/product/shop-list",
+     *   tags={"产品"},
+     *   summary="购物币专区",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -392,241 +276,30 @@ class ProductController extends WebController
      *   )
      * )
      */
-    public function typeProductList(Request $request)
+    public function shopList()
     {
-        if (Input::get('type_id')) {
-
-        }
-        $data = array(
-            0 =>
-                array(
-                    'id' => 4570371,
-                    'product_id' => 419,
-                    'period_code' => '201807100006',
-                    'title' => '2017款 Apple iMac Pro 27英寸 3.2GHz八核处理器 32GB内存 1TB固态硬盘（发货周期一个月）',
-                    'img_cover' => '1496734422804',
-                    'sell_price' => '43437.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            1 =>
-                array(
-                    'id' => 4570741,
-                    'product_id' => 851,
-                    'period_code' => '201807100009',
-                    'title' => '欧米茄 手表 海马系列机械男表 212.30.41.20.01.003',
-                    'img_cover' => '1509681943111',
-                    'sell_price' => '28156.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            2 =>
-                array(
-                    'id' => 4569990,
-                    'product_id' => 423,
-                    'period_code' => '201807100007',
-                    'title' => '2017款 Apple MacBook Pro 13英寸 3.1GHz 256GB 颜色随机',
-                    'img_cover' => '1496749031039',
-                    'sell_price' => '15717.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            3 =>
-                array(
-                    'id' => 4571297,
-                    'product_id' => 635,
-                    'period_code' => '201807100016',
-                    'title' => '中国黄金 Au9999黄金金元宝50g',
-                    'img_cover' => '1517389553224',
-                    'sell_price' => '16088.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            4 =>
-                array(
-                    'id' => 4571373,
-                    'product_id' => 813,
-                    'period_code' => '201807100016',
-                    'title' => '中国黄金 Au9999黄金薄片投资金条50g',
-                    'img_cover' => '1517389701883',
-                    'sell_price' => '16088.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            5 =>
-                array(
-                    'id' => 4570539,
-                    'product_id' => 809,
-                    'period_code' => '201807100008',
-                    'title' => 'Apple iPhone X 64GB 颜色随机',
-                    'img_cover' => '1505283417013',
-                    'sell_price' => '9227.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            6 =>
-                array(
-                    'id' => 4571397,
-                    'product_id' => 643,
-                    'period_code' => '201807100035',
-                    'title' => '中国黄金 Au9999黄金薄片投资金条20g',
-                    'img_cover' => '1517389610477',
-                    'sell_price' => '6431.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            7 =>
-                array(
-                    'id' => 4571406,
-                    'product_id' => 850,
-                    'period_code' => '201807100030',
-                    'title' => '华为 Mate 10 Pro 全网通 6GB+64GB 颜色随机',
-                    'img_cover' => '1508487287928',
-                    'sell_price' => '5389.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            8 =>
-                array(
-                    'id' => 4571410,
-                    'product_id' => 814,
-                    'period_code' => '201807100009',
-                    'title' => '中国黄金 Au9999黄金薄片投资金条100g',
-                    'img_cover' => '1517389752869',
-                    'sell_price' => '32175.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            9 =>
-                array(
-                    'id' => 4571477,
-                    'product_id' => 280,
-                    'period_code' => '201807100051',
-                    'title' => '海信 BCD-535WTVBP/Q 535L 对开门冰箱 变频节能静音 （流光金）',
-                    'img_cover' => '1493889435765',
-                    'sell_price' => '3959.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            10 =>
-                array(
-                    'id' => 4571494,
-                    'product_id' => 951,
-                    'period_code' => '201807100051',
-                    'title' => 'OPPO R15 全面屏手机 6G+128G 颜色随机',
-                    'img_cover' => '1521443309021',
-                    'sell_price' => '3299.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            11 =>
-                array(
-                    'id' => 4571499,
-                    'product_id' => 284,
-                    'period_code' => '201807100043',
-                    'title' => 'vivo Xplay6 全网通 6GB+128GB 4G手机 颜色随机',
-                    'img_cover' => '1493889744047',
-                    'sell_price' => '4948.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            12 =>
-                array(
-                    'id' => 4571507,
-                    'product_id' => 407,
-                    'period_code' => '201807100026',
-                    'title' => '大疆“御”Mavic Pro 可折叠4K超清航拍无人机 全能套装',
-                    'img_cover' => '1496405945137',
-                    'sell_price' => '8799.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            13 =>
-                array(
-                    'id' => 4571520,
-                    'product_id' => 146,
-                    'period_code' => '201807100031',
-                    'title' => 'Apple iPhone 7 128GB 颜色随机',
-                    'img_cover' => '1492654169352',
-                    'sell_price' => '6807.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            14 =>
-                array(
-                    'id' => 4571545,
-                    'product_id' => 812,
-                    'period_code' => '201807100054',
-                    'title' => '中国黄金 Au9999黄金薄片投资金条10g',
-                    'img_cover' => '1517389656916',
-                    'sell_price' => '3248.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            15 =>
-                array(
-                    'id' => 4571558,
-                    'product_id' => 158,
-                    'period_code' => '201807100069',
-                    'title' => '小米 Ninebot九号平衡车 颜色随机',
-                    'img_cover' => '1489658629414',
-                    'sell_price' => '2199.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            16 =>
-                array(
-                    'id' => 4571585,
-                    'product_id' => 853,
-                    'period_code' => '201807100004',
-                    'title' => '中国黄金 Au9999黄金薄片投资金条200g',
-                    'img_cover' => '1517389895501',
-                    'sell_price' => '63910.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            17 =>
-                array(
-                    'id' => 4571529,
-                    'product_id' => 949,
-                    'period_code' => '201807100046',
-                    'title' => 'vivo X21 全面屏 双摄美颜拍照手机 6GB+128GB 颜色随机',
-                    'img_cover' => '1521531050452',
-                    'sell_price' => '3518.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            18 =>
-                array(
-                    'id' => 4571592,
-                    'product_id' => 141,
-                    'period_code' => '201807100028',
-                    'title' => 'Apple iPhone 7 Plus 128GB 颜色随机',
-                    'img_cover' => '1489655988379',
-                    'sell_price' => '7907.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-            19 =>
-                array(
-                    'id' => 4570749,
-                    'product_id' => 636,
-                    'period_code' => '201807100008',
-                    'title' => 'Apple iPhone X 256GB 颜色随机',
-                    'img_cover' => '1505282863087',
-                    'sell_price' => '10657.00',
-                    'bid_step' => 10,
-                    'is_favorite' => 0,
-                ),
-
-        );
-        self::showMsg($data);
+        $product = new Product();
+        $product->limit = $this->limit;
+        $product->offset = $this->offset;
+        self::showMsg($product->shopList());
     }
 
-
-    public function period()
+    /**
+     * @SWG\Get(path="/api/product/shop-detail",
+     *   tags={"产品"},
+     *   summary="购物币专区产品详情",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="product_id", in="query", default="7", description="产品详情", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function shopDetail()
     {
-        $model = new Period();
-        $model->saveData(2);
+        $product = new Product();
+        self::showMsg($product->shopDetail($this->request->product_id));
     }
 }

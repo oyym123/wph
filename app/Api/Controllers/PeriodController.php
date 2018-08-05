@@ -13,7 +13,6 @@ use App\Api\components\WebController;
 
 class PeriodController extends WebController
 {
-
-
+    
 
 }
