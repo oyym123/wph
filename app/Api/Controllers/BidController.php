@@ -65,6 +65,7 @@ class BidController extends WebController
     public function record()
     {
         $bid = new Bid();
+        $bid->limit = 100;
         self::showMsg($bid->bidRecord($this->request->period_id));
     }
 
@@ -123,8 +124,28 @@ class BidController extends WebController
         self::showMsg((new Bid())->newestBid($this->request->periods));
     }
 
-    public function autoBidStatus()
+    /**
+     * @SWG\Get(path="/api/bid/auto-info",
+     *   tags={"竞拍"},
+     *   summary="获取自动竞拍数据信息",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="period_id", in="query", default="49", description="期数id", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *                  [remain_times] => 5 （剩余次数）
+     *                  [total_times] => 6  （总次数）
+     *     "
+     *   )
+     * )
+     */
+    public function autoInfo()
     {
-
+        $this->auth();
+        self::showMsg(AutoBid::isAutoBid($this->userId, $this->request->period_id));
     }
 }

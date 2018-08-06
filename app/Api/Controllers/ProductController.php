@@ -61,10 +61,10 @@ class ProductController extends WebController
      *   tags={"产品"},
      *   summary="商品详情",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="period_id", in="query", default="", description="",required=true,
+     *   @SWG\Parameter(name="period_id", in="query", default="49", description="期数id",required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="token", in="header", default="", description="用户token",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -99,11 +99,11 @@ class ProductController extends WebController
      *                          [bid_step] => 1
      *                          [price_add_length] => 0.1
      *                          [init_price] => 0.00
-     *                          [countdown_length] => 10
+     *                          [countdown_length] => 10 (竞拍倒计时)
      *                          [is_voucher_bids_enable] => 1
-     *                          [buy_by_diff] => 1
-     *                          [settlement_bid_id] => b1b7b2ae63f70ab2016465b1307b6061
-     *                          [auctioneer_id] => 5
+     *                          [buy_by_diff] => 1  （是否可以差价购买 1=可以差价购，0=不可以）
+     *                          [settlement_bid_id] => 256 (中奖者投标id)
+     *                          [auctioneer_id] => 5 （拍卖师id）
      *                          [is_favorite] => 0
      *                          [product_status] => 3
      *                          [default_offer] => 5
@@ -148,6 +148,7 @@ class ProductController extends WebController
     public function detail()
     {
         $period = new  Period();
+        $period->userId = $this->userId;
         self::showMsg($period->getProductDetail($this->request->period_id));
     }
 
@@ -302,4 +303,5 @@ class ProductController extends WebController
         $product = new Product();
         self::showMsg($product->shopDetail($this->request->product_id));
     }
+
 }

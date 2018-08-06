@@ -46,11 +46,12 @@ class Period extends Common
         return $key != 999 ? $data[$key] : $data;
     }
 
-    /** 获取闪拍头条数据 */
+    /** 获取成交数据 */
     public function dealEnd($where = [])
     {
         $data = [];
-        $periods = Period::has('product')->where($where + ['status' => self::STATUS_OVER])->limit($this->limit)->orderBy('updated_at', 'desc')->get();
+        $periods = Period::has('product')->where($where + ['status' => self::STATUS_OVER])
+            ->offset($this->offset)->limit($this->limit)->orderBy('updated_at', 'desc')->get();
         foreach ($periods as $period) {
             $product = $period->product;
             $data[] = [
@@ -73,30 +74,32 @@ class Period extends Common
     }
 
     /** 获取产品列表 */
-    public function getProductList($type = 1)
+    public function getProductList($type = 1, $data = [])
     {
         $cacheKey = 'period@getProductList';
         if ($this->hasCache($cacheKey)) {
             return $this->getCache($cacheKey);
         }
+
         $where = [
             'deleted_at' => null,
             'status' => self::STATUS_IN_PROGRESS
         ];
 
-        if ($type == 2) {
-            $periodIds = DB::table('bid')->select('period_id')->where([
-                'user_id' => $this->userId,
-                'status' => Bid::STATUS_FAIL
-            ])->get()->toArray();
+        if ($type == 2) {   //我在拍
+            $expend = DB::table('expend')
+                ->select('period_id')
+                ->where(['user_id' => $this->userId])
+                ->groupBy('period_id')
+                ->get()->toArray();
 
             $where = $where + [
-                    'id' => array_column($periodIds, 'period_id'),
+                    'id' => array_column($expend, 'period_id'),
                 ];
-            if (empty($periodIds)) {
-                self::showMsg('没有数据', self::CODE_NO_DATA);
+            if (empty($expend)) {
+                self::showMsg('没有我在拍数据', self::CODE_NO_DATA);
             }
-        } elseif ($type == 3) {
+        } elseif ($type == 3) { //我收藏
             $collectIds = DB::table('collection')->select('product_id')->where([
                 'user_id' => $this->userId,
                 'status' => Collection::STATUS_COLLECTION_YES
@@ -108,9 +111,13 @@ class Period extends Common
             if (empty($collectIds)) {
                 self::showMsg('没有数据', self::CODE_NO_DATA);
             }
+        } elseif ($type == 5) { //拍卖师分类
+            $where = $where + [
+                    'auctioneer_id' => $data['auctioneer_id'],
+                ];
         }
 
-        if ($type == 4) {
+        if ($type == 4) { //产品类型分类
             $where = [];
             if (!empty($this->request->type)) {
                 $where = ['product.type' => $this->request->type];
@@ -138,7 +145,7 @@ class Period extends Common
                 'product_id' => $product->id,
                 'period_code' => $period->code,
                 'title' => $product->title,
-                'img_cover' => env('QINIU_URL_IMAGES') . $product->img_cover,
+                'img_cover' => self::getImg($product->img_cover),
                 'sell_price' => $product->sell_price,
                 'bid_step' => $product->bid_step,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
@@ -150,10 +157,17 @@ class Period extends Common
     /** 获取产品详情 */
     public function getProductDetail($id)
     {
-        $period = $this->getPeriod($id);
+        $period = $this->getPeriod(['id' => $id]);
         $product = $period->product;
         $auctioneer = $period->Auctioneer;
         $collection = new Collection();
+        $bid = new Bid();
+        $this->limit = 6;
+        $proxy = [];
+        if ($this->userId > 0) {
+            $proxy = AutoBid::isAutoBid($this->userId, $period->id);
+        }
+
         $data = [
             'detail' => [
                 'id' => $period->id,
@@ -162,8 +176,8 @@ class Period extends Common
                 'period_code' => $period->code,
                 'title' => $product->title,
                 'product_type' => $product->type,
-                'img_cover' => $product->img_cover,
-                'imgs' => $product->imgs,
+                'img_cover' => $product->getImgCover(),
+                'imgs' => json_decode($product->imgs, true),
                 'sell_price' => $product->sell_price,
                 'bid_step' => $product->step,
                 'price_add_length' => $product->price_add_length,
@@ -200,38 +214,12 @@ class Period extends Common
                 'pay_status' => 0,
                 'pay_time' => 0,
             ],
-            'bid_records' => [
-                0 =>
-                    array(
-                        'area' => '江西南昌',
-                        'bid_nickname' => '不可忽视的激情',
-                        'bid_no' => 3775,
-                        'bid_price' => '377.50',
-                    ),
-                1 =>
-                    array(
-                        'area' => '陕西西安',
-                        'bid_nickname' => 'appouu',
-                        'bid_no' => 3774,
-                        'bid_price' => '377.40',
-                    ),
-                2 =>
-                    array(
-                        'area' => '江西南昌',
-                        'bid_nickname' => '不可忽视的激情',
-                        'bid_no' => 3773,
-                        'bid_price' => '377.30',
-                    ),
-            ]
-        ];
-        return $data;
-        $data = array(
-            'proxy' =>
-                array(),
+            'past_deal' => $this->dealEnd(['product_id' => $product->id]),
+            'proxy' => $proxy,
             'price' =>
                 array(
                     'c' => 0,
-                    'd' => '377.50',
+                    'd' => $period->bid_price,
                     'h' => NULL,
                     'g' => NULL,
                     'b' => NULL,
@@ -239,31 +227,9 @@ class Period extends Common
                     'f' => NULL,
                     'a' => NULL,
                 ),
-            'bid_records' =>
-                array(
-                    0 =>
-                        array(
-                            'area' => '江西南昌',
-                            'bid_nickname' => '不可忽视的激情',
-                            'bid_no' => 3775,
-                            'bid_price' => '377.50',
-                        ),
-                    1 =>
-                        array(
-                            'area' => '陕西西安',
-                            'bid_nickname' => 'appouu',
-                            'bid_no' => 3774,
-                            'bid_price' => '377.40',
-                        ),
-                    2 =>
-                        array(
-                            'area' => '江西南昌',
-                            'bid_nickname' => '不可忽视的激情',
-                            'bid_no' => 3773,
-                            'bid_price' => '377.30',
-                        ),
-                ),
-        );
+            'bid_records' => $bid->bidRecord($period->id)
+        ];
+        return $data;
     }
 
 //    /** 是否有真人参与 */
@@ -388,9 +354,9 @@ class Period extends Common
 //        return $this->hasMany('App\Models\Bid', 'period_id', 'id');
 //    }
 
-    public function getPeriod($id, $where = [])
+    public function getPeriod($where = [])
     {
-        if ($model = Period::where($where + ['id' => $id])->first()) {
+        if ($model = Period::where($where)->first()) {
             return $model;
         }
         list($info, $status) = $this->returnRes('', self::CODE_NO_DATA);

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class AutoBid extends Common
@@ -146,5 +145,25 @@ class AutoBid extends Common
                 'status' => self::STATUS_IN_PROGRESS
             ])->update(['status' => self::STATUS_OVER]);
         }
+    }
+
+    /** 判断是否是自动竞拍状态 */
+    public static function isAutoBid($userId, $periodId)
+    {
+        $model = DB::table('auto_bid')->where([
+            'user_id' => $userId,
+            'period_id' => $periodId,
+            'status' => self::STATUS_IN_PROGRESS
+        ])->where('remain_times', '>', 0)->first();
+        if ($model) {
+            return [
+                'remain_times' => $model->remain_times,
+                'total_times' => $model->times,
+            ];
+        }
+        return [
+            'remain_times' => 0,
+            'total_times' => 0,
+        ];
     }
 }

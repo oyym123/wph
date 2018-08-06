@@ -54,6 +54,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('product/shop-list', 'ProductController@shopList');
     Route::get('product/shop-detail', 'ProductController@shopDetail');
     Route::get('product/history-trend', 'ProductController@historyTrend');
+    Route::get('product/past-deal', 'ProductController@pastDeal');
 
 
     //竞拍
@@ -61,6 +62,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('bid/record', 'BidController@record');
     Route::get('bid/auto', 'BidController@auto');
     Route::post('bid/newest-bid', 'BidController@newestBid');
+    Route::get('bid/auto-info', 'BidController@autoInfo');
 
     /** 用户中心 */
     Route::post('user/address', 'UserController@address'); //用户收货地址

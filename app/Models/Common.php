@@ -66,6 +66,12 @@ class Common extends Model
         return $key != 999 ? $data[$key] : $data;
     }
 
+    /** 获取七牛云图片 */
+    public static function getImg($img)
+    {
+        return env('QINIU_URL_IMAGES') . $img;
+    }
+
     /** 返回数据 */
     public function returnRes($data, $status = self::CODE_NORMAL)
     {

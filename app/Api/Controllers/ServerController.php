@@ -127,7 +127,7 @@ class ServerController extends WebController
 
             DB::commit();
 
-            // return "您好！欢迎关注爱谛沉香!";
+            // return "您好！欢迎关注微排行!";
         } catch (Exception $e) {
             DB::rollback();
 

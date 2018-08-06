@@ -44,7 +44,7 @@ class Bid extends Common
     public function personBid($periodId, $auto = 0)
     {
         $periods = new Period();
-        $period = $periods->getPeriod($periodId, ['status' => Period::STATUS_IN_PROGRESS]);
+        $period = $periods->getPeriod(['id' => $periodId, 'status' => Period::STATUS_IN_PROGRESS]);
         $products = new Product();
         $redis = app('redis')->connection('first');
         DB::table('period')->where(['id' => $periodId])->increment('bid_price', 0.1);//自增0.1
@@ -317,7 +317,7 @@ class Bid extends Common
     public function bidRecord($periodId)
     {
         $data = [];
-        $bids = Bid::has('user')->where(['period_id' => $periodId])->limit(100)->orderBy('bid_price', 'desc')->get();
+        $bids = Bid::has('user')->where(['period_id' => $periodId])->limit($this->limit)->orderBy('bid_price', 'desc')->get();
         foreach ($bids as $key => $bid) {
             $user = $bid->user;
             $data[] = [

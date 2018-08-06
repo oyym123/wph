@@ -33,4 +33,28 @@ class Auctioneer extends Common
         return $model->id;
     }
 
+    /** 拍卖师主页 */
+    public function home($id)
+    {
+        $model = Auctioneer::getAuctioneer(['id' => $id]);
+        $data = [
+            'id' => $model->id,
+            'img' => self::getImg($model->image),
+            'tags' => $model->tags,
+            'name' => $model->name,
+            'number' => $model->number,
+            'year' => $model->year,
+            'certificate' => $model->certificate,
+            'list' => (new Period())->getProductList(5, ['auctioneer_id' => $id])
+        ];
+        return $data;
+    }
+
+    public function getAuctioneer($where = [])
+    {
+        if ($model = Auctioneer::where($where)->first()) {
+            return $model;
+        }
+        self::showMsg('没有该拍卖师!', self::CODE_NO_DATA);
+    }
 }
