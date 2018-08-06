@@ -203,7 +203,7 @@ class Period extends Common
                 'used_real_bids' => 0,
                 'used_voucher_bids' => 0,
                 'used_money' => '0.00',
-                'is_buy_differential_able' => 0,
+                'is_buy_differential_able' => $product->buy_by_diff,
                 'buy_differential_money' => '0.00',
                 'order_id' => NULL,
                 'order_type' => NULL,

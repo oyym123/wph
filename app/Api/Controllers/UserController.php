@@ -199,6 +199,7 @@ class UserController extends WebController
      *                  [nickname] => 佚名
      *                  [created_at] => 2018-07-21 00:42:40
      *                  [status] => 状态
+     *                  [user_id] => 813259857
      *                  [register_type] => 注册类型
      *                  [bid_currency] => 254.00 （拍币）
      *                  [gift_currency] => 0.00   （赠币）
@@ -216,6 +217,7 @@ class UserController extends WebController
             'nickname' => $user->nickname,
             'created_at' => $user->created_at,
             'status' => $user->status,
+            'user_id' => substr($user->email, 0, strrpos($user->email, '@')),
             'register_type' => User::REGISTER_TYPE_WEI_XIN,
             'bid_currency' => $this->userIdent->bid_currency,
             'gift_currency' => $this->userIdent->gift_currency,
@@ -243,7 +245,6 @@ class UserController extends WebController
         $income = new Income();
         self::showMsg($income->shoppingCurrency($this->userId));
     }
-
 
 
     /**
