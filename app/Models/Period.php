@@ -194,12 +194,14 @@ class Period extends Common
                 'is_gift_bids_enable' => 1,
                 'collection_users_count' => 10,
                 'bid_users_count' => 1,
+                'bid_count' => ($period->bid_price * 10) / $product->pay_amount,
                 'buy_by_diff' => $product->buy_by_diff,
                 'settlement_bid_id' => $period->bid_id,
                 'auctioneer_id' => $period->auctioneer_id,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
                 'product_status' => $product->status,
                 'return_proportion' => config('bid.return_proportion') * 100,
+                'tags_img' => self::getImg('weipaihangbanner.png'),
                 'auction_avatar' => Auctioneer::AUCTION_AVATAR,
                 'auction_id' => Auctioneer::AUCTION_ID,
                 'auction_name' => Auctioneer::AUCTION_NAME,
@@ -222,7 +224,7 @@ class Period extends Common
                 'pay_status' => 0,
                 'pay_time' => 0,
             ],
-            'past_deal' => $this->dealEnd(['product_id' => $product->id]),
+            'past_deal' => array_chunk($this->dealEnd(['product_id' => $product->id]), 3),
             'proxy' => $proxy,
             'price' =>
                 array(
