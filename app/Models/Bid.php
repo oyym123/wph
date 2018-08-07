@@ -294,6 +294,7 @@ class Bid extends Common
                 DB::table('period')->where(['id' => $period->id])->update([
                     'status' => Period::STATUS_OVER,
                     'user_id' => $robotPeriod->user_id,
+                    'bid_end_time' => date('Y-m-d H:i:s', time()),
                     'bid_id' => $bid->id
                 ]);
                 //新增该产品新的期数

@@ -43,7 +43,7 @@ class WebController extends Controller
 
         $allowIp = ['218.17.209.172', '127.0.0.1'];
         if (in_array(Helper::getIP(), $allowIp)) {
-            $path = $this->isWindows() ? 'G:/logs/wph.log' : '/www/logs/wph.log';
+            $path = self::isWindows() ? 'G:/logs/wph.log' : '/www/logs/wph.log';
             if (!empty($_POST)) {
                 Helper::writeLog($_POST, $path);
             }
@@ -83,13 +83,12 @@ class WebController extends Controller
     }
 
     /** 判断操作系统是不是windows，方便测试和开发 */
-    public function isWindows()
+    public static function isWindows()
     {
         if (PHP_OS == 'WINNT') {
             return true;
         };
     }
-
 
     public function needLogin()
     {
@@ -140,8 +139,8 @@ class WebController extends Controller
             $item['pars'] = !empty($_GET) ? $_GET : null;
         }
 
-        //   if ((isset($_GET['debug']) && $_GET['debug'] == '1') || strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
-        if ((isset($_GET['debug']) && $_GET['debug'] == '1') || strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') == true) {
+        //   if ((isset($_GET['debug']) && $_GET['debug'] == '1') || strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') == true) {
+        if ((isset($_GET['debug']) && $_GET['debug'] == '1') || self::isWindows()) {
             echo "<pre>";
             print_r($_REQUEST);
             print_r($item);
@@ -222,7 +221,7 @@ class WebController extends Controller
         //声明CODE，获取小程序传过来的CODE
         $appid = env('WEIXIN_APP_ID');
         $secret = env('WEIXIN_SECRET');
-        if ($this->isWindows() || $code == 1) { //测试
+        if (self::isWindows() || $code == 1) { //测试
             $res = '{"session_key":"O+rLUsjqo2GsMX9G9Mt9pw==","openid":"oZ5zW5TnpqKWtmku1ZUiSO0yXiRU"}';
         } else {
             //api接口

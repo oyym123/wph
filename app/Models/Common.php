@@ -160,7 +160,7 @@ class Common extends Model
         }
 
         //   if ((isset($_GET['debug']) && $_GET['debug'] == '1') || strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
-        if ((isset($_GET['debug']) && $_GET['debug'] == '1') || strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') == true) {
+        if ((isset($_GET['debug']) && $_GET['debug'] == '1') || (PHP_OS == 'WINNT')) {
             echo "<pre>";
             print_r($_REQUEST);
             print_r($item);

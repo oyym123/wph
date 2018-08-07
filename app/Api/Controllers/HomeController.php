@@ -111,6 +111,7 @@ class HomeController extends WebController
      *           [id] => 期数id
      *           [period_code] => 期数代码
      *           [bid_price] => 竞拍价格
+     *           [save_price] => 节省的价格
      *           [user_id] => 用户id
      *           [nickname] => 用户昵称
      *           [avatar] => 用户头像

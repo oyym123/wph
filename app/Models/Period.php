@@ -54,6 +54,7 @@ class Period extends Common
             ->offset($this->offset)->limit($this->limit)->orderBy('updated_at', 'desc')->get();
         foreach ($periods as $period) {
             $product = $period->product;
+            $savePrice = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
             $data[] = [
                 'id' => $period->id,
                 'period_code' => $period->code,
@@ -63,6 +64,7 @@ class Period extends Common
                 'title' => $product->title,
                 'short_title' => $product->title,
                 'bid_step' => $product->bid_step,
+                'save_price' => $savePrice,
                 'end_time' => $period->bid_end_time,
                 'img_cover' => env('QINIU_URL_IMAGES') . $product->img_cover,
                 'product_id' => $product->id,

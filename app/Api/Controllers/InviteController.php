@@ -32,7 +32,6 @@ class InviteController extends WebController
     /** 推广详情页 */
     public function view()
     {
-
         list($info, $status) = $this->userInfo();
         if (!$status) {
             return redirect()->action('UserController@register-view');
@@ -70,5 +69,4 @@ class InviteController extends WebController
             'data' => $data
         ]);
     }
-
 }
