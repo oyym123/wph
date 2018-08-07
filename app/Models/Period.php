@@ -192,6 +192,8 @@ class Period extends Common
                 'init_price' => $product->init_price,
                 'countdown_length' => ($x = $redis->ttl('period@countdown' . $period->id)) > 0 ? $x : 0,
                 'is_gift_bids_enable' => 1,
+                'collection_users_count' => 10,
+                'bid_users_count' => 1,
                 'buy_by_diff' => $product->buy_by_diff,
                 'settlement_bid_id' => $period->bid_id,
                 'auctioneer_id' => $period->auctioneer_id,
