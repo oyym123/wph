@@ -16,6 +16,7 @@ class Period extends Common
     /**
      * 可以被批量赋值的属性.
      *
+     *
      * @var array
      */
     protected $fillable = [
@@ -170,6 +171,11 @@ class Period extends Common
             $proxy = AutoBid::isAutoBid($this->userId, $period->id);
         }
         $redis = app('redis')->connection('first');
+        $imgs = json_decode($product->imgs);
+        $images = [];
+        foreach ($imgs as $img) {
+            $images[] = env('QINIU_URL_IMAGES') . $img;
+        }
         $data = [
             'detail' => [
                 'id' => $period->id,
@@ -179,7 +185,7 @@ class Period extends Common
                 'title' => $product->title,
                 'product_type' => $product->type,
                 'img_cover' => $product->getImgCover(),
-                'imgs' => json_decode($product->imgs, true),
+                'imgs' => $images,
                 'sell_price' => $product->sell_price,
                 'bid_step' => $product->pay_amount,
                 'price_add_length' => $product->price_add_length,
@@ -192,11 +198,11 @@ class Period extends Common
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
                 'product_status' => $product->status,
                 'return_proportion' => config('bid.return_proportion') * 100,
-
                 'auction_avatar' => Auctioneer::AUCTION_AVATAR,
                 'auction_id' => Auctioneer::AUCTION_ID,
                 'auction_name' => Auctioneer::AUCTION_NAME,
-                'auctioneer_avatar' => $auctioneer->image,
+                'auctioneer_avatar' => self::getImg($auctioneer->image),
+                'auctioneer_tags' => $auctioneer->tags,
                 'auctioneer_license' => $auctioneer->number,
                 'auctioneer_name' => $auctioneer->name,
             ],
