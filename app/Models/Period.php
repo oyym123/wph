@@ -169,7 +169,7 @@ class Period extends Common
         if ($this->userId > 0) {
             $proxy = AutoBid::isAutoBid($this->userId, $period->id);
         }
-
+        $redis = app('redis')->connection('first');
         $data = [
             'detail' => [
                 'id' => $period->id,
@@ -181,19 +181,18 @@ class Period extends Common
                 'img_cover' => $product->getImgCover(),
                 'imgs' => json_decode($product->imgs, true),
                 'sell_price' => $product->sell_price,
-                'bid_step' => $product->step,
+                'bid_step' => $product->pay_amount,
                 'price_add_length' => $product->price_add_length,
                 'init_price' => $product->init_price,
-                'countdown_length' => $product->countdown_length,
-                'is_voucher_bids_enable' => 1,
+                'countdown_length' => $redis->ttl('period@countdown' . $period->id),
+                'is_gift_bids_enable' => 1,
                 'buy_by_diff' => $product->buy_by_diff,
                 'settlement_bid_id' => $period->bid_id,
                 'auctioneer_id' => $period->auctioneer_id,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
                 'product_status' => $product->status,
-                'default_offer' => 5,
-                'offer_ladder' => '10,20,50,66',
-                'have_show' => 0,
+                'return_proportion' => config('bid.return_proportion') * 100,
+
                 'auction_avatar' => Auctioneer::AUCTION_AVATAR,
                 'auction_id' => Auctioneer::AUCTION_ID,
                 'auction_name' => Auctioneer::AUCTION_NAME,
@@ -203,15 +202,14 @@ class Period extends Common
             ],
             'expended' => [
                 'used_real_bids' => 0,
-                'used_voucher_bids' => 0,
+                'used_gift_bids' => 0,
                 'used_money' => '0.00',
                 'is_buy_differential_able' => $product->buy_by_diff,
                 'buy_differential_money' => '0.00',
-                'order_id' => NULL,
-                'order_type' => NULL,
+                'order_sn' => '',
+                'order_type' => '',
                 'need_to_bided_pay' => 0,
                 'need_to_bided_pay_price' => '0.00',
-                'return_bids' => 0,
                 'return_shop_bids' => 0,
                 'pay_status' => 0,
                 'pay_time' => 0,
@@ -220,14 +218,14 @@ class Period extends Common
             'proxy' => $proxy,
             'price' =>
                 array(
-                    'c' => 0,
-                    'd' => $period->bid_price,
-                    'h' => NULL,
-                    'g' => NULL,
-                    'b' => NULL,
-                    'e' => NULL,
-                    'f' => NULL,
-                    'a' => NULL,
+                    'd' => 0,
+                    'c' => $period->bid_price,
+                    'h' => '',
+                    'g' => '',
+                    'b' => '',
+                    'e' => '',
+                    'f' => '',
+                    'a' => '',
                 ),
             'bid_records' => $bid->bidRecord($period->id)
         ];
