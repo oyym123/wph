@@ -42,7 +42,7 @@ class Common extends Model
     const TYPE_GIFT_CURRENCY = 1;       //赠币
     const TYPE_BID_CURRENCY = 2;        //拍币
     const TYPE_SHOPPING_CURRENCY = 3;   //购物币
-    const TYPE_INVITE_CURRENCY = 4;   //推广币
+    const TYPE_INVITE_CURRENCY = 4;     //推广币
 
     public function getCurrencyStr($key = 999)
     {

@@ -43,7 +43,8 @@ class Auctioneer extends Common
             'tags' => $model->tags,
             'name' => $model->name,
             'number' => $model->number,
-            'year' => $model->year,
+            'unit' => $model->unit,
+            'year' => $model->years,
             'certificate' => $model->certificate,
             'list' => (new Period())->getProductList(5, ['auctioneer_id' => $id])
         ];
