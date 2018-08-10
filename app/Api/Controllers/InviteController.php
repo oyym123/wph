@@ -9,64 +9,85 @@
 namespace App\Api\Controllers;
 
 use App\Api\components\WebController;
-use App\Invite;
-use Qiniu\Http\Request;
-use TheSeer\Tokenizer\Exception;
-use Illuminate\Support\Facades\DB;
+use App\Models\Invite;
 
 class InviteController extends WebController
 {
-    /** 我的推广 */
+    /**
+     * @SWG\Get(path="/api/invite/index",
+     *   tags={"我的推广"},
+     *   summary="推广主页",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *          [total_users] => 2  （邀请总人数）
+     *          [first_level] => 1   （一级邀请人数）
+     *          [second_level] => 1    （二级邀请人数）
+     *          [first_level_list] => Array （一级邀请人详细列表）
+     *          (
+     *              [0] => Array
+     *              (
+     *                  [nickname] => 佚名34
+     *                  [created_at] => 2018-08-09 22:40:01
+     *              )
+     *          )
+     *          [second_level_list] => Array （二级邀请人详细列表）
+     *          (
+     *              [0] => Array
+     *              (
+     *                  [nickname] => 佚名45
+     *                  [created_at] => 2018-08-09 22:41:21
+     *              )
+     *          )
+     *     "
+     *   )
+     * )
+     */
     public function index()
     {
-        list($info, $status) = $this->userInfo();
-        if (!$status) {
-            return redirect()->action('UserController@registerView');
-        }
-        // $userInfo = DB::table('user_info')->where('user_id', 1)->first(); // 测试
-        return view('api.invite.my_invite', [
-            'user_info' => $info
-        ]);
+        $this->auth();
+        $model = new Invite();
+        $res = $model->detail($this->userId);
+        self::showMsg($res);
     }
 
-    /** 推广详情页 */
-    public function view()
+    /**
+     * @SWG\Get(path="/api/invite/invite-list",
+     *   tags={"我的推广"},
+     *   summary="推广人加载更多接口",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="type", in="query", default="1", description="1 =一级推广人，2 =二级推广人",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function inviteList()
     {
-        list($info, $status) = $this->userInfo();
-        if (!$status) {
-            return redirect()->action('UserController@register-view');
+        $this->auth();
+        $model = new Invite();
+        $model->limit = $this->limit;
+        $model->offset = $this->offset;
+        if ($this->request->type == 1) {
+            $flag = 'first';
+        } else {
+            $flag = 'second';
         }
-        //$userInfo = DB::table('user_info')->where('user_id', 1)->first(); // 测试
-
-        //$x = DB::table('user_point_card')->where('user_id', $userInfo->user_id)
-        // ->where('type', $_GET['type'])->get();
-//        var_dump($x);
-//        foreach ($x as $a) {
-//            print_r($a->id);
-//        }
-//        exit;
-        return view('api.invite.invite_view', [
-            'user_info' => $info,
-            'point_list' => DB::table('user_point_card')->where('user_id', $info->user_id)->get()
-        ]);
-    }
-
-    /** 推广详情页 */
-    public function qrcode()
-    {
-        list($info, $status) = $this->userInfo();
-        if (!$status) {
-            return redirect()->action('UserController@registerView');
-        }
-        $data = [
-            'user_photo' => $info->user_photo,
-            'nick_name' => $info->nickname
-        ];
-        $result = self::weixin()->qrcode->forever(session('user_id'));
-        $imageLink = self::weixin()->qrcode->url($result->ticket);
-        return view('api.invite.invite_qrcode', [
-            'image_link' => $imageLink,
-            'data' => $data
-        ]);
+        list($count, $user) = $model->inviteList($this->userId, $flag);
+        self::showMsg($user);
     }
 }

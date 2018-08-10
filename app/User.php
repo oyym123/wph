@@ -98,7 +98,7 @@ class User extends Authenticatable
     public function saveData($data)
     {
         $model = self::create($data);
-        return [$model, $model->save()];
+        return $model;
     }
 
     /** 用户信息修改 */

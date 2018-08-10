@@ -26,6 +26,8 @@ class Income extends Common
         'period_id',
     ];
 
+    const STATUS_ALREADY_WITHDRAW = 10; //已提现
+
     /** 结算所有未竞拍用户的返回拍币金额 */
     public static function settlement($periodId, $userId)
     {
@@ -93,11 +95,11 @@ class Income extends Common
     }
 
     /** 收入明细 */
-    public function detail($userId)
+    public function detail($userId, $type = [])
     {
         $incomes = Income::where([
-            'user_id' => $userId
-        ])->offset($this->offset)->limit($this->limit)->orderBy('created_at', 'desc')->get();
+                'user_id' => $userId
+            ] + $type)->offset($this->offset)->limit($this->limit)->orderBy('created_at', 'desc')->get();
         $data = [];
         foreach ($incomes as $income) {
             $data[] = [
@@ -228,5 +230,46 @@ class Income extends Common
             ];
             return $data;
         }
+    }
+
+    /** 可提现金额 */
+    public function withdrawAmount($userId)
+    {
+        return DB::table('income')->where([
+            'user_id' => $userId,
+            'type' => self::TYPE_INVITE_CURRENCY,
+        ])->where('status', '<>', self::STATUS_ALREADY_WITHDRAW)
+            ->sum('amount');
+    }
+
+    /** 我的绩效 */
+    public function performance($userId)
+    {
+        $incomes = self::where([
+            'user_id' => $userId,
+            'type' => self::TYPE_INVITE_CURRENCY
+        ])->offset($this->offset)->limit($this->limit)->get();
+        $withdraws = $alreadyWithdraw = $data = [];
+        foreach ($incomes as $income) {
+            if ($income->status == self::STATUS_ALREADY_WITHDRAW) {
+                $alreadyWithdraw[] = $income->amount;
+            } else {
+                $withdraws[] = $income->amount;
+            }
+            $data[] = [
+                'title' => $income->name,
+                'created_at' => $income->created_at,
+                'amount' => $income->amount
+            ];
+        }
+        $alWithdraw = array_sum($alreadyWithdraw);
+        $withdraw = array_sum($withdraws);
+        $res = [
+            'total_amount' => $withdraw + $alWithdraw,
+            'withdraw' => $withdraw,
+            'already_withdraw' => $alWithdraw,
+            'income' => $data
+        ];
+        return $res;
     }
 }

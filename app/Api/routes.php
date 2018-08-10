@@ -66,7 +66,14 @@ Route::group(['middleware' => 'web'], function () {
 
     /** 用户中心 */
     Route::post('user/address', 'UserController@address'); //用户收货地址
+    Route::post('user/withdraw', 'UserController@withdraw'); //提现
 
+    Route::post('user/set-withdraw-account', 'UserController@setWithdrawAccount'); //我的绩效
+    Route::get('user/performance', 'UserController@performance'); //我的绩效
+    Route::get('user/performance-income', 'UserController@performanceIncome'); //我的绩效-收益加载更多
+    Route::get('user/performance-withdraw', 'UserController@performanceWithDraw'); //我的绩效-提现信息加载更多
+    Route::get('user/property-income', 'UserController@propertyIncome'); //收益明细
+    Route::get('user/property-expend', 'UserController@propertyExpend'); //支出明细
     Route::get('user/property', 'UserController@property'); //我的竞拍
     Route::get('user/batch-register', 'UserController@batchRegister');//批量用户注册
     Route::get('user/shopping-currency', 'UserController@shoppingCurrency');//批量用户注册
@@ -75,6 +82,9 @@ Route::group(['middleware' => 'web'], function () {
         return view('api.user.balance-desc');
     });
 
+    /**  我的推广  */
+    Route::get('invite/index', 'InviteController@Index'); //我的推广主页
+    Route::get('invite/invite-list', 'InviteController@inviteList'); //我的推广主页
 
     /** 订单中心 */
     Route::get('order/my-auction', 'OrderController@MyAuction'); //我的竞拍
@@ -89,7 +99,6 @@ Route::group(['middleware' => 'web'], function () {
     //收藏
     Route::get('collection/collect', 'CollectionController@collect');
 
-
     Route::get('user/register-view', 'UserController@registerView');//用户注册视图
     Route::get('user/info', 'UserController@info');//用户注册提交表单
     Route::post('user/update-post', 'UserController@updatePost');//用户注册提交表单
@@ -101,10 +110,6 @@ Route::group(['middleware' => 'web'], function () {
     Route::any('wechat', 'WechatController@server');
     Route::any('test', 'UserController@test');
     Route::any('user/center', 'UserController@center');
-    /** 推广 */
-    Route::any('invite', 'InviteController@index');
-    Route::any('invite/qrcode', 'InviteController@qrcode');
-    Route::any('invite/view', 'InviteController@view');
 
 
     /** 会员卡与积分 */

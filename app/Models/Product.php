@@ -79,6 +79,7 @@ class Product extends Common
         $data = [];
         foreach ($products as $product) {
             $data[] = [
+                'product_id' => $product->id,
                 'title' => $product->title,
                 'sell_price' => $product->sell_price,
                 'img_cover' => $product->getImgCover(),
@@ -86,7 +87,6 @@ class Product extends Common
         }
         return $data;
     }
-
 
     /** 购物币专区详情 */
     public function shopDetail($productId)

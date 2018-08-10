@@ -50,7 +50,7 @@ class Common extends Model
             self::TYPE_GIFT_CURRENCY => '赠币',
             self::TYPE_BID_CURRENCY => '拍币',
             self::TYPE_SHOPPING_CURRENCY => '购物币',
-            self::TYPE_INVITE_CURRENCY => '推广币',
+            self::TYPE_INVITE_CURRENCY => '元',
         ];
         return $key != 999 ? $data[$key] : $data;
     }
@@ -84,7 +84,7 @@ class Common extends Model
         }
     }
 
-    /** 缓存数据，默认1分钟 */
+    /** 获取数据*/
     public function getCache($key)
     {
         if (Cache::has($key)) {

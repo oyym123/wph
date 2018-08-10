@@ -11,10 +11,12 @@ use App\Models\City;
 use App\Models\Evaluate;
 use App\Models\Expend;
 use App\Models\Income;
+use App\Models\Invite;
 use App\Models\Order;
 use App\Models\Pay;
 use App\Models\Period;
 use App\Models\UserAddress;
+use App\Models\Withdraw;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\RegisterUserPost;
 use App\User;
@@ -61,7 +63,6 @@ class UserController extends WebController
 
     }
 
-
     /**
      * @param Request $request
      * @SWG\Get(path="/api/user/info",
@@ -75,6 +76,9 @@ class UserController extends WebController
      *     type="string",
      *   ),
      *   @SWG\Parameter(name="avatar", in="query", default="default_user_photo10.png", description="头像地址", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="invite_code", in="query", default="f4eed21cc611d4234466d08b5176fcf8", description="邀请码",
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -99,7 +103,7 @@ class UserController extends WebController
                 'email' => rand(1000000, 999999999) . '@163.com',
                 'nickname' => $request->nickname ?: '佚名',
                 'name' => $request->nickname ?: '佚名',
-                'avatar' => $avatar ?: $this->getImage('default_user_photo10.png'),
+                'avatar' => $avatar ?: 'default_user_photo10.png',
                 'is_real' => USER::TYPE_REAL_PERSON,
                 'token' => $token,
                 'ip' => $address['ip'],
@@ -111,8 +115,15 @@ class UserController extends WebController
                 Redis::hdel('token', $model->token);
                 DB::table('users')->where('id', $model->id)->update($data);
             } else {
-                $model = new User();
-                $model->saveData($data);
+                $model = (new User())->saveData($data);
+                $inviteCode = md5(md5($model->id));
+                if ($model->id) {
+                    DB::table('users')->where('id', $model->id)->update([
+                        'invite_code' => $inviteCode,
+                        'be_invited_code' => $request->invite_code
+                    ]);
+                    (new Invite())->saveData($model->id, $request->invite_code);
+                }
             }
             Redis::hset('token', $token, $model->id);
             self::showMsg(['token' => $token]);
@@ -247,19 +258,12 @@ class UserController extends WebController
         self::showMsg($income->shoppingCurrency($this->userId));
     }
 
-
     /**
      * @SWG\Get(path="/api/user/property",
      *   tags={"用户中心"},
      *   summary="我的财产",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
-     *     type="string",
-     *   ),
-     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
-     *     type="string",
-     *   ),
-     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -270,13 +274,6 @@ class UserController extends WebController
     public function property()
     {
         $this->auth();
-        $expend = new Expend();
-        $expend->limit = $this->limit;
-        $expend->offset = $this->offset;
-
-        $income = new Income();
-        $income->limit = $this->limit;
-        $income->offset = $this->offset;
         $data = [
             'balance_desc' => [
                 'id' => 1,
@@ -292,10 +289,66 @@ class UserController extends WebController
             'bid_currency' => $this->userIdent->bid_currency,
             'gift_currency' => $this->userIdent->gift_currency,
             'shopping_currency' => $this->userIdent->shopping_currency,
-            'expend' => $expend->detail($this->userId),
-            'income' => $income->detail($this->userId),
+            'expend' => (new Expend())->detail($this->userId),
+            'income' => (new Income())->detail($this->userId),
         ];
         self::showMsg($data);
+    }
+
+    /**
+     * @SWG\Get(path="/api/user/property-income",
+     *   tags={"用户中心"},
+     *   summary="加载更多收益明细信息",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function propertyIncome()
+    {
+        $this->auth();
+        $income = new Income();
+        $income->limit = $this->limit;
+        $income->offset = $this->offset;
+        self::showMsg($income->detail($this->userId));
+    }
+
+    /**
+     * @SWG\Get(path="/api/user/property-expend",
+     *   tags={"用户中心"},
+     *   summary="加载更多支出明细信息",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function propertyExpend()
+    {
+        $this->auth();
+        $expend = new Expend();
+        $expend->limit = $this->limit;
+        $expend->offset = $this->offset;
+        self::showMsg($expend->detail($this->userId));
     }
 
     /**
@@ -367,7 +420,6 @@ class UserController extends WebController
         }
     }
 
-
     /**
      * @SWG\Get(path="/api/user/evaluate",
      *   tags={"用户中心"},
@@ -385,5 +437,194 @@ class UserController extends WebController
     {
         $this->auth();
         self::showMsg((new Evaluate())->getList(['user_id' => $this->userId]));
+    }
+
+    /**
+     * @SWG\Get(path="/api/user/performance",
+     *   tags={"用户中心"},
+     *   summary="我的绩效",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *                  [total_amount] => 10 总额
+     *                   [withdraw] => 10 可提现额
+     *                  [already_withdraw] => 0 已提现额
+     *                  [income_list] => Array  收益明细
+     *                      (
+     *                         [0] => Array
+     *                           (
+     *                              [amount] => 10.00 元
+     *                              [created_at] => 2018-08-09 19:34:09
+     *                              [title] => 张三充值100拍币
+     *                          )
+     *                       )
+     *                  [withdraw_list] => Array 提现明细
+     *                     (
+     *                          [0] => Array
+     *                          (
+     *                              [amount] => 10.00 元
+     *                              [created_at] => 2018-08-09 19:34:09
+     *                              [status] => 正在处理
+     *                          )
+     *                      )
+     *     "
+     *   )
+     * )
+     */
+    public function performance()
+    {
+        $this->auth();
+        $result = (new Income())->performance($this->userId);
+        $data = [
+            'total_amount' => $result['total_amount'],
+            'withdraw' => $result['withdraw'],
+            'already_withdraw' => $result['already_withdraw'],
+            'income_list' => $result['income'],
+            'withdraw_list' => (new Withdraw())->detail($this->userId),
+        ];
+        self::showMsg($data);
+    }
+
+    /**
+     * @SWG\Get(path="/api/user/performance-income",
+     *   tags={"用户中心"},
+     *   summary="我的绩效加载更多收益明细信息",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function performanceIncome()
+    {
+        $this->auth();
+        self::showMsg((new Withdraw())->detail($this->userId));
+    }
+
+    /**
+     * @SWG\Get(path="/api/user/performance-withdraw",
+     *   tags={"用户中心"},
+     *   summary="我的绩效加载更多提现明细信息",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function performanceWithdraw()
+    {
+        $this->auth();
+        $result = (new Income())->detail($this->userId, ['type' => Income::TYPE_INVITE_CURRENCY]);
+        self::showMsg($result);
+    }
+
+    /**
+     * @SWG\Post(path="/api/user/set-withdraw-account",
+     *   tags={"用户中心"},
+     *   summary="设置提现账号",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="account", in="formData", default="18779284928@163.com", description="设置提现账号", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="username", in="formData", default="王强", description="姓名", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="password", in="formData", default="666666", description="密码", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function setWithdrawAccount()
+    {
+        $this->auth();
+        $request = $this->request;
+        $data = [
+            'cashout_account' => $request->account,
+            'cashout_name' => $request->username,
+            'cashout_password' => $request->password,
+        ];
+        $model = User::where(['id' => $this->userId])->update($data);
+        if ($model) {
+            self::showMsg('设置成功', 0);
+        } else {
+            self::showMsg('设置失败', 4);
+        }
+    }
+
+    /**
+     * @SWG\Post(path="/api/user/withdraw",
+     *   tags={"用户中心"},
+     *   summary="提现",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="amount", in="formData", default="10", description="提现金额", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="password", in="formData", default="666666", description="密码", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function withdraw()
+    {
+        $this->auth();
+        $request = $this->request;
+        if ($request->amount <= 0) {
+            self::showMsg('提现金额必须大于0元');
+        }
+
+        $withdraw = (new Income())->withdrawAmount($this->userId);
+
+        if ($request->amount > $withdraw) {
+            self::showMsg('大于可提现金额 ' . $withdraw . '元，请重新选择提现金额');
+        }
+
+        if ($request->password != $this->userIdent->cashout_password) {
+            self::showMsg('密码错误!');
+        }
+
+        $data = [
+            'amount' => $request->amount,
+            'user_id' => $this->userId,
+            'status' => Withdraw::STATUS_PROCESSING,
+            'account' => $this->userIdent->cashout_account,
+        ];
+        if ((new Withdraw())->saveData($data)) {
+            self::showMsg('申请提现成功，请等待管理员处理！');
+        } else {
+            self::showMsg('申请提现失败！');
+        }
     }
 }
