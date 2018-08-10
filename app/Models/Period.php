@@ -310,13 +310,24 @@ class Period extends Common
         $product = $products->getCacheProduct($productId);
         foreach ($periods as $period) {
             $bidPrices[] = $period->bid_price;
+        }
+        $averagePrice = round(array_sum($bidPrices) / count($bidPrices), 2);
+        foreach ($periods as $period) {
+
             $list[] = [
                 'code' => $period->code,
                 'price' => $period->bid_price,
             ];
+            if ($period->bid_price - $averagePrice > 0) {
+                $flag = 1;
+            } else {
+                $flag = 0;
+            }
             $data[] = [
                 'end_time' => $period->bid_end_time,
                 'bid_price' => $period->bid_price,
+                'flag' => $flag,
+                'diff_price' => abs($period->bid_price - $averagePrice),
                 'nickname' => $period->user ? $period->user->nickname : '',
             ];
         }
@@ -326,7 +337,7 @@ class Period extends Common
             'present_price' => $data[0]['bid_price'],
             'max_price' => min($bidPrices),
             'min_price' => max($bidPrices),
-            'average_price' => round(array_sum($bidPrices) / count($bidPrices), 2),
+            'average_price' => $averagePrice,
             'detail' => $data,
             'list' => $list
         ];

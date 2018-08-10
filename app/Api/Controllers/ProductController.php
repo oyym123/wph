@@ -236,6 +236,8 @@ class ProductController extends WebController
      *                      (
      *                          [0] => Array
      *                               (
+     *                                  [flag] => 0 (0=下降，1=上升)
+     *                                  [diff_price] => 0.2 (对比平均差价值)
      *                                  [end_time] => 拍中时间
      *                                  [bid_price] => 成交价
      *                                  [nickname] => 昵称
