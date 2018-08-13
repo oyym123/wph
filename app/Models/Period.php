@@ -210,8 +210,8 @@ class Period extends Common
                 'auctioneer_id' => $period->auctioneer_id,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
                 'product_status' => $product->status,
-                'return_proportion' => config('bid . return_proportion') * 100,
-                'tags_img' => self::getImg('weipaihangbanner . png'),
+                'return_proportion' => config('bid.return_proportion') * 100,
+                'tags_img' => self::getImg('weipaihangbanner.png'),
                 'auction_avatar' => Auctioneer::AUCTION_AVATAR,
                 'auction_id' => Auctioneer::AUCTION_ID,
                 'auction_name' => Auctioneer::AUCTION_NAME,
@@ -281,8 +281,8 @@ class Period extends Common
      */
     public function saveData($productId)
     {
-        $dayStart = date('Y - m - d', time()) . ' 00:00:00';
-        $dayEnd = date('Y - m - d', time()) . ' 23:59:59';
+        $dayStart = date('Y-m-d', time()) . ' 00:00:00';
+        $dayEnd = date('Y-m-d', time()) . ' 23:59:59';
 
         $check = DB::table('period')
             ->whereBetween('created_at', [$dayStart, $dayEnd])
@@ -303,7 +303,7 @@ class Period extends Common
         $model = self::create($data);
         $redis = app('redis')->connection('first');
         //设置倒计时初始时间和初始价格
-        $redis->setex('period@countdown' . $model->id, config('bid . init_countdown'), 1);
+        $redis->setex('period@countdown' . $model->id, config('bid.init_countdown'), 1);
         RobotPeriod::batchSave($model->id, $productId);
     }
 
