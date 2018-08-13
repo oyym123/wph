@@ -181,11 +181,6 @@ class Period extends Common
             $proxy = AutoBid::isAutoBid($this->userId, $period->id);
         }
         $redis = app('redis')->connection('first');
-        $imgs = json_decode($product->imgs);
-        $images = [];
-        foreach ($imgs as $img) {
-            $images[] = env('QINIU_URL_IMAGES') . $img;
-        }
         $data = [
             'detail' => [
                 'id' => $period->id,
@@ -195,7 +190,7 @@ class Period extends Common
                 'title' => $product->title,
                 'product_type' => $product->type,
                 'img_cover' => $product->getImgCover(),
-                'imgs' => $images,
+                'imgs' => self::getImgs($product->imgs),
                 'sell_price' => $product->sell_price,
                 'bid_step' => $product->pay_amount,
                 'price_add_length' => $product->price_add_length,

@@ -74,6 +74,16 @@ class Common extends Model
         return env('QINIU_URL_IMAGES') . $img;
     }
 
+    /** 获取七牛云多张图片 */
+    public static function getImgs($imgs)
+    {
+        $images = [];
+        foreach (json_decode($imgs) as $img) {
+            $images[] = env('QINIU_URL_IMAGES') . $img;
+        }
+        return $images;
+    }
+
     /** 返回数据 */
     public function returnRes($data, $status = self::CODE_NORMAL)
     {

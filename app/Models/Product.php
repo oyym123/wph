@@ -93,11 +93,13 @@ class Product extends Common
     {
         $product = $this->getCacheProduct($productId);
         if ($product->is_shop == self::SHOPPING_YES) {
+            $collection = new Collection();
             return [
                 'title' => $product->title,
                 'sell_price' => $product->sell_price,
+                'is_favorite' => $collection->isCollect($this->userId, $product->id),
                 'img_cover' => $product->getImgCover(),
-                'imgs' => json_decode($product->imgs, true),
+                'imgs' => self::getImgs($product->imgs),
                 'evaluate' => (new Evaluate())->getList(['product_id' => $productId])
             ];
         } else {
