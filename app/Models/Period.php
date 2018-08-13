@@ -105,7 +105,6 @@ class Period extends Common
                 ->where(['user_id' => $this->userId])
                 ->groupBy('period_id')
                 ->get()->toArray();
-
             $where = $where + [
                     'id' => array_column($expend, 'period_id'),
                 ];
