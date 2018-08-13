@@ -26,6 +26,7 @@ class InviteController extends WebController
      *          [total_users] => 2  （邀请总人数）
      *          [first_level] => 1   （一级邀请人数）
      *          [second_level] => 1    （二级邀请人数）
+     *          [invite_code] =>  f4eed21cc611d4234466d08b5176fcf8    （推广码）
      *          [first_level_list] => Array （一级邀请人详细列表）
      *          (
      *              [0] => Array
@@ -50,6 +51,8 @@ class InviteController extends WebController
     {
         $this->auth();
         $model = new Invite();
+        $model->userEntity = $this->userIdent;
+
         $res = $model->detail($this->userId);
         self::showMsg($res);
     }

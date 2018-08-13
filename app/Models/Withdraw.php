@@ -54,4 +54,13 @@ class Withdraw extends Common
         }
         return $data;
     }
+
+    /** 判断是否有正在申请的提现 */
+    public function isProcessing($userId)
+    {
+        return self::where([
+            'status' => self::STATUS_PROCESSING,
+            'user_id' => $userId
+        ])->first();
+    }
 }

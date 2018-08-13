@@ -68,6 +68,7 @@ class Invite extends Common
             'total_users' => $count1 + $count2,
             'first_level' => $count1,
             'second_level' => $count2,
+            'invite_code' => $this->userEntity->invite_code,
             'first_level_list' => $user1,
             'second_level_list' => $user2,
         ];

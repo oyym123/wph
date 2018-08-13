@@ -125,7 +125,6 @@ class Bid extends Common
     public function getLastBidInfo($redis, $periodId, $type = false)
     {
         $lastPersonIds = json_decode($redis->get('bid@lastPersonId'));
-
         if (!empty($lastPersonIds->$periodId)) {
 
             if (!empty($type)) {

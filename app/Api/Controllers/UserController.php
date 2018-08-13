@@ -615,6 +615,9 @@ class UserController extends WebController
             self::showMsg('密码错误!');
         }
 
+        if ((new Withdraw())->isProcessing($this->userId)) {
+            self::showMsg('已申请过一次，请等处理完成后再次申请!');
+        }
         $data = [
             'amount' => $request->amount,
             'user_id' => $this->userId,
