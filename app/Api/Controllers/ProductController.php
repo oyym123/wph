@@ -292,6 +292,9 @@ class ProductController extends WebController
      *   tags={"产品"},
      *   summary="购物币专区产品详情",
      *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token",
+     *     type="string",
+     *   ),
      *   @SWG\Parameter(name="product_id", in="query", default="7", description="产品详情", required=true,
      *     type="string",
      *   ),
@@ -302,7 +305,9 @@ class ProductController extends WebController
      */
     public function shopDetail()
     {
+        $this->auth();
         $product = new Product();
+        $product->userId = $this->userId;
         self::showMsg($product->shopDetail($this->request->product_id));
     }
 
