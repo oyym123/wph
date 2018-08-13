@@ -296,7 +296,7 @@ class Period extends Common
             'product_id' => $productId,
             'auctioneer_id' => Auctioneer::randAuctioneer(),
             'status' => self::STATUS_IN_PROGRESS,
-            'robot_rate' => config('bid . robot_rate'),
+            'robot_rate' => config('bid.robot_rate'),
             'person_rate' => mt_rand(100, 150) / 100,
             'code' => $code,
         ];
