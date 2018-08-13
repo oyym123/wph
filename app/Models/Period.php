@@ -76,6 +76,16 @@ class Period extends Common
         return $data;
     }
 
+    /** 获取下一期的period_id */
+    public function nextPeriod($productId)
+    {
+        $period = Period::where([
+            'product_id' => $productId,
+            'status' => self::STATUS_IN_PROGRESS
+        ])->select(['id'])->orderBy('created_at', 'desc')->first();
+        return $period->id;
+    }
+
     /** 获取产品列表 */
     public function getProductList($type = 1, $data = [])
     {
@@ -123,13 +133,13 @@ class Period extends Common
         if ($type == 4) { //产品类型分类
             $where = [];
             if (!empty($this->request->type)) {
-                $where = ['product.type' => $this->request->type];
+                $where = ['product . type' => $this->request->type];
             }
             $periods = DB::table('period')
-                ->join('product', 'product.id', '=', 'period.product_id')
+                ->join('product', 'product . id', ' = ', 'period . product_id')
                 ->where([
-                        'period.deleted_at' => null,
-                        'period.status' => self::STATUS_IN_PROGRESS
+                        'period . deleted_at' => null,
+                        'period . status' => self::STATUS_IN_PROGRESS
                     ] + $where)->offset($this->offset)->limit($this->limit)->get();
         } else {
             $periods = DB::table('period')->where($where)->offset($this->offset)->limit($this->limit)->get();
@@ -200,8 +210,8 @@ class Period extends Common
                 'auctioneer_id' => $period->auctioneer_id,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
                 'product_status' => $product->status,
-                'return_proportion' => config('bid.return_proportion') * 100,
-                'tags_img' => self::getImg('weipaihangbanner.png'),
+                'return_proportion' => config('bid . return_proportion') * 100,
+                'tags_img' => self::getImg('weipaihangbanner . png'),
                 'auction_avatar' => Auctioneer::AUCTION_AVATAR,
                 'auction_id' => Auctioneer::AUCTION_ID,
                 'auction_name' => Auctioneer::AUCTION_NAME,
@@ -271,12 +281,12 @@ class Period extends Common
      */
     public function saveData($productId)
     {
-        $dayStart = date('Y-m-d', time()) . ' 00:00:00';
-        $dayEnd = date('Y-m-d', time()) . ' 23:59:59';
+        $dayStart = date('Y - m - d', time()) . ' 00:00:00';
+        $dayEnd = date('Y - m - d', time()) . ' 23:59:59';
 
         $check = DB::table('period')
             ->whereBetween('created_at', [$dayStart, $dayEnd])
-            ->where('product_id', '=', $productId)
+            ->where('product_id', ' = ', $productId)
             ->orderBy('created_at', 'desc')
             ->first();
 
@@ -286,14 +296,14 @@ class Period extends Common
             'product_id' => $productId,
             'auctioneer_id' => Auctioneer::randAuctioneer(),
             'status' => self::STATUS_IN_PROGRESS,
-            'robot_rate' => config('bid.robot_rate'),
+            'robot_rate' => config('bid . robot_rate'),
             'person_rate' => mt_rand(100, 150) / 100,
             'code' => $code,
         ];
         $model = self::create($data);
         $redis = app('redis')->connection('first');
         //设置倒计时初始时间和初始价格
-        $redis->setex('period@countdown' . $model->id, config('bid.init_countdown'), 1);
+        $redis->setex('period@countdown' . $model->id, config('bid . init_countdown'), 1);
         RobotPeriod::batchSave($model->id, $productId);
     }
 

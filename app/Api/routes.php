@@ -55,7 +55,8 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('product/shop-detail', 'ProductController@shopDetail');
     Route::get('product/history-trend', 'ProductController@historyTrend');
     Route::get('product/past-deal', 'ProductController@pastDeal');
-
+    //前往下一期
+    Route::get('period/next-period', 'PeriodController@nextPeriod');
 
     //竞拍
     Route::post('bid/bidding', 'BidController@bidding');
