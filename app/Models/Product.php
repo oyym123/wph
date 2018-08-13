@@ -95,6 +95,7 @@ class Product extends Common
         if ($product->is_shop == self::SHOPPING_YES) {
             $collection = new Collection();
             return [
+                'product_id' => $product->id,
                 'title' => $product->title,
                 'sell_price' => $product->sell_price,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),

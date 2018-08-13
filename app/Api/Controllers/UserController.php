@@ -558,6 +558,9 @@ class UserController extends WebController
      *   @SWG\Parameter(name="password", in="formData", default="666666", description="密码", required=true,
      *     type="string",
      *   ),
+     *   @SWG\Parameter(name="confirm_password", in="formData", default="666666", description="确认密码", required=true,
+     *     type="string",
+     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -567,11 +570,27 @@ class UserController extends WebController
     {
         $this->auth();
         $request = $this->request;
+
+        if (!empty($this->userIdent->cashout_password)) {
+            self::showMsg('您已经设置过密码，请勿重复设置,如果忘记密码，请联系管理员!', 4);
+        }
+
+        if ($request->password != $request->confirm_password) {
+            self::showMsg('与确认的密码不一致!', 4);
+        }
+
+        $length = mb_strlen($request->password, 'utf8');
+
+        if ($length > 20 || $length < 6) {
+            self::showMsg('密码长度,应该在6~20之间!', 4);
+        }
+
         $data = [
             'cashout_account' => $request->account,
             'cashout_name' => $request->username,
             'cashout_password' => $request->password,
         ];
+
         $model = User::where(['id' => $this->userId])->update($data);
         if ($model) {
             self::showMsg('设置成功', 0);
