@@ -347,7 +347,8 @@ class Bid extends Common
                     'd' => $bid->nickname,
                     'e' => $bid->pay_type,
                     'f' => $bid->status,
-                    'g' => $bid->end_time
+                    'g' => $bid->end_time,
+                    'h' => ($x = $redis->ttl('period@countdown' . $bid->period_id)) > 0 ? $x : 0
                 ];
             }
         }
