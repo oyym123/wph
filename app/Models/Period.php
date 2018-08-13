@@ -174,6 +174,7 @@ class Period extends Common
         $auctioneer = $period->Auctioneer;
         $collection = new Collection();
         $bid = new Bid();
+        $bid->limit = 3;
         $this->limit = 6;
         $proxy = [];
         if ($this->userId > 0) {
