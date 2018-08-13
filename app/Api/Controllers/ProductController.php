@@ -310,5 +310,4 @@ class ProductController extends WebController
         $product->userId = $this->userId;
         self::showMsg($product->shopDetail($this->request->product_id));
     }
-
 }
