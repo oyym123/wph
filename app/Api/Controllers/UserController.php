@@ -100,7 +100,7 @@ class UserController extends WebController
             $data = [
                 'session_key' => $result['session_key'],
                 'open_id' => $result['openid'],
-                'email' => rand(1000000, 999999999) . '@163.com',
+                'email' => rand(10000, 99999) . '@163.com',
                 'nickname' => $request->nickname ?: '佚名',
                 'name' => $request->nickname ?: '佚名',
                 'avatar' => $avatar ?: 'default_user_photo10.png',
@@ -118,11 +118,13 @@ class UserController extends WebController
                 $model = (new User())->saveData($data);
                 $inviteCode = md5(md5($model->id));
                 if ($model->id) {
-                    DB::table('users')->where('id', $model->id)->update([
-                        'invite_code' => $inviteCode,
-                        'be_invited_code' => $request->invite_code
-                    ]);
-                    (new Invite())->saveData($model->id, $request->invite_code);
+                    if ((new Invite())->checkoutCode($request->invite_code)) {
+                        DB::table('users')->where('id', $model->id)->update([
+                            'invite_code' => $inviteCode,
+                            'be_invited_code' => $request->invite_code
+                        ]);
+                        (new Invite())->saveData($model->id, $request->invite_code);
+                    }
                 }
             }
             Redis::hset('token', $token, $model->id);
@@ -228,7 +230,7 @@ class UserController extends WebController
             'nickname' => $user->nickname,
             'created_at' => $user->created_at,
             'status' => $user->status,
-            'user_id' => substr($user->email, 0, strrpos($user->email, '@')),
+            'user_id' => substr($user->email, 0, strrpos($user->email, '@')) . $user->id,
             'register_type' => User::REGISTER_TYPE_WEI_XIN,
             'bid_currency' => $this->userIdent->bid_currency,
             'gift_currency' => $this->userIdent->gift_currency,
