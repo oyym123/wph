@@ -50,6 +50,9 @@ class BidController extends WebController
      *   @SWG\Parameter(name="period_id", in="query", default="16", description="",
      *     type="string",
      *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
      *   @SWG\Response(
      *       response=200,description="
      *              [bid_price] => 价格
@@ -65,7 +68,11 @@ class BidController extends WebController
     public function record()
     {
         $bid = new Bid();
-        $bid->limit = 100;
+        if ($this->request->limit) {
+            $bid->limit = $this->request->limit;
+        } else {
+            $bid->limit = 100;
+        }
         self::showMsg($bid->bidRecord($this->request->period_id));
     }
 
