@@ -38,6 +38,8 @@ class BidController extends WebController
         $this->auth();
         if ($this->request->times == 1 || empty($this->request->times)) {
             $bid = new Bid();
+            $bid->userIdent = $this->userIdent;
+            $bid->userId = $this->userId;
             self::showMsg($bid->personBid($this->request->period_id));
         } else {
             $autoBid = new AutoBid();
