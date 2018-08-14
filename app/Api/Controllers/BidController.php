@@ -51,6 +51,41 @@ class BidController extends WebController
 
 
     /**
+     * @SWG\Get(path="/api/bid/record",
+     *   tags={"竞拍"},
+     *   summary="出价记录",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="period_id", in="query", default="16", description="",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *              [bid_price] => 价格
+     *              [bid_time] => 2018-07-26 17:56:40
+     *              [nickname] => 昵称
+     *              [avatar] => 头像
+     *              [area] => 地址
+     *              [bid_type] => 0 = 出局 , 1 = 领先
+     *     "
+     *   )
+     * )
+     */
+    public function record()
+    {
+        $bid = new Bid();
+        if ($this->request->limit) {
+            $bid->limit = $this->request->limit;
+        } else {
+            $bid->limit = 100;
+        }
+        self::showMsg($bid->bidRecord($this->request->period_id));
+    }
+
+
+    /**
      * @SWG\Post(path="/api/bid/newest-bid",
      *   tags={"竞拍"},
      *   summary="最新竞拍数据",
