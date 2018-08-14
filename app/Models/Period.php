@@ -288,7 +288,7 @@ class Period extends Common
 
         $check = DB::table('period')
             ->whereBetween('created_at', [$dayStart, $dayEnd])
-            ->where('product_id', ' = ', $productId)
+            ->where('product_id', '=', $productId)
             ->orderBy('created_at', 'desc')
             ->first();
 
