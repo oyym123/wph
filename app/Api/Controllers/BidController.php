@@ -77,17 +77,17 @@ class BidController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/api/bid/auto",
+     * @SWG\Post(path="/api/bid/auto",
      *   tags={"竞拍"},
      *   summary="自动竞拍提交数据",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="period_id", in="query", default="16", description="期数id", required=true,
+     *   @SWG\Parameter(name="period_id", in="formData", default="16", description="期数id", required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="times", in="query", default="6", description="次数", required=true,
+     *   @SWG\Parameter(name="times", in="formData", default="6", description="次数", required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -122,6 +122,7 @@ class BidController extends WebController
      *                  e => 拍币类型（1=赠币，2=拍币）
      *                  f => 状态（1=竞拍成功【按钮需要调整为本期结束】，0=竞拍未成功）
      *                  g => 2018-07-27 16:30:04
+     *                  h => 9 (倒计时时间)
      *     "
      *   )
      * )

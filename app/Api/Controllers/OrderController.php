@@ -176,7 +176,7 @@ class OrderController extends WebController
                 }
                 break;
             case 2: //差价购
-
+                
 
                 break;
             case 3: //待付款

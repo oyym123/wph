@@ -61,7 +61,7 @@ Route::group(['middleware' => 'web'], function () {
     //竞拍
     Route::post('bid/bidding', 'BidController@bidding');
     Route::get('bid/record', 'BidController@record');
-    Route::get('bid/auto', 'BidController@auto');
+    Route::post('bid/auto', 'BidController@auto');
     Route::post('bid/newest-bid', 'BidController@newestBid');
     Route::get('bid/auto-info', 'BidController@autoInfo');
 
