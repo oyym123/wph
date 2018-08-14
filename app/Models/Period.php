@@ -180,6 +180,11 @@ class Period extends Common
         if ($this->userId > 0) {
             $proxy = AutoBid::isAutoBid($this->userId, $period->id);
         }
+        if ($product->status == self::STATUS_IN_PROGRESS) {
+            $status = 0;
+        } else {
+            $status = 1;
+        }
         $redis = app('redis')->connection('first');
         $data = [
             'detail' => [
@@ -205,7 +210,7 @@ class Period extends Common
                 'settlement_bid_id' => $period->bid_id,
                 'auctioneer_id' => $period->auctioneer_id,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
-                'product_status' => $product->status,
+                'product_status' => $status,
                 'return_proportion' => config('bid.return_proportion') * 100,
                 'tags_img' => self::getImg('weipaihangbanner.png'),
                 'auction_avatar' => Auctioneer::AUCTION_AVATAR,
