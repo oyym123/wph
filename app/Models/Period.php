@@ -173,8 +173,9 @@ class Period extends Common
         $product = $period->product;
         $auctioneer = $period->Auctioneer;
         $collection = new Collection();
-        $bid = new Bid();
-        $bid->limit = 3;
+//       $bid = new Bid();
+//        $bid->limit = 3;
+        $userCount = DB::table('bid')->select('user_id')->where(['period_id' => $period->id])->groupBy(['user_id'])->get();
         $this->limit = 6;
         $proxy = [];
         if ($this->userId > 0) {
@@ -203,8 +204,8 @@ class Period extends Common
                 'countdown' => $product->countdown_length,
                 'countdown_length' => ($x = $redis->ttl('period@countdown' . $period->id)) > 0 ? $x : 0,
                 'is_gift_bids_enable' => 1,
-                'collection_users_count' => 10,
-                'bid_users_count' => 1,
+                'collection_users_count' => $product->collection_count,
+                'bid_users_count' => count($userCount),
                 'bid_count' => ($period->bid_price * 10) / $product->pay_amount,
                 'buy_by_diff' => $product->buy_by_diff,
                 'settlement_bid_id' => $period->bid_id,
@@ -248,7 +249,7 @@ class Period extends Common
                     'f' => '',
                     'a' => '',
                 ),
-            'bid_records' => $bid->bidRecord($period->id)
+            //'bid_records' => $bid->bidRecord($period->id)
         ];
         return $data;
     }

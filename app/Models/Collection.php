@@ -32,20 +32,32 @@ class Collection extends Common
         return !empty($res) ? self::STATUS_COLLECTION_YES : self::STATUS_COLLECTION_NO;
     }
 
+    /** 收藏人数统计 */
+    public function userCount($productId)
+    {
+        DB::table('collection')->where([
+            'status' => self::STATUS_COLLECTION_YES,
+            'product_id' => $productId
+        ])->count();
+    }
+
     public function saveData($data)
     {
         $model = Collection::where($data)->first();
         if ($model) {
             if ($model->status == self::STATUS_COLLECTION_NO) {
                 Collection::where($data)->update(['status' => self::STATUS_COLLECTION_YES]);
+                DB::table('product')->where(['id' => $data['product_id']])->increment('collection_count', 1);
                 return ['info' => '收藏成功', 'status' => self::STATUS_COLLECTION_YES];
             } else {
                 Collection::where($data)->update(['status' => self::STATUS_COLLECTION_NO]);
+                DB::table('product')->where(['id' => $data['product_id']])->decrement('collection_count', 1);
                 return ['info' => '取消收藏成功', 'status' => self::STATUS_COLLECTION_NO];
             }
         } else {
             $data['status'] = self::STATUS_COLLECTION_YES;
             self::create($data);
+            DB::table('product')->where(['id' => $data['product_id']])->increment('collection_count', 1);
             return ['info' => '收藏成功', 'status' => self::STATUS_COLLECTION_YES];
         }
     }

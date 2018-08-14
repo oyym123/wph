@@ -154,7 +154,10 @@ class ProductController extends Controller
                     $period->saveData($form->model()->id);
                 }
                 $payAmount = $form->model()->type == 1 ? 10 : 1;
-                DB::table('product')->where(['id' => $form->model()->id])->update(['pay_amount' => $payAmount]);
+                DB::table('product')->where(['id' => $form->model()->id])->update([
+                    'pay_amount' => $payAmount,
+                    'collection_count' => rand(100, 9999)
+                ]);
                 //清除产品缓存
                 Cache::forget('product@find' . $form->model()->id);
             });
