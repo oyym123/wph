@@ -115,23 +115,18 @@ class Bid extends Common
     /** 设置最后一个竞拍人的id */
     public function setLastPersonId($redis, $data)
     {
-        $lastPersonIds = json_decode($redis->get('bid@lastPersonId'), true);
-        $lastPersonIds[$data['period_id']] = $data;
-        //设置1年的存储期限，但会不断刷新
-        $redis->setex('bid@lastPersonId', 86400 * 365, json_encode($lastPersonIds));
+        $redis->hset('bid@lastPersonId', $data['period_id'], json_encode($data));
     }
 
     /** 获取最后一个竞拍人的id */
     public function getLastBidInfo($redis, $periodId, $type = false)
     {
-        $lastPersonIds = json_decode($redis->get('bid@lastPersonId'));
-        if (!empty($lastPersonIds->$periodId)) {
-
+        $lastPersonIds = json_decode($redis->hget('bid@lastPersonId', $periodId));
+        if (!empty($lastPersonIds)) {
             if (!empty($type)) {
-
-                return $lastPersonIds->$periodId->$type;
+                return $lastPersonIds->$type;
             } else {
-                return $lastPersonIds->$periodId;
+                return $lastPersonIds;
             }
         } else {
             return 0;

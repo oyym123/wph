@@ -13,7 +13,6 @@ use App\Api\components\WebController;
 use App\Models\Order;
 use App\Models\Pay;
 use App\Models\Period;
-use App\Models\Shipping;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends WebController
@@ -21,7 +20,7 @@ class OrderController extends WebController
 
     /**
      * @SWG\Get(path="/api/order/my-auction",
-     *   tags={"用户中心"},
+     *   tags={"我的竞拍"},
      *   summary="我的竞拍",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
@@ -142,7 +141,7 @@ class OrderController extends WebController
                     $data['bid_step'] = $period->bid_step;
                     $data['sell_price'] = $product->sell_price;
                     $data['settlement_bid_price'] = $period->bid_price;
-                    $data['result_status'] = $request->type;
+                    $data['result_status'] = 0;
                     $data['num'] = $num; //出价次数
                     $res[] = $data;
                 }
@@ -166,7 +165,71 @@ class OrderController extends WebController
                     $data['bid_step'] = $period->bid_step;
                     $data['sell_price'] = $product->sell_price;
                     $data['settlement_bid_price'] = $period->bid_price;
-                    $data['result_status'] = $request->type;
+                    $data['result_status'] = 1;
+                    $data['num'] = $num; //出价次数
+                    $data['label'] = Order::getStatus($order->status); //出价次数
+                    $data['sn'] = $order->sn;
+                    $data['order_time'] = $order->created_at;
+                    $data['order_status'] = $order->status;
+                    $res[] = $data;
+                }
+                break;
+            case 2: //差价购
+                $expend = DB::table('expend')
+                    ->select('period_id')
+                    ->where(['user_id' => $this->userId])
+                    ->groupBy('period_id')
+                    ->get()->toArray();
+                $periodIds = array_column($expend, 'period_id');
+
+                $periods = Period::whereIn('id', $periodIds)->where([
+                    'status' => Period::STATUS_OVER
+                ])->where('user_id', '<>', $this->userId)->get();
+
+                foreach ($periods as $period) {
+                    $product = $period->product;
+                    $num = DB::table('bid')
+                        ->where([
+                            'period_id' => $period,
+                            'user_id' => $this->userId
+                        ])->count('id');
+                    $data['period_id'] = $period->id;
+                    $data['product_id'] = $period->product_id;
+                    $data['period_code'] = $period->code;
+                    $data['title'] = $product->title;
+                    $data['img_cover'] = $product->getImgCover();
+                    $data['bid_step'] = $period->bid_step;
+                    $data['sell_price'] = $product->sell_price;
+                    $data['settlement_bid_price'] = $period->bid_price;
+                    $data['result_status'] = 2;
+                    $data['num'] = $num; //出价次数
+                    $res[] = $data;
+                }
+                break;
+            case 3: //待付款
+                $orders = Order::has('period')
+                    ->where([
+                        'buyer_id' => $this->userId,
+                        'status' => Order::STATUS_WAIT_PAY
+                    ])
+                    ->get();
+                foreach ($orders as $order) {
+                    $period = $order->period;
+                    $product = $order->product;
+                    $num = DB::table('bid')
+                        ->where([
+                            'period_id' => $period,
+                            'user_id' => $this->userId
+                        ])->count('id');
+                    $data['period_id'] = $period->id;
+                    $data['product_id'] = $period->product_id;
+                    $data['period_code'] = $period->code;
+                    $data['title'] = $product->title;
+                    $data['img_cover'] = $product->getImgCover();
+                    $data['bid_step'] = $period->bid_step;
+                    $data['sell_price'] = $product->sell_price;
+                    $data['settlement_bid_price'] = $period->bid_price;
+                    $data['result_status'] = 3;
                     $data['num'] = $num; //出价次数
                     $data['label'] = Order::getStatus($order->status); //出价次数
                     $data['sn'] = $order->sn;
@@ -175,21 +238,69 @@ class OrderController extends WebController
                     $res[] = $data;
                 }
                 break;
-            case 2: //差价购
-                
-
-                break;
-            case 3: //待付款
-
-
-                break;
             case 4: //待签收
-
-
+                $orders = Order::has('period')
+                    ->where([
+                        'buyer_id' => $this->userId,
+                        'status' => Order::STATUS_SHIPPED
+                    ])
+                    ->get();
+                foreach ($orders as $order) {
+                    $period = $order->period;
+                    $product = $order->product;
+                    $num = DB::table('bid')
+                        ->where([
+                            'period_id' => $period,
+                            'user_id' => $this->userId
+                        ])->count('id');
+                    $data['period_id'] = $period->id;
+                    $data['product_id'] = $period->product_id;
+                    $data['period_code'] = $period->code;
+                    $data['title'] = $product->title;
+                    $data['img_cover'] = $product->getImgCover();
+                    $data['bid_step'] = $period->bid_step;
+                    $data['sell_price'] = $product->sell_price;
+                    $data['settlement_bid_price'] = $period->bid_price;
+                    $data['result_status'] = 4;
+                    $data['num'] = $num; //出价次数
+                    $data['label'] = Order::getStatus($order->status); //出价次数
+                    $data['sn'] = $order->sn;
+                    $data['order_time'] = $order->created_at; //出价次数
+                    $data['order_status'] = $order->status; //出价次数
+                    $res[] = $data;
+                }
                 break;
             case 5: //待晒单
-
-
+                $orders = Order::has('period')
+                    ->where([
+                        'buyer_id' => $this->userId,
+                        'status' => Order::STATUS_CONFIRM_RECEIVING
+                    ])
+                    ->get();
+                foreach ($orders as $order) {
+                    $period = $order->period;
+                    $product = $order->product;
+                    $num = DB::table('bid')
+                        ->where([
+                            'period_id' => $period,
+                            'user_id' => $this->userId
+                        ])->count('id');
+                    $data['period_id'] = $period->id;
+                    $data['product_id'] = $period->product_id;
+                    $data['period_code'] = $period->code;
+                    $data['title'] = $product->title;
+                    $data['img_cover'] = $product->getImgCover();
+                    $data['bid_step'] = $period->bid_step;
+                    $data['sell_price'] = $product->sell_price;
+                    $data['settlement_bid_price'] = $period->bid_price;
+                    $data['result_status'] = 5;
+                    $data['num'] = $num; //出价次数
+                    $data['label'] = Order::getStatus($order->status); //出价次数
+                    $data['sn'] = $order->sn;
+                    $data['order_time'] = $order->created_at; //出价次数
+                    $data['order_status'] = $order->status; //出价次数
+                    $res[] = $data;
+                }
                 break;
         }
         self::showMsg($res);
@@ -197,7 +308,7 @@ class OrderController extends WebController
 
     /**
      * @SWG\Get(path="/api/order/confirm-receipt",
-     *   tags={"用户中心"},
+     *   tags={"我的竞拍"},
      *   summary="确认收货",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
@@ -224,7 +335,7 @@ class OrderController extends WebController
 
     /**
      * @SWG\Get(path="/api/order/transport-detail",
-     *   tags={"用户中心"},
+     *   tags={"我的竞拍"},
      *   summary="物流详情",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
