@@ -87,6 +87,7 @@ class OrderController extends WebController
             'result_status' => 0,
             'pay_status' => Pay::STATUS_UNPAID,
             'pay_time' => '',
+            'save_price' => 0,
             'pay_price' => 0,
             'pay_shop_bids' => 0,
             'order_time' => '',
@@ -152,6 +153,7 @@ class OrderController extends WebController
                         $data['title'] = $product->title;
                         $data['img_cover'] = $product->getImgCover();
                         $data['bid_step'] = $period->bid_step;
+                        $data['save_price'] = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $period->bid_price;
                         $data['result_status'] = 1;
@@ -237,6 +239,7 @@ class OrderController extends WebController
                         $data['img_cover'] = $product->getImgCover();
                         $data['bid_step'] = $period->bid_step;
                         $data['sell_price'] = $product->sell_price;
+                        $data['save_price'] = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
                         $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 4;
                         $data['label'] = Order::getStatus($order->status);
@@ -263,6 +266,7 @@ class OrderController extends WebController
                         $data['img_cover'] = $product->getImgCover();
                         $data['bid_step'] = $period->bid_step;
                         $data['sell_price'] = $product->sell_price;
+                        $data['save_price'] = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
                         $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 5;
                         $data['label'] = Order::getStatus($order->status);
