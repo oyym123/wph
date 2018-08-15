@@ -40,7 +40,6 @@ class OrderController extends WebController
      *              is_purchase_enable => 是否可加价
      *              sell_price => 售价
      *              num => 出价次数
-     *              settlement_bid_price => 成交价
      *              pay_real_price => 真正成交价格
      *              end_time => 结束时间
      *              is_long_history => 是否很长时间
@@ -78,7 +77,6 @@ class OrderController extends WebController
             'is_purchase_enable' => 1,
             'sell_price' => '8787.00',
             'num' => 0,
-            'settlement_bid_price' => '862.00',
             'pay_real_price' => '862.00',
             'end_time' => '',
             'label' => '',
@@ -133,7 +131,7 @@ class OrderController extends WebController
                         $data['img_cover'] = $product->getImgCover();
                         $data['bid_step'] = $period->bid_step;
                         $data['sell_price'] = $product->sell_price;
-                        $data['settlement_bid_price'] = $period->bid_price;
+                        $data['pay_price'] = $period->bid_price;
                         $data['result_status'] = 0;
                         $data['num'] = $num; //出价次数
                         $res[] = $data;
@@ -155,7 +153,7 @@ class OrderController extends WebController
                         $data['img_cover'] = $product->getImgCover();
                         $data['bid_step'] = $period->bid_step;
                         $data['sell_price'] = $product->sell_price;
-                        $data['settlement_bid_price'] = $period->bid_price;
+                        $data['pay_price'] = $period->bid_price;
                         $data['result_status'] = 1;
                         $data['label'] = Order::getStatus($order->status); //出价次数
                         $data['sn'] = $order->sn;
@@ -190,7 +188,7 @@ class OrderController extends WebController
                         $data['bid_step'] = $period->bid_step;
                         $data['sell_price'] = $product->sell_price;
                         $data['nickname'] = $period->nickname;
-                        $data['settlement_bid_price'] = $period->bid_price;
+                        $data['pay_price'] = $period->bid_price;
                         $data['result_status'] = 2;
                         $data['return_voucher_bids'] = $payAmount * config('bid.return_proportion');
                         $res[] = $data;
