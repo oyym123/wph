@@ -58,17 +58,20 @@ Route::group(['middleware' => 'web'], function () {
     //前往下一期
     Route::get('period/next-period', 'PeriodController@nextPeriod');
 
-    //竞拍
+    /** 竞拍 */
     Route::post('bid/bidding', 'BidController@bidding');
     Route::get('bid/record', 'BidController@record');
     Route::post('bid/auto', 'BidController@auto');
     Route::post('bid/newest-bid', 'BidController@newestBid');
     Route::get('bid/auto-info', 'BidController@autoInfo');
 
+    /** 支付 */
+    Route::post('pay/wx-pay', 'PayController@WxPay'); //我的绩效
+
+
     /** 用户中心 */
     Route::post('user/address', 'UserController@address'); //用户收货地址
     Route::post('user/withdraw', 'UserController@withdraw'); //提现
-
     Route::post('user/set-withdraw-account', 'UserController@setWithdrawAccount'); //我的绩效
     Route::get('user/performance', 'UserController@performance'); //我的绩效
     Route::get('user/performance-income', 'UserController@performanceIncome'); //我的绩效-收益加载更多

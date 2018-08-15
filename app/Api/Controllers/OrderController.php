@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends WebController
 {
-
     /**
      * @SWG\Get(path="/api/order/my-auction",
      *   tags={"我的竞拍"},
@@ -95,12 +94,10 @@ class OrderController extends WebController
             'order_time' => '',
             'check_status' => 0,
             'return_voucher_bids' => 0,
-
             'nickname' => $user->nickname,
             'show_confirm_trans' => 0,
         );
         $types = [$request->type];
-
         if ($request->type = 100) {
             $types = [0, 1, 2, 3, 4, 5];
         }
@@ -284,6 +281,28 @@ class OrderController extends WebController
     }
 
     /**
+     * @SWG\Get(path="/api/order/confirm",
+     *   tags={"我的竞拍"},
+     *   summary="确认订单",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="type", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function confirm()
+    {
+
+
+    }
+
+    /**
      * @SWG\Get(path="/api/order/confirm-receipt",
      *   tags={"我的竞拍"},
      *   summary="确认收货",
@@ -301,6 +320,7 @@ class OrderController extends WebController
      */
     public function confirmReceipt()
     {
+        $this->auth();
         $order = new Order();
         $res = $order->confirmReceipt($this->request->sn, $this->userId);
         if ($res) {
@@ -377,6 +397,7 @@ class OrderController extends WebController
      */
     public function transportDetail()
     {
+        $this->auth();
         self::showMsg((new order())->transportDetail($this->request->sn, $this->userId));
     }
 }

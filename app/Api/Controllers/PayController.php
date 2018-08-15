@@ -10,27 +10,58 @@ namespace App\Api\Controllers;
 
 
 use App\Api\components\WebController;
+use App\Models\Order;
+use App\Models\Pay;
 use Illuminate\Support\Facades\Request;
 
 class PayController extends WebController
 {
 
-    //微信支付
-    public function Wx_Pay()
+    /**
+     * @SWG\Post(path="/api/pay/wx-pay",
+     *   tags={"支付"},
+     *   summary="微信支付",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="amount", in="formData", default="1", description="金额", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function WxPay()
     {
-        $request = Request::instance();
-        $fee = $request->param('fee');
-        $details = $request->param('details');//商品的详情，比如iPhone8，紫色
+        $this->auth();
+        $user = $this->userIdent;
+        $request = $this->request;
+        $fee = $request->amount;
+        $details = '充值';//商品的详情，比如iPhone8，紫色
         // $fee = 0.01;//举例充值0.01
         $appid = config('bid.wx_app_id');//appid
         $body = $details;// '金邦汇商城';//'【自己填写】'
         $mch_id = config('bid.wx_mch_id');//'你的商户号【自己填写】'
         $nonce_str = $this->nonce_str();//随机字符串
         $notify_url = $_SERVER["HTTP_HOST"] . '/api/newbie-guide';//回调的url【自己填写】';
-        $openid = $request->param('openid');//'用户的openid【自己填写】';
+        $total_fee = $fee * 100;//因为充值金额最小是1 而且单位为分 如果是充值1元所以这里需要*100
+        $order = new Order();
+        $orderInfo = [
+            'sn' => $order->createSn(),
+            'pay_type' => Pay::TYPE_WEI_XIN,
+            'pay_amount' => $total_fee,
+            'status' => Order::STATUS_WAIT_PAY,
+            'type' => Order::TYPE_BID, //表示竞拍类型订单
+            'buyer_id' => $this->userId,
+        ];
+        
+        $order = $order->createOrder($orderInfo);
+        $openid = $user->open_id;//'用户的openid【自己填写】';
         $out_trade_no = $this->order_number($openid);//商户订单号
         $spbill_create_ip = '116.62.212.29';//'服务器的ip【自己填写】';
-        $total_fee = $fee * 100;//因为充值金额最小是1 而且单位为分 如果是充值1元所以这里需要*100
+
         $trade_type = 'JSAPI';//交易类型 默认
         //这里是按照顺序的 因为下面的签名是按照顺序 排序错误 肯定出错
         $post['appid'] = $appid;
@@ -68,13 +99,15 @@ class PayController extends WebController
         //统一接口prepay_id
         $url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
         $xml = $this->http_request($url, $post_xml);
+
         $array = $this->xml($xml);//全要大写
-        if ($array['RETURN_CODE'] == 'SUCCESS' && $array['RESULT_CODE'] == 'SUCCESS') {
+        //  print_r($array);exit;
+        if ($array['return_code'] == 'SUCCESS' && $array['result_code'] == 'SUCCESS') {
             $time = time();
-            $tmp = '';//临时数组用于签名
+            $tmp = [];//临时数组用于签名
             $tmp['appId'] = $appid;
             $tmp['nonceStr'] = $nonce_str;
-            $tmp['package'] = 'prepay_id=' . $array['PREPAY_ID'];
+            $tmp['package'] = 'prepay_id=' . $array['prepay_id'];
             $tmp['signType'] = 'MD5';
             $tmp['timeStamp'] = "$time";
 
@@ -82,21 +115,19 @@ class PayController extends WebController
             $data['timeStamp'] = "$time";//时间戳
             $data['nonceStr'] = $nonce_str;//随机字符串
             $data['signType'] = 'MD5';//签名算法，暂支持 MD5
-            $data['package'] = 'prepay_id=' . $array['PREPAY_ID'];//统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*
+            $data['package'] = 'prepay_id=' . $array['prepay_id'];//统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*
             $data['paySign'] = $this->sign($tmp);//签名,具体签名方案参见微信公众号支付帮助文档;
             $data['out_trade_no'] = $out_trade_no;
-
         } else {
             $data['state'] = 0;
             $data['text'] = "错误";
-            $data['RETURN_CODE'] = $array['RETURN_CODE'];
-            $data['RETURN_MSG'] = $array['RETURN_MSG'];
+            $data['return_code'] = $array['return_code'];
+            $data['result_msg'] = $array['result_msg'];
         }
-        echo json_encode($data);
+        self::showMsg($data);
     }
 
-
-//随机32位字符串
+    //随机32位字符串
     private function nonce_str()
     {
         $result = '';
@@ -150,20 +181,13 @@ class PayController extends WebController
         return $output;
     }
 
-//获取xml
+    //将XML转为array
     private function xml($xml)
     {
-        $p = xml_parser_create();
-        xml_parse_into_struct($p, $xml, $vals, $index);
-        xml_parser_free($p);
-        $data = "";
-        foreach ($index as $key => $value) {
-            if ($key == 'xml' || $key == 'XML') continue;
-            $tag = $vals[$value[0]]['tag'];
-            $value = $vals[$value[0]]['value'];
-            $data[$tag] = $value;
-        }
-        return $data;
+        //禁止引用外部xml实体
+        libxml_disable_entity_loader(true);
+        $values = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+        return $values;
     }
 //微信支付结束
 }

@@ -38,9 +38,11 @@ class Order extends Common
         'signed_at', //签收时间
     ];
 
-    const TYPE_BID = 1; //竞拍类型订单
-    const TYPE_BUY_BY_DIFF = 2; //差价购买
-    const TYPE_SHOP = 3;  //购物币全款购买
+    const TYPE_BID = 1;                 //竞拍类型订单
+    const TYPE_BUY_BY_DIFF = 2;         //差价购买
+    const TYPE_SHOP = 3;                //购物币全款购买
+    const TYPE_AUTO_BID = 4;            //自动竞拍支付订单
+    const TYPE_RECHARGE = 5;            //充值
 
     const STATUS_WAIT_PAY = 10;         // 待付款
     const STATUS_PAYED = 15;            // 已付款
