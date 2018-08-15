@@ -190,6 +190,7 @@ class Bid extends Common
                             'product_id' => $product->id,
                             'period_id' => $bid->period_id,
                             'status' => Order::STATUS_WAIT_PAY,
+                            'type' => Order::TYPE_BID, //表示竞拍类型订单
                             'buyer_id' => $bid->user_id,
                             'address_id' => $address->id, //收货人地址
                             'str_address' => str_replace('||', ' ', $address->str_address) . $address->detail_address,

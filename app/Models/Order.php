@@ -39,8 +39,8 @@ class Order extends Common
     ];
 
     const TYPE_BID = 1; //竞拍类型订单
-    const TYPE_BUY_BY_DIFF = 2;
-    const TYPE_SHOP = 3;
+    const TYPE_BUY_BY_DIFF = 2; //差价购买
+    const TYPE_SHOP = 3;  //购物币全款购买
 
     const STATUS_WAIT_PAY = 10;         // 待付款
     const STATUS_PAYED = 15;            // 已付款
@@ -52,6 +52,7 @@ class Order extends Common
 
     const STATUS_EVALUATION_YES = 1;    //已评价
     const STATUS_EVALUATION_NO = 0;     //未评价
+
 
     public static function getStatus($key = 999)
     {
@@ -148,6 +149,7 @@ class Order extends Common
         }
         self::showMsg('订单不存在!', self::CODE_NO_DATA);
     }
+
 
     /** 获取拍期数表信息 */
     public function Period()
