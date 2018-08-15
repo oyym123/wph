@@ -135,7 +135,7 @@ class OrderController extends WebController
                         $data['bid_step'] = $period->bid_step;
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $period->bid_price;
-                        $data['nickname'] = $period->nickname;
+                        $data['nickname'] = '...';
                         $data['result_status'] = 0;
                         $data['num'] = $num; //出价次数
                         $res[] = $data;
@@ -160,7 +160,7 @@ class OrderController extends WebController
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $period->bid_price;
                         $data['result_status'] = 1;
-                        $data['nickname'] = $period->nickname;
+                        $data['nickname'] = $user->nickname;
                         $data['label'] = Order::getStatus($order->status); //出价次数
                         $data['sn'] = $order->sn;
                         $data['order_time'] = $order->created_at;

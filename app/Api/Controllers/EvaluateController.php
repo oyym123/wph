@@ -91,4 +91,28 @@ class EvaluateController extends WebController
         $model->limit = $this->limit;
         self::showMsg($model->getList(['product_id' => $this->request->product_id]));
     }
+
+    /**
+     * @SWG\Get(path="/api/evaluate/lists",
+     *   tags={"晒单"},
+     *   summary="首页晒单接口",
+     *   description="Author: OYYM",
+     *    @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function lists()
+    {
+        $model = new Evaluate();
+        $model->offset = $this->offset;
+        $model->limit = $this->limit;
+        self::showMsg($model->getList());
+    }
 }

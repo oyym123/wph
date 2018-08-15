@@ -98,6 +98,7 @@ Route::group(['middleware' => 'web'], function () {
 
     /** 晒单 */
     Route::post('evaluate/submit', 'EvaluateController@submit'); //提交晒单
+    Route::get('evaluate/lists', 'EvaluateController@lists'); //首页晒单列表
     Route::get('evaluate', 'EvaluateController@index'); //晒单列表
 
     //收藏
