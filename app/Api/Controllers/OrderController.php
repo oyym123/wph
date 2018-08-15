@@ -26,7 +26,7 @@ class OrderController extends WebController
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="type", in="query", default="0", description="（0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）" ,required=true,
+     *   @SWG\Parameter(name="type", in="query", default="0", description="（100= 全部 , 0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）" ,required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -48,7 +48,7 @@ class OrderController extends WebController
      *              sn => 订单号
      *              bid_type => 竞拍类型 （0 = 正常竞拍 , 1 = 差价购买）
      *              order_status => 订单类型 （ 10 = 未支付 , 15 = 已付款 ,20 = 待发货 , 25 = 已发货 , 50 = 买家已签收 , 100 = 已完成）
-     *              result_status => 结果类型 （100=全部,0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）
+     *              result_status => 结果类型 （100= 全部 , 0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）
      *              pay_status => 支付状态 （10=>未支付 , 20=已支付）
      *              pay_time => 支付时间
      *              pay_price => 支付价格
