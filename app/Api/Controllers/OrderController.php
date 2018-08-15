@@ -69,9 +69,9 @@ class OrderController extends WebController
         $data = array(
             'period_id' => 4372346,
             'product_id' => 626,
-            'period_code' => '201806210002',
-            'title' => 'Apple iPhone 8 Plus 256G 颜色随机',
-            'img_cover' => '1505284333822',
+            'period_code' => '',
+            'title' => '',
+            'img_cover' => '',
             'bid_step' => 1,
             'product_type' => 0,
             'is_purchase_enable' => 1,
@@ -96,14 +96,16 @@ class OrderController extends WebController
             'nickname' => $user->nickname,
             'show_confirm_trans' => 0,
         );
-        $types = [$request->type];
-        if ($request->type = 100) {
+
+        if ($request->type == 100) {
             $types = [0, 1, 2, 3, 4, 5];
+        } else {
+            $types = [$request->type];
         }
 
         $result = [];
 
-        foreach ($types as $type) {
+        foreach ($types as $key=>$type) {
             switch ($type) {
                 case 0: //我在拍
                     //  $bids = Period::find(39)->bid()->where(['id' => 755])->first();
