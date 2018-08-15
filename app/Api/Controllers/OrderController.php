@@ -84,7 +84,7 @@ class OrderController extends WebController
             'sn' => '',
             'bid_type' => 0,
             'order_status' => 0,
-            'result_status' => 0,
+            'result_status' => 99,
             'pay_status' => Pay::STATUS_UNPAID,
             'pay_time' => '',
             'save_price' => 0,
