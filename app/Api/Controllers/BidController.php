@@ -125,8 +125,9 @@ class BidController extends WebController
      *   ),
      *   @SWG\Response(
      *       response=200,description="
-     *                  [remain_times] => 5 （剩余次数）
+     *                  [remain_times] => 3 （剩余次数）
      *                  [total_times] => 6  （总次数）
+     *                  [percent] => 50  （百分比）
      *     "
      *   )
      * )

@@ -159,11 +159,13 @@ class AutoBid extends Common
             return [
                 'remain_times' => $model->remain_times,
                 'total_times' => $model->times,
+                'percent' => $model->remain_times / $model->times,
             ];
         }
         return [
             'remain_times' => 0,
             'total_times' => 0,
+            'percent' => 0,
         ];
     }
 }
