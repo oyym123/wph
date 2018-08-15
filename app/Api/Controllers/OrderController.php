@@ -25,6 +25,12 @@ class OrderController extends WebController
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
+     *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
+     *     type="string",
+     *   ),
      *   @SWG\Parameter(name="type", in="query", default="0", description="（100= 全部 , 0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）" ,required=true,
      *     type="string",
      *   ),
@@ -102,9 +108,7 @@ class OrderController extends WebController
         } else {
             $types = [$request->type];
         }
-
         $result = [];
-
         foreach ($types as $key => $type) {
             switch ($type) {
                 case 0: //我在拍
@@ -118,7 +122,7 @@ class OrderController extends WebController
 
                     $periods = Period::whereIn('id', $periodIds)->where([
                         'status' => Period::STATUS_IN_PROGRESS
-                    ])->get();
+                    ])->offset($this->offset)->limit($this->limit)->get();
 
                     foreach ($periods as $period) {
                         $product = $period->product;
@@ -146,7 +150,7 @@ class OrderController extends WebController
                         ->where([
                             'buyer_id' => $this->userId,
                             'type' => Order::TYPE_BID
-                        ])->get();
+                        ])->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $period = $order->period;
                         $product = $order->product;
@@ -177,7 +181,7 @@ class OrderController extends WebController
                     $periodIds = array_column($expend, 'period_id');
                     $periods = Period::whereIn('id', $periodIds)->where([
                         'status' => Period::STATUS_OVER
-                    ])->where('user_id', '<>', $this->userId)->get();
+                    ])->where('user_id', '<>', $this->userId)->offset($this->offset)->limit($this->limit)->get();
 
                     foreach ($periods as $period) {
                         $product = $period->product;
@@ -206,7 +210,7 @@ class OrderController extends WebController
                             'buyer_id' => $this->userId,
                             'status' => Order::STATUS_WAIT_PAY
                         ])
-                        ->get();
+                        ->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $period = $order->period;
                         $product = $order->product;
@@ -233,7 +237,7 @@ class OrderController extends WebController
                             'buyer_id' => $this->userId,
                             'status' => Order::STATUS_SHIPPED
                         ])
-                        ->get();
+                        ->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $period = $order->period;
                         $product = $order->product;
@@ -261,7 +265,7 @@ class OrderController extends WebController
                             'buyer_id' => $this->userId,
                             'status' => Order::STATUS_CONFIRM_RECEIVING
                         ])
-                        ->get();
+                        ->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $period = $order->period;
                         $product = $order->product;
