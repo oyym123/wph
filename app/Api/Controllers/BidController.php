@@ -77,13 +77,12 @@ class BidController extends WebController
     {
         $bid = new Bid();
         if ($this->request->limit) {
-            $bid->limit = $this->request->limit;
+            $bid->limit = $this->limit;
         } else {
-            $bid->limit = 100;
+            $bid->limit = 3;
         }
         self::showMsg($bid->bidRecord($this->request->period_id));
     }
-
 
     /**
      * @SWG\Post(path="/api/bid/newest-bid",
