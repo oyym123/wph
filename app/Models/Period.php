@@ -181,16 +181,11 @@ class Period extends Common
         if ($this->userId > 0) {
             $proxy = AutoBid::isAutoBid($this->userId, $period->id);
         }
-        if ($product->status == self::STATUS_IN_PROGRESS) {
-            $status = 0;
-        } else {
-            $status = 1;
-        }
         $redis = app('redis')->connection('first');
         $data = [
             'detail' => [
                 'id' => $period->id,
-                'period_status' => $status,
+                'period_status' => $period->status,
                 'product_id' => $period->product_id,
                 'period_code' => $period->code,
                 'title' => $product->title,
