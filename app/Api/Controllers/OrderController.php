@@ -105,7 +105,7 @@ class OrderController extends WebController
 
         $result = [];
 
-        foreach ($types as $key=>$type) {
+        foreach ($types as $key => $type) {
             switch ($type) {
                 case 0: //我在拍
                     //  $bids = Period::find(39)->bid()->where(['id' => 755])->first();
@@ -135,6 +135,7 @@ class OrderController extends WebController
                         $data['bid_step'] = $period->bid_step;
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $period->bid_price;
+                        $data['nickname'] = $period->nickname;
                         $data['result_status'] = 0;
                         $data['num'] = $num; //出价次数
                         $res[] = $data;
@@ -159,6 +160,7 @@ class OrderController extends WebController
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $period->bid_price;
                         $data['result_status'] = 1;
+                        $data['nickname'] = $period->nickname;
                         $data['label'] = Order::getStatus($order->status); //出价次数
                         $data['sn'] = $order->sn;
                         $data['order_time'] = $order->created_at;
@@ -217,6 +219,7 @@ class OrderController extends WebController
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 3;
+                        $data['nickname'] = $period->nickname;
                         $data['label'] = Order::getStatus($order->status);
                         $data['sn'] = $order->sn;
                         $data['order_time'] = $order->created_at;
@@ -244,6 +247,7 @@ class OrderController extends WebController
                         $data['save_price'] = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
                         $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 4;
+                        $data['nickname'] = $period->nickname;
                         $data['label'] = Order::getStatus($order->status);
                         $data['sn'] = $order->sn;
                         $data['order_time'] = $order->created_at;
