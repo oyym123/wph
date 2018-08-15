@@ -190,7 +190,7 @@ class Period extends Common
         $data = [
             'detail' => [
                 'id' => $period->id,
-                'period_status' => $period->status,
+                'period_status' => $status,
                 'product_id' => $period->product_id,
                 'period_code' => $period->code,
                 'title' => $product->title,
@@ -211,7 +211,7 @@ class Period extends Common
                 'settlement_bid_id' => $period->bid_id,
                 'auctioneer_id' => $period->auctioneer_id,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
-                'product_status' => $status,
+                'product_status' => $product->status,
                 'return_proportion' => config('bid.return_proportion') * 100,
                 'tags_img' => self::getImg('weipaihangbanner.png'),
                 'auction_avatar' => Auctioneer::AUCTION_AVATAR,
