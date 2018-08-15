@@ -61,6 +61,9 @@ class BidController extends WebController
      *   @SWG\Parameter(name="limit", in="query", default="20", description="个数",
      *     type="string",
      *   ),
+     *   @SWG\Parameter(name="pages", in="query", default="0", description="页数",
+     *     type="string",
+     *   ),
      *   @SWG\Response(
      *       response=200,description="
      *              [bid_price] => 价格
@@ -80,6 +83,9 @@ class BidController extends WebController
             $bid->limit = $this->limit;
         } else {
             $bid->limit = 3;
+        }
+        if ($this->offset >= 1) {
+            self::showMsg('最多显示100条！', 0);
         }
         self::showMsg($bid->bidRecord($this->request->period_id));
     }
