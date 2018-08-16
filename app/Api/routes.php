@@ -91,6 +91,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('invite/invite-list', 'InviteController@inviteList'); //我的推广主页
 
     /** 订单中心 */
+    Route::get('order/cancel-order', 'OrderController@cancelOrder'); //我的竞拍
     Route::get('order/my-auction', 'OrderController@MyAuction'); //我的竞拍
     Route::get('order/confirm-order', 'OrderController@confirmOrder'); //确认订单
     Route::get('order/confirm-receipt', 'OrderController@confirmReceipt'); //确认收货

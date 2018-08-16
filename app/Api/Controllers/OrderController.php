@@ -293,15 +293,42 @@ class OrderController extends WebController
         self::showMsg($result);
     }
 
+
+    /**
+     * @SWG\Get(path="/api/order/cancel-order",
+     *   tags={"我的竞拍"},
+     *   summary="取消订单",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="sn", in="query", default="201807312348483696031716", description="订单号", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function cancelOrder()
+    {
+        $this->auth();
+        $order = new Order();
+        $order->userId = $this->userId;
+        if ($order->cancel($this->request->sn) == 1) {
+            self::showMsg('取消订单成功！', 0);
+        } else {
+            self::showMsg('取消订单失败！', 4);
+        }
+    }
+
+
     /**
      * @SWG\Get(path="/api/order/confirm-order",
      *   tags={"我的竞拍"},
      *   summary="确认订单",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
-     *     type="string",
-     *   ),
-     *   @SWG\Parameter(name="type", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -314,6 +341,7 @@ class OrderController extends WebController
 
 
     }
+
 
     /**
      * @SWG\Get(path="/api/order/confirm-receipt",

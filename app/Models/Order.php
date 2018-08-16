@@ -143,6 +143,18 @@ class Order extends Common
         }
     }
 
+    /** 取消订单 */
+    public function cancel($sn)
+    {
+        $model = $this->getOrder([
+            'sn' => $sn,
+            'buyer_id' => $this->userId,
+            'status' => Order::STATUS_WAIT_PAY
+        ]);
+        // $model->withTrashed()->restore();
+        return $model->delete();
+    }
+
     /** 获取订单详情 */
     public function getOrder($where = [])
     {
