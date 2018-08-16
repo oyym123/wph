@@ -50,7 +50,7 @@ class OrderController extends WebController
      *              end_time => 结束时间
      *              is_long_history => 是否很长时间
      *              sn => 订单号
-     *              bid_type => 竞拍类型 （0 = 正常竞拍 , 1 = 差价购买）
+     *              bid_type => 竞拍类型 （1 = 正常竞拍 , 2 = 差价购买）
      *              order_status => 订单类型 （ 10 = 未支付 , 15 = 已付款 ,20 = 待发货 , 25 = 已发货 , 50 = 买家已签收 , 100 = 已完成）
      *              result_status => 结果类型 （100= 全部 , 0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）
      *              pay_status => 支付状态 （10=>未支付 , 20=已支付）
@@ -220,6 +220,7 @@ class OrderController extends WebController
                         $data['title'] = $product->title;
                         $data['img_cover'] = $product->getImgCover();
                         $data['bid_step'] = $period->bid_step;
+                        $data['bid_type'] = $order->type;
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 3;
@@ -310,7 +311,7 @@ class OrderController extends WebController
      */
     public function confirmOrder()
     {
-        
+
 
     }
 
