@@ -132,13 +132,13 @@ class Period extends Common
         if ($type == 4) { //产品类型分类
             $where = [];
             if (!empty($this->request->type)) {
-                $where = ['product . type' => $this->request->type];
+                $where = ['product.type' => $this->request->type];
             }
             $periods = DB::table('period')
-                ->join('product', 'product . id', ' = ', 'period . product_id')
+                ->join('product', 'product.id', '=', 'period.product_id')
                 ->where([
-                        'period . deleted_at' => null,
-                        'period . status' => self::STATUS_IN_PROGRESS
+                        'period.deleted_at' => null,
+                        'period.status' => self::STATUS_IN_PROGRESS
                     ] + $where)->offset($this->offset)->limit($this->limit)->get();
         } else {
             $periods = DB::table('period')->where($where)->offset($this->offset)->limit($this->limit)->get();
