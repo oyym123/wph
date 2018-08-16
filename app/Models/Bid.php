@@ -339,7 +339,7 @@ class Bid extends Common
                 $res[] = [
                     'a' => $bid->period_id,
                     'b' => $bid->pay_amount,
-                    'c' => round($bid->bid_price, 2) . '0',
+                    'c' => number_format($bid->bid_price, 2),
                     'd' => $bid->nickname,
                     'e' => $bid->pay_type,
                     'f' => $bid->status,
