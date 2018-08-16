@@ -45,12 +45,12 @@ class WeiXinCallBack
             }
             $data[$key] = $val;
         }
-
         return [$data, self::getSign($params) == $data['sign']];
     }
 
     /** 生成xml数据 */
-    public static function xml($data) {
+    public static function xml($data)
+    {
         if (!is_array($data) || empty($data)) {
             return '';
         }

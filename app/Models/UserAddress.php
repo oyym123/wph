@@ -63,11 +63,11 @@ class UserAddress extends Common
             'is_default' => self::STATUS_IS_DEFAULT,
             'user_id' => $userId
         ])->first();
-        if (empty($model)) {
-            return self::where([
-                'user_id' => $userId
-            ])->first();
-        }
+//        if (empty($model)) {
+//            return self::where([
+//                'user_id' => $userId
+//            ])->first();
+//        }
         return $model;
     }
 }

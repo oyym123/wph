@@ -12,17 +12,16 @@ Route::group(['prefix' => 'swagger'], function () {
     Route::get('my-data', 'SwaggerController@getMyData');
 });
 
-
 Route::get('/auctioneer', function () {
     return new \App\Http\Resources\AuctioneerCollection(Auctioneer::paginate());
 });
 
 Route::group(['middleware' => 'web'], function () {
-
     //新手指引banner链接
     Route::get('/newbie-guide', function () {
         return view('api.home.newbie_guide');
     });
+    Route::any('wx-notify/notify', 'WxNotifyController@notify'); // 微信回调
 
     Route::get('auctioneer', 'AuctioneerController@index');
 
@@ -66,10 +65,12 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('bid/auto-info', 'BidController@autoInfo');
 
     /** 支付 */
-    Route::post('pay/wx-pay', 'PayController@WxPay'); //我的绩效
+    Route::post('pay/recharge', 'PayController@recharge'); //充值
+    Route::post('pay/pay', 'PayController@pay'); //立即购买
 
 
     /** 用户中心 */
+    Route::get('user/default-address', 'UserController@defaultAddress'); //用户收货地址
     Route::post('user/address', 'UserController@address'); //用户收货地址
     Route::post('user/withdraw', 'UserController@withdraw'); //提现
     Route::post('user/set-withdraw-account', 'UserController@setWithdrawAccount'); //我的绩效

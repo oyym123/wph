@@ -422,6 +422,32 @@ class UserController extends WebController
         }
     }
 
+
+    /**
+     * @SWG\Get(path="/api/user/default-address",
+     *   tags={"用户中心"},
+     *   summary="获取用户默认地址",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function defaultAddress()
+    {
+        $this->auth();
+        $address = UserAddress::defaultAddress($this->userId);
+        $addressInfo = [
+            'username' => $address->user_name,
+            'telephone' => $address->telephone,
+            'address' => str_replace('||', ' ', $address->str_address) . $address->detail_address
+        ];
+        self::showMsg($addressInfo);
+    }
+
     /**
      * @SWG\Get(path="/api/user/evaluate",
      *   tags={"用户中心"},
@@ -651,4 +677,5 @@ class UserController extends WebController
             self::showMsg('申请提现失败！');
         }
     }
+
 }

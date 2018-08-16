@@ -83,7 +83,11 @@ class Period extends Common
             'product_id' => $productId,
             'status' => self::STATUS_IN_PROGRESS
         ])->select(['id'])->orderBy('created_at', 'desc')->first();
-        return $period->id;
+        if ($period) {
+            return $period->id;
+        } else {
+            self::showMsg('该产品暂时没有竞拍活动!', 4);
+        }
     }
 
     /** 获取产品列表 */

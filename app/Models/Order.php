@@ -35,6 +35,7 @@ class Order extends Common
         'str_phone_number', //手机号
         'expired_at', //过期时间
         'type', //类型
+        'ip', //ip
         'signed_at', //签收时间
     ];
 
@@ -164,6 +165,18 @@ class Order extends Common
         self::showMsg('订单不存在!', self::CODE_NO_DATA);
     }
 
+
+    /** 获取购物可以币抵消的价格 */
+    public function getDiscountAmount($productId, $userId)
+    {
+        Vouchers::getAmount($productId, $userId);
+    }
+
+    /** 获取最终支付价格 */
+    public function getPayAmount($data)
+    {
+        return $data['amount'] - ($this->getDiscountAmount($data['product_id'], $data['user_id']));
+    }
 
     /** 获取拍期数表信息 */
     public function Period()

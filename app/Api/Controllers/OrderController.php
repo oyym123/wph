@@ -13,6 +13,9 @@ use App\Api\components\WebController;
 use App\Models\Order;
 use App\Models\Pay;
 use App\Models\Period;
+use App\Models\Product;
+use App\Models\UserAddress;
+use App\Models\Vouchers;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends WebController
@@ -99,6 +102,7 @@ class OrderController extends WebController
             'order_time' => '',
             'check_status' => 0,
             'return_voucher_bids' => 0,
+            'used_voucher_bids' => 0,
             'nickname' => $user->nickname,
             'show_confirm_trans' => 0,
         );
@@ -201,6 +205,7 @@ class OrderController extends WebController
                         $data['pay_price'] = $period->bid_price;
                         $data['result_status'] = 2;
                         $data['return_voucher_bids'] = $payAmount * config('bid.return_proportion');
+                        $data['used_voucher_bids'] = Vouchers::getAmount($period->product_id, $this->userId);
                         $res[] = $data;
                     }
                     break;
@@ -229,6 +234,7 @@ class OrderController extends WebController
                         $data['sn'] = $order->sn;
                         $data['order_time'] = $order->created_at;
                         $data['order_status'] = $order->status;
+                        $data['used_voucher_bids'] = Vouchers::getAmount($product->id, $this->userId);
                         $res[] = $data;
                     }
                     break;
@@ -320,26 +326,6 @@ class OrderController extends WebController
         } else {
             self::showMsg('取消订单失败！', 4);
         }
-    }
-
-
-    /**
-     * @SWG\Get(path="/api/order/confirm-order",
-     *   tags={"我的竞拍"},
-     *   summary="确认订单",
-     *   description="Author: OYYM",
-     *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
-     *     type="string",
-     *   ),
-     *   @SWG\Response(
-     *       response=200,description="successful operation"
-     *   )
-     * )
-     */
-    public function confirmOrder()
-    {
-
-
     }
 
 
@@ -441,4 +427,6 @@ class OrderController extends WebController
         $this->auth();
         self::showMsg((new order())->transportDetail($this->request->sn, $this->userId));
     }
+
+
 }

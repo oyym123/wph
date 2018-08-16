@@ -44,4 +44,26 @@ class Vouchers extends Common
             return $model->id;
         }
     }
+
+    /** 获取可用购物币金额 */
+    public static function getAmount($productId, $userId)
+    {
+        $model = Vouchers::where([
+            'product_id' => $productId,
+            'user_id' => $userId,
+            'status' => self::STATUS_ENABLE
+        ])->first();
+        if ($model) {
+            return $model->amount;
+        }
+        return 0;
+    }
+
+    public static function getVouchers($where = [])
+    {
+        if ($model = Vouchers::where($where)->first()) {
+            return $model;
+        }
+        self::showMsg('没有返回的购物币!', self::CODE_ERROR);
+    }
 }

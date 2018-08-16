@@ -259,6 +259,15 @@ class Helper
         file_put_contents($path, date('Y-m-d H:i:s') . "\n" . var_export($data, 1) . "\n", FILE_APPEND);
     }
 
+    //将XML转为array
+    public static function xmlToArray($xml)
+    {
+        //禁止引用外部xml实体
+        libxml_disable_entity_loader(true);
+        $values = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+        return $values;
+    }
+
     public static function errors()
     {
         return [

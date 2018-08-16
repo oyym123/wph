@@ -24,6 +24,7 @@ class Income extends Common
         'product_id',
         'expired_at',
         'period_id',
+        'order_id',
     ];
 
     const STATUS_ALREADY_WITHDRAW = 10; //已提现
@@ -109,6 +110,12 @@ class Income extends Common
             ];
         }
         return $data;
+    }
+
+    /** 用户充值 */
+    public function recharge($data)
+    {
+        return self::create($data);
     }
 
     /** 查看是否有返还的购物币 */
