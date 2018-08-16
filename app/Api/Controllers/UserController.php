@@ -285,7 +285,7 @@ class UserController extends WebController
                 'params' => [
                     'key' => 'url',
                     'type' => 'String',
-                    'value' => $_SERVER["HTTP_HOST"] . '/api/balance-desc',
+                    'value' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/balance-desc',
                 ],
             ],
             'bid_currency' => $this->userIdent->bid_currency,

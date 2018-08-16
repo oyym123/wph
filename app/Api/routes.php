@@ -92,6 +92,7 @@ Route::group(['middleware' => 'web'], function () {
 
     /** 订单中心 */
     Route::get('order/my-auction', 'OrderController@MyAuction'); //我的竞拍
+    Route::get('order/confirm-order', 'OrderController@confirmOrder'); //确认订单
     Route::get('order/confirm-receipt', 'OrderController@confirmReceipt'); //确认收货
     Route::get('order/transport-detail', 'OrderController@transportDetail'); //运输详情
 

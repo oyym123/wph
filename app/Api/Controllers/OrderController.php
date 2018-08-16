@@ -293,7 +293,7 @@ class OrderController extends WebController
     }
 
     /**
-     * @SWG\Get(path="/api/order/confirm",
+     * @SWG\Get(path="/api/order/confirm-order",
      *   tags={"我的竞拍"},
      *   summary="确认订单",
      *   description="Author: OYYM",
@@ -308,9 +308,9 @@ class OrderController extends WebController
      *   )
      * )
      */
-    public function confirm()
+    public function confirmOrder()
     {
-
+        
 
     }
 
