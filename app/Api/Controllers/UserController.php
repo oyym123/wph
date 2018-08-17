@@ -257,7 +257,8 @@ class UserController extends WebController
     {
         $this->auth();
         $income = new Income();
-        self::showMsg($income->shoppingCurrency($this->userId));
+        $res = $income->shoppingCurrency($this->userId) + ['shipping_currency' => $this->userIdent->shopping_currency];
+        self::showMsg($res);
     }
 
     /**

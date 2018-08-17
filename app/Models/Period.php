@@ -222,6 +222,19 @@ class Period extends Common
                 'auctioneer_license' => $auctioneer->number,
                 'auctioneer_name' => $auctioneer->name,
             ],
+            'guide' => [
+                [
+                    'id' => 1,
+                    'title' => '新手指引',
+                    'img' => env('QINIU_URL_IMAGES') . '1485314751522.jpg',
+                    'function' => 'html',
+                    'params' => [
+                        'key' => 'url',
+                        'type' => 'String',
+                        'value' => $_SERVER["HTTP_HOST"] . '/api/newbie-guide',
+                    ],
+                ],
+            ],
             'expended' => [
                 'used_real_bids' => 0,
                 'used_gift_bids' => 0,

@@ -230,8 +230,18 @@ class Income extends Common
                     ];
                 }
             }
-
             $data = [
+                'shopping_rule' => [
+                    'id' => 8,
+                    'title' => '使用规则',
+                    'img' => '',
+                    'function' => 'html',
+                    'params' => [
+                        'key' => 'url',
+                        'type' => 'String',
+                        'value' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/shopping-rule',
+                    ],
+                ],
                 'usable' => $usable,
                 'disable' => $disable
             ];

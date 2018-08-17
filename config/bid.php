@@ -13,5 +13,5 @@ return [
     'init_countdown' => 300, //初始化竞拍时间5分钟
     'return_proportion' => 1, //购物币返还比例
     'order_expired_at' => date('Y-m-d H:i:s', time() + 86400 * 10), //订单过期时间
-    'bid_currency_expired_at' => date('Y-m-d H:i:s', time() + 86400 * 10), //返还的购物币过期时间
+    'bid_currency_expired_at' => date('Y-m-d H:i:s', time() + 86400 * 30), //返还的购物币过期时间
 ];

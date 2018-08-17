@@ -88,6 +88,9 @@ Route::group(['middleware' => 'web'], function () {
         return view('api.user.balance-desc');
     });
 
+    Route::get('/shopping-rule', function () {
+        return view('api.user.shopping-rule');
+    });
     /**  我的推广  */
     Route::get('invite/index', 'InviteController@Index'); //我的推广主页
     Route::get('invite/invite-list', 'InviteController@inviteList'); //我的推广主页
