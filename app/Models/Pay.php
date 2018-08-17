@@ -50,7 +50,7 @@ class Pay extends Common
         $mch_id = config('bid.wx_mch_id');//'你的商户号【自己填写】'
         $nonce_str = $this->nonce_str();//随机字符串
         $notify_url = $_SERVER["HTTP_HOST"] . '/api/wx-notify/notify';//回调的url【自己填写】';
-        $total_fee = $res['amount'] * 100;//因为充值金额最小是1 而且单位为分 如果是充值1元所以这里需要*100
+        $total_fee = $res['amount'];//因为充值金额最小是1 而且单位为分 如果是充值1元所以这里需要*100
         $openid = $res['open_id'];//'用户的openid【自己填写】';
         $out_trade_no = $res['sn'];//商户订单号
         $spbill_create_ip = '116.62.212.29';//'服务器的ip【自己填写】';

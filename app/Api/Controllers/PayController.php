@@ -78,16 +78,28 @@ class PayController extends WebController
             'gift_amount' => $recharge->gift_amount,
             'recharge_card_id' => $recharge->id,
         ];
-        $order = $order->createOrder($orderInfo);
-        $pay = new Pay();
-        $data = [
-            'details' => '充值',
-            'open_id' => $this->userIdent->open_id,
-            'sn' => $order->sn,
-            'order_id' => $order->id,
-            'amount' => $order->pay_amount
-        ];
-        self::showMsg($pay->WxPay($data));
+        $res = [];
+        DB::beginTransaction();
+        try {
+            $order = $order->createOrder($orderInfo);
+            $pay = new Pay();
+            $data = [
+                'details' => '充值',
+                'open_id' => $this->userIdent->open_id,
+                'sn' => $order->sn,
+                'order_id' => $order->id,
+                'amount' => $order->pay_amount
+            ];
+            $res = $pay->WxPay($data);
+            if ($res['state'] == 0) {
+                throw new \Exception($res['result_msg']);
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            self::showMsg($e->getMessage(), 4); // 等待处理
+        }
+        self::showMsg($res);
     }
 
     /**
