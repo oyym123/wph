@@ -16,8 +16,8 @@ class RechargeCard extends Common
         foreach ($model as $item) {
             $data[] = [
                 'id' => $item->id,
-                'amount' => $item->amount,
-                'gift_amount' => $item->gift_amount,
+                'amount' => number_format($item->amount),
+                'gift_amount' => number_format($item->gift_amount),
             ];
         }
         return $data;
