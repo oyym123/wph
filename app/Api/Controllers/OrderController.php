@@ -201,7 +201,7 @@ class OrderController extends WebController
                         $data['img_cover'] = $product->getImgCover();
                         $data['bid_step'] = $period->bid_step;
                         $data['sell_price'] = $product->sell_price;
-                        $data['nickname'] = $period->nickname;
+                        $data['nickname'] = ($x = $period->user) ? $x->nickname : '';
                         $data['pay_price'] = $period->bid_price;
                         $data['result_status'] = 2;
                         $data['return_voucher_bids'] = $payAmount * config('bid.return_proportion');
@@ -229,7 +229,7 @@ class OrderController extends WebController
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 3;
-                        $data['nickname'] = $period->nickname;
+                        $data['nickname'] = $user->nickname;
                         $data['label'] = Order::getStatus($order->status);
                         $data['sn'] = $order->sn;
                         $data['order_time'] = $order->created_at;
