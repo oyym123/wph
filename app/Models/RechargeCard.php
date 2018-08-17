@@ -22,7 +22,7 @@ class RechargeCard extends Common
         }
         return [
             'list' => $data,
-            'user-agreement' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/user-agreement'
+            'user_agreement' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/user-agreement'
         ];
     }
 
