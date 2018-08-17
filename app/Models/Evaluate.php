@@ -75,6 +75,7 @@ class Evaluate extends Common
         $data = [
             'id' => $evaluate->id,
             'product_title' => $product->title,
+            'img_cover' => $product->getImgCover(),
             'content' => $evaluate->content,
             'created_at' => $evaluate->created_at,
             'nickname' => $evaluate->user->nickname,
