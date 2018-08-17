@@ -241,6 +241,21 @@ class UserController extends WebController
     }
 
     /**
+     * @SWG\Get(path="/api/user/user-agreement",
+     *   tags={"用户中心"},
+     *   summary="用户协议",
+     *   description="Author: OYYM",
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function userAgreement()
+    {
+        return view('api.user.user-agreement');
+    }
+
+    /**
      * @SWG\Get(path="/api/user/shopping-currency",
      *   tags={"用户中心"},
      *   summary="我的购物币",

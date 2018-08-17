@@ -71,6 +71,7 @@ Route::group(['middleware' => 'web'], function () {
 
 
     /** 用户中心 */
+    Route::get('user/user-agreement', 'UserController@userAgreement'); //用户收货地址
     Route::get('user/default-address', 'UserController@defaultAddress'); //用户收货地址
     Route::post('user/address', 'UserController@address'); //用户收货地址
     Route::post('user/withdraw', 'UserController@withdraw'); //提现
@@ -84,17 +85,18 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('user/batch-register', 'UserController@batchRegister');//批量用户注册
     Route::get('user/shopping-currency', 'UserController@shoppingCurrency');//批量用户注册
     Route::get('user/evaluate', 'UserController@evaluate');//批量用户注册
-    Route::get('/balance-desc', function () {
+    Route::get('/balance-desc', function () {  //收益详情
         return view('api.user.balance-desc');
     });
 
-    Route::get('/shopping-rule', function () {
+    Route::get('/shopping-rule', function () { //购物币规则
         return view('api.user.shopping-rule');
     });
 
-    Route::get('/common-problems', function () {
+    Route::get('/common-problems', function () { //常见问题
         return view('api.user.common-problems');
     });
+
     /**  我的推广  */
     Route::get('invite/index', 'InviteController@Index'); //我的推广主页
     Route::get('invite/invite-list', 'InviteController@inviteList'); //我的推广主页
