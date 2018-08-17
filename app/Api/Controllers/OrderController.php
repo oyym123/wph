@@ -258,7 +258,7 @@ class OrderController extends WebController
                         $data['save_price'] = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
                         $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 4;
-                        $data['nickname'] = $period->nickname;
+                        $data['nickname'] = $user->nickname;
                         $data['label'] = Order::getStatus($order->status);
                         $data['sn'] = $order->sn;
                         $data['order_time'] = $order->created_at;
