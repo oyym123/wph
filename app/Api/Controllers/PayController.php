@@ -70,7 +70,7 @@ class PayController extends WebController
         $orderInfo = [
             'sn' => $order->createSn(),
             'pay_type' => Pay::TYPE_WEI_XIN,
-            'pay_amount' => $recharge->amount,
+            'pay_amount' => number_format($recharge->amount),
             'status' => Order::STATUS_WAIT_PAY,
             'type' => Order::TYPE_RECHARGE,
             'buyer_id' => $this->userId,

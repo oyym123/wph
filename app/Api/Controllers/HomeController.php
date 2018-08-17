@@ -159,6 +159,7 @@ class HomeController extends WebController
      *                  [img_cover] => 产品封面
      *                  [sell_price] => 市场价
      *                  [bid_step] => 竞价
+     *                  [pay_amount] => 每次竞拍应该支付的价格
      *                  [is_favorite] => 是否收藏 1 = 已收藏 | 0 = 未收藏
      *     "
      *   )

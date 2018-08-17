@@ -164,6 +164,7 @@ class Period extends Common
                 'img_cover' => self::getImg($product->img_cover),
                 'sell_price' => $product->sell_price,
                 'bid_step' => $product->bid_step,
+                'pay_amount' => $product->pay_amount,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
             ];
         }

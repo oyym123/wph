@@ -125,7 +125,7 @@ class AutoBid extends Common
             'period_id' => $periodId,
         ])->orderBy('created_at', 'desc')->first();
 
-        if ($item && $item->remain_times >= 0) {
+        if ($item && $item->remain_times > 0) {
             $data = [
                 'user_id' => $userId,
                 'type' => $item->amount_type,
