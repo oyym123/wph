@@ -227,7 +227,7 @@ class Period extends Common
                 [
                     'id' => 1,
                     'title' => '竞拍指南',
-                    'img' => env('QINIU_URL_IMAGES') . '1485314751522.jpg',
+                    'img' => self::getImg('weipaizhinan.png'),
                     'function' => 'html',
                     'params' => [
                         'key' => 'url',
