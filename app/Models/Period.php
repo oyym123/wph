@@ -189,7 +189,7 @@ class Period extends Common
         $data = [
             'detail' => [
                 'id' => $period->id,
-                'period_status' => $period->status == self::STATUS_IN_PROGRESS ? 1 : 0,
+                'period_status' => $period->status == self::STATUS_IN_PROGRESS ? 0 : 1,
                 'product_id' => $period->product_id,
                 'period_code' => $period->code,
                 'title' => $product->title,
