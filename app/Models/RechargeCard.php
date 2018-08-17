@@ -20,7 +20,10 @@ class RechargeCard extends Common
                 'gift_amount' => number_format($item->gift_amount),
             ];
         }
-        return $data;
+        return [
+            'list' => $data,
+            'user-agreement' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/user-agreement'
+        ];
     }
 
     public function getRechargeCard($where = [])
