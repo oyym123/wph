@@ -139,11 +139,14 @@ class Period extends Common
                 $where = ['product.type' => $this->request->type];
             }
             $periods = DB::table('period')
+                ->select(['*', 'period.id'])
                 ->join('product', 'product.id', '=', 'period.product_id')
                 ->where([
                         'period.deleted_at' => null,
                         'period.status' => self::STATUS_IN_PROGRESS
                     ] + $where)->offset($this->offset)->limit($this->limit)->get();
+            print_r($periods);
+            exit;
         } else {
             $periods = DB::table('period')->where($where)->offset($this->offset)->limit($this->limit)->get();
         }
@@ -155,6 +158,7 @@ class Period extends Common
         $data = [];
         $collection = new Collection();
         foreach ($periods as $period) {
+
             $product = Product::find($period->product_id);
             $data[] = [
                 'id' => $period->id,
