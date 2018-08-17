@@ -56,17 +56,18 @@ class WxNotifyController extends Controller
                 if ($incomes) {
                     exit('已经充值过了!');
                 }
+                $amount = $order->pay_amount + $order->gift_amount;
                 $income = [
                     'type' => Income::TYPE_BID_CURRENCY,
                     'user_id' => $order->buyer_id,
-                    'amount' => $order->pay_amount,
+                    'amount' => $amount,
                     'name' => '充值拍币',
                     'order_id' => $order->id
                 ];
                 if (!Income::create($income)) {
                     throw new \Exception('充值失败');
                 }
-                DB::table('users')->where(['id' => $order->buyer_id])->increment('bid_currency', $order->pay_amount);
+                DB::table('users')->where(['id' => $order->buyer_id])->increment('bid_currency', $amount);
                 //标记已付款
                 DB::table('order')->where(['id' => $order->id])->update(['status' => Order::STATUS_PAYED]);
             } else {

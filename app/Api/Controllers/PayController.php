@@ -14,12 +14,28 @@ use App\Models\Order;
 use App\Models\Pay;
 use App\Models\Period;
 use App\Models\Product;
+use App\Models\RechargeCard;
 use App\Models\UserAddress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 
 class PayController extends WebController
 {
+    /**
+     * @SWG\Get(path="/api/pay/recharge-center",
+     *   tags={"支付"},
+     *   summary="充值中心",
+     *   description="Author: OYYM",
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function rechargeCenter()
+    {
+        self::showMsg((new RechargeCard())->lists());
+    }
+
     /**
      * @SWG\Post(path="/api/pay/recharge",
      *   tags={"支付"},
@@ -28,7 +44,7 @@ class PayController extends WebController
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="amount", in="formData", default="1", description="金额", required=true,
+     *   @SWG\Parameter(name="id", in="formData", default="1", description="充值卡id", required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -48,18 +64,21 @@ class PayController extends WebController
     {
         $this->auth();
         $request = $this->request;
+        $rechargeCard = new RechargeCard();
+        $recharge = $rechargeCard->getRechargeCard(['id' => $request->id]);
         $order = new Order();
         $orderInfo = [
             'sn' => $order->createSn(),
             'pay_type' => Pay::TYPE_WEI_XIN,
-            'pay_amount' => $request->amount,
+            'pay_amount' => $recharge->amount,
             'status' => Order::STATUS_WAIT_PAY,
             'type' => Order::TYPE_RECHARGE,
             'buyer_id' => $this->userId,
             'ip' => $request->getClientIp(),
+            'gift_amount' => $recharge->gift_amount,
+            'recharge_card_id' => $recharge->id,
         ];
         $order = $order->createOrder($orderInfo);
-
         $pay = new Pay();
         $data = [
             'details' => '充值',

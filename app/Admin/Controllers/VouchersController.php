@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Common;
 use App\Models\Vouchers;
 
 use Encore\Admin\Form;
@@ -58,7 +59,7 @@ class VouchersController extends Controller
         return Admin::content(function (Content $content) {
 
             $content->header('header');
-            $content->description('description');
+            $content->description('新增');
 
             $content->body($this->form());
         });
@@ -88,11 +89,8 @@ class VouchersController extends Controller
     protected function form()
     {
         return Admin::form(Vouchers::class, function (Form $form) {
-
-            $form->display('id', 'ID');
-
-            $form->display('created_at', 'Created At');
-            $form->display('updated_at', 'Updated At');
+            $form->display('created_at', '创建时间');
+            $form->display('updated_at', '修改时间');
         });
     }
 }

@@ -37,6 +37,8 @@ class Order extends Common
         'type', //类型
         'ip', //ip
         'signed_at', //签收时间
+        'recharge_card_id', //充值卡id
+        'gift_amount', //赠送的金额
     ];
 
     const TYPE_BID = 1;                 //竞拍类型订单
