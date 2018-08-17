@@ -181,7 +181,8 @@ class Bid extends Common
                         (new AutoBid())->back($period->id, $bid->user_id);
                         //生成一个订单
                         $order = new Order();
-                        $address = UserAddress::defaultAddress($bid->user_id);
+
+
                         $orderInfo = [
                             'sn' => $order->createSn(),
                             'pay_type' => Pay::TYPE_WEI_XIN,
@@ -192,12 +193,16 @@ class Bid extends Common
                             'status' => Order::STATUS_WAIT_PAY,
                             'type' => Order::TYPE_BID, //表示竞拍类型订单
                             'buyer_id' => $bid->user_id,
-                            'address_id' => $address->id, //收货人地址
-                            'str_address' => str_replace('||', ' ', $address->str_address) . $address->detail_address,
-                            'str_username' => $address->user_name, //收货人姓名
-                            'str_phone_number' => $address->telephone, //手机号
                             'expired_at' => config('bid.order_expired_at'), //过期时间
                         ];
+                        
+                        $address = UserAddress::defaultAddress($bid->user_id);
+                        if ($address) {
+                            $orderInfo['address_id'] = $address->id; //收货人地址
+                            $orderInfo['str_address'] = str_replace('||', ' ', $address->str_address) . $address->detail_address;
+                            $orderInfo['str_username'] = $address->user_name;//收货人姓名
+                            $orderInfo['str_phone_number'] = $address->telephone; //手机号
+                        }
                         $order = $order->createOrder($orderInfo);
                         //转换状态
                         DB::table('period')->where(['id' => $period->id])->update([
