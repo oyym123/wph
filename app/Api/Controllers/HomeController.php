@@ -65,7 +65,7 @@ class HomeController extends WebController
                     'params' => [
                         'key' => 'url',
                         'type' => 'String',
-                        'value' => $_SERVER["HTTP_HOST"] . '/api/newbie-guide',
+                        'value' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/newbie-guide',
                     ],
                 ],
             ],
