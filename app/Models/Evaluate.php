@@ -62,9 +62,40 @@ class Evaluate extends Common
         return $data;
     }
 
+    public function detail($id)
+    {
+        $evaluate = $this->getEvaluate(['id' => $id]);
+        $products = new Product();
+        $product = $products->getCacheProduct($evaluate->product_id);
+        $images = [];
+        $imgs = json_decode($evaluate->imgs);
+        foreach ($imgs as $img) {
+            $images[] = env('QINIU_URL_IMAGES') . $img;
+        }
+        $data = [
+            'id' => $evaluate->id,
+            'product_title' => $product->title,
+            'content' => $evaluate->content,
+            'created_at' => $evaluate->created_at,
+            'nickname' => $evaluate->user->nickname,
+            'avatar' => $evaluate->user->getAvatar(),
+            'imgs' => $images
+        ];
+        return $data;
+    }
+
     /** 获取用户表信息 */
     public function User()
     {
         return $this->hasOne('App\User', 'id', 'user_id');
+    }
+
+    /** 获取评论 */
+    public function getEvaluate($where = [])
+    {
+        if ($model = Evaluate::where($where)->first()) {
+            return $model;
+        }
+        self::showMsg('没有晒单！', 4);
     }
 }

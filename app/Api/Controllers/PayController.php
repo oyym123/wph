@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Request;
 
 class PayController extends WebController
 {
-
     /**
      * @SWG\Post(path="/api/pay/recharge",
      *   tags={"支付"},
@@ -71,7 +70,6 @@ class PayController extends WebController
         ];
         self::showMsg($pay->WxPay($data));
     }
-
 
     /**
      * @SWG\Post(path="/api/pay/pay",

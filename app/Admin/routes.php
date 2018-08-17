@@ -27,6 +27,8 @@ Route::group([
         $router->resource('period', 'PeriodController');
         //投标记录
         $router->resource('bid', 'BidController');
+        //充值卡
+        $router->resource('recharge-card', 'RechargeCardController');
     });
 
     $router->get('/', 'HomeController@index');

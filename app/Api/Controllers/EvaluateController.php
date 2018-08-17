@@ -115,4 +115,23 @@ class EvaluateController extends WebController
         $model->limit = $this->limit;
         self::showMsg($model->getList());
     }
+
+    /**
+     * @SWG\Get(path="/api/evaluate/detail",
+     *   tags={"晒单"},
+     *   summary="晒单详情页",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="id", in="query", default="1", description="评论id", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function detail()
+    {
+        $model = new Evaluate();
+        self::showMsg($model->detail($this->request->id));
+    }
 }
