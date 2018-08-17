@@ -32,10 +32,28 @@ class Product extends Common
         return $key != 999 ? $data[$key] : $data;
     }
 
-    /** 获取产品数量 */
-    public static function counts()
+    public function setImgsAttribute($pictures)
     {
-        return DB::table('product')->where(['status' => 1])->count();
+        if (is_array($pictures)) {
+            $this->attributes['imgs'] = json_encode($pictures);
+        }
+    }
+
+    public function getImgsAttribute($pictures)
+    {
+        return json_decode($pictures, true) ?: [];
+    }
+
+    /** 获取产品数量 */
+    public static function counts($today = 0)
+    {
+        if ($today) {
+            return DB::table('product')->where(['status' => self::STATUS_ENABLE])
+                ->whereBetween('created_at', [date('Y-m-d', time()), date('Y-m-d', time()) . ' 23:59:59'])
+                ->count();
+        } else {
+            return DB::table('product')->where(['status' => self::STATUS_ENABLE])->count();
+        }
     }
 
     /** 获取缓存的产品信息 */

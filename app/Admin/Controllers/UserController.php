@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Common;
 use App\User;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Facades\Admin;
@@ -24,11 +25,10 @@ class UserController extends Controller
         return Admin::content(function (Content $content) {
 
             $content->header('用户管理');
-            $content->description('用户列表');
+            $content->description('列表');
             $content->body($this->grid());
         });
     }
-
 
     /**
      * Edit interface.
@@ -78,13 +78,21 @@ class UserController extends Controller
             });
             $grid->disableExport();
             $grid->id('ID')->sortable();
-            $grid->name('名字');
-            $grid->email('邮箱');
+            // $grid->email('邮箱');
             $grid->avatar('头像')->display(function ($released) {
                 return '<a href="' . env('QINIU_URL_IMAGES') . $released . '" target="_blank" ><img src="' .
                     env('QINIU_URL_IMAGES') . $released . '?imageView/1/w/65/h/45" ></a>';
             });
-
+            $grid->name('昵称');
+            $grid->bid_currency('拍币')->sortable();
+            $grid->shopping_currency('购物币')->sortable();
+            $grid->invite_currency('推广币')->sortable();
+            $grid->gift_currency('赠币')->sortable();
+            $grid->cashout_account('提现账号');
+            $grid->cashout_name('提现账号名称');
+            $grid->status('状态')->display(function ($released) {
+                return $released ? '有效' : '无效';
+            });
             $grid->is_real('身份')->display(function ($released) {
                 return User::getIsReal($released);
             });
@@ -96,7 +104,7 @@ class UserController extends Controller
             $grid->updated_at('修改时间');
             // filter($callback)方法用来设置表格的简单搜索框
             $grid->filter(function ($filter) {
-                $filter->like('nickname', '名字');
+                $filter->like('nickname', '昵称');
                 $filter->in('is_real', '身份')->select(User::getIsReal());
                 $filter->between('created_at', '创建时间')->datetime();
                 $filter->between('updated_at', '修改时间')->datetime();
@@ -116,8 +124,7 @@ class UserController extends Controller
             $form->text('name', '名字');
             $form->text('email', '邮箱');
             $form->image('avatar', '头像');
-            $disk = \Storage::disk('qiniu');
-            $disk->getDriver()->downloadUrl('file.jpg');
+            $form->switch('status', '状态')->states(Common::getStates())->default(1);
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '修改时间');
 //            $form->text('role_id', '角色');

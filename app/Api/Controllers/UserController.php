@@ -39,7 +39,6 @@ class UserController extends WebController
         self::showMsg($data);
     }
 
-
     /** 注册 */
     public function registerView(Request $request)
     {
@@ -56,11 +55,6 @@ class UserController extends WebController
             'invite_user_mobile' => empty($inviteUserInfo->bind_mobile) ? '' : $inviteUserInfo->bind_mobile,
             'codeError' => $request->input('codeError')
         ]);
-    }
-
-    public function login()
-    {
-
     }
 
     /**
@@ -115,6 +109,7 @@ class UserController extends WebController
                 DB::table('users')->where('id', $model->id)->update($data);
             } else {
                 $data['email'] = rand(10000, 99999) . '@163.com';
+                $data['gift_currency'] = config('bid.user_gift_currency');
                 $model = (new User())->saveData($data);
                 $inviteCode = md5(md5($model->id));
                 if ($model->id) {
@@ -136,11 +131,12 @@ class UserController extends WebController
 
     /**
      * 批量注册用户
+     * http://wph.com/api/user/batch-register
      */
     public function batchRegister()
     {
         $model = new User();
-        for ($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 30; $i++) {
             $model->rebotRegister();
         }
     }

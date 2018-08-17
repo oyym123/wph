@@ -45,15 +45,15 @@ return [
         'qiniu' => [
             'driver'  => 'qiniu',
             'domains' => [
-                'default'   => 'od83l5fvw.bkt.clouddn.com', //你的七牛域名
+                'default'   => env('QINIU_URL_IMAGES'), //你的七牛域名
                 'https'     => '',
                 'custom'    => '',
             ],
-            'access_key'=> 'f-KIZZ1SYOlx4YCicakrFOisWit4ecyp57JmT9oB',  //AccessKey
-            'secret_key'=> 'udndYYIGsy-_OKsxmGsZ8wl9L3S0AlqlZNLiZbUN',  //SecretKey
-            'bucket'    => 'oyym',  //Bucket名字
+            'access_key'=> env('QINIU_ACCESS_KEY'),  //AccessKey
+            'secret_key'=>  env('QINIU_SECRET_KEY'),  //SecretKey
+            'bucket'    => env('QINIU_BUCKETC_IMAGES'),  //Bucket名字
             'notify_url'=> '',  //持久化处理回调地址
-            'url'       => 'http://of8kfibjo.bkt.clouddn.com/',  // 填写文件访问根url
+            'url'       => env('QINIU_URL_IMAGES'),  // 填写文件访问根url
             'access'    => 'public'  //空间访问控制 public 或 private
         ],
 

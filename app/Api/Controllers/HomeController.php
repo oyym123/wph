@@ -71,6 +71,12 @@ class HomeController extends WebController
             ],
             'display_module' => [
                 [
+                    'id' => 0,
+                    'title' => '推广',
+                    'img' => env('QINIU_URL_IMAGES') . 'chongzhi2018.png',
+                    'url' => 'invite.html',
+                ],
+                [
                     'id' => 1,
                     'title' => '充值',
                     'img' => env('QINIU_URL_IMAGES') . 'chongzhi2018.png',

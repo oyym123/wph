@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\User;
 use Encore\Admin\Widgets\InfoBox;
@@ -35,16 +36,22 @@ class HomeController extends Controller
                     $column->append($infoBox1);
                 });
 
-                $row->column(4, function (Column $column) {
-                    $infoBox2 = new InfoBox('今日订单总数', 'shopping-cart', 'blue', '/admin/users', '1024');
-                    $column->append($infoBox2);
-                });
 
                 $row->column(4, function (Column $column) {
-                    $infoBox3 = new InfoBox('今日访问量', 'eye', 'purple', '', '1024');
+                    $start = date('Y-m-d', time()) . ' 00:00:00';
+                    $end = date('Y-m-d', time()) . ' 23:59:59';
+                    $infoBox3 = new InfoBox('今日商品数量', 'eye', 'blue', '/admin/product?created_at[start]=' .
+                        $start . '&created_at[end]=' . $end, Product::counts(1));
                     $column->append($infoBox3);
                 });
 
+                $row->column(4, function (Column $column) {
+                    $start = date('Y-m-d', time()) . ' 00:00:00';
+                    $end = date('Y-m-d', time()) . ' 23:59:59';
+                    $infoBox2 = new InfoBox('今日订单总数', 'shopping-cart', 'purple', '/admin/order?created_at[start]=' .
+                        $start . '&created_at[end]=' . $end, Order::counts(1));
+                    $column->append($infoBox2);
+                });
             });
 
             $content->row(function (Row $row) {
@@ -55,12 +62,12 @@ class HomeController extends Controller
                 });
 
                 $row->column(4, function (Column $column) {
-                    $infoBox2 = new InfoBox('商品数量', 'th-large', 'yellow', '/admin/users', Product::counts());
+                    $infoBox2 = new InfoBox('商品总数量', 'th-large', 'yellow', '/admin/product', Product::counts());
                     $column->append($infoBox2);
                 });
 
                 $row->column(4, function (Column $column) {
-                    $infoBox3 = new InfoBox('待处理订单', 'file-text-o', 'red', '', '1024');
+                    $infoBox3 = new InfoBox('待处理订单', 'file-text-o', 'red', '/admin/order', Order::counts());
                     $column->append($infoBox3);
                 });
 

@@ -41,10 +41,10 @@ class Order extends Common
         'gift_amount', //赠送的金额
     ];
 
-    const TYPE_BID = 1;                 //竞拍类型订单
+    const TYPE_BID = 1;                 //竞拍类型
     const TYPE_BUY_BY_DIFF = 2;         //差价购买
     const TYPE_SHOP = 3;                //购物币全款购买
-    const TYPE_AUTO_BID = 4;            //自动竞拍支付订单
+    const TYPE_AUTO_BID = 4;            //自动竞拍支付
     const TYPE_RECHARGE = 5;            //充值
 
     const STATUS_WAIT_PAY = 10;         // 待付款
@@ -58,6 +58,19 @@ class Order extends Common
     const STATUS_EVALUATION_YES = 1;    //已评价
     const STATUS_EVALUATION_NO = 0;     //未评价
 
+
+    /** 获取类型 */
+    public static function getType($key = 999)
+    {
+        $data = [
+            self::TYPE_BID => '竞拍类型',
+            self::TYPE_BUY_BY_DIFF => '差价购买',
+            //self::TYPE_SHOP => '购物币全款购买',
+            //   self::TYPE_AUTO_BID => '自动竞拍支付订单',
+            self::TYPE_RECHARGE => '充值',
+        ];
+        return $key != 999 ? $data[$key] : $data;
+    }
 
     public static function getStatus($key = 999)
     {
@@ -143,6 +156,18 @@ class Order extends Common
             $milliSecond = str_pad(round($milli * 1000000), 6, '0', STR_PAD_RIGHT);
             $sn = date('YmdHis', time()) . $milliSecond . $rand;
             return $sn;
+        }
+    }
+
+    public static function counts($today = 0)
+    {
+        if ($today) {
+            return DB::table('order')
+                ->whereBetween('created_at', [date('Y-m-d', time()), date('Y-m-d', time()) . ' 23:59:59'])
+                ->count();
+        } else {
+            return DB::table('order')
+                ->count();
         }
     }
 

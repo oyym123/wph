@@ -29,6 +29,12 @@ Route::group([
         $router->resource('bid', 'BidController');
         //充值卡
         $router->resource('recharge-card', 'RechargeCardController');
+        //提现申请
+        $router->resource('withdraw', 'WithdrawController');
+        //推广代理
+        $router->resource('invite', 'InviteController');
+        //订单管理
+        $router->resource('order', 'OrderController');
     });
 
     $router->get('/', 'HomeController@index');

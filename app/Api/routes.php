@@ -71,6 +71,7 @@ Route::group(['middleware' => 'web'], function () {
 
 
     /** 用户中心 */
+    Route::get('user/batch-register', 'UserController@batchRegister');
     Route::get('user/user-agreement', 'UserController@userAgreement'); //用户收货地址
     Route::get('user/default-address', 'UserController@defaultAddress'); //用户收货地址
     Route::post('user/address', 'UserController@address'); //用户收货地址

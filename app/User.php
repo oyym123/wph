@@ -129,7 +129,6 @@ class User extends Authenticatable
         }
     }
 
-
     /**
      * 机器用户注册
      */
@@ -149,13 +148,15 @@ class User extends Authenticatable
         $token = md5(md5($openId . $sessionKey));
         $user = DB::table('users')->where(['email' => $randQQ . '@qq.com', 'is_real' => User::TYPE_ROBOT])->first();
 
-//        $img = file_get_contents('C:\xampp\htdocs\100.png'); //测试图片
-//        $img2 = file_get_contents('C:\xampp\htdocs\100.jpg'); //测试图片
-//        $img3 = file_get_contents('C:\xampp\htdocs\100girl.jpg'); //测试图片
-
-        $img = file_get_contents('/www/img/100.png'); //测试图片
-        $img2 = file_get_contents('/www/img/100.jpg'); //测试图片
-        $img3 = file_get_contents('/www/img/100girl.jpg'); //测试图片
+        if (PHP_OS == 'WINNT') {
+            $img = file_get_contents('C:\xampp\htdocs\100.png'); //测试图片
+            $img2 = file_get_contents('C:\xampp\htdocs\100.jpg'); //测试图片
+            $img3 = file_get_contents('C:\xampp\htdocs\100girl.jpg'); //测试图片
+        } else {
+            $img = file_get_contents('/www/img/100.png'); //测试图片
+            $img2 = file_get_contents('/www/img/100.jpg'); //测试图片
+            $img3 = file_get_contents('/www/img/100girl.jpg'); //测试图片
+        }
         $imgQQ = Helper::get($qqInfo[0]);
         $flag = 0;
         if ($imgQQ != $img && $imgQQ != $img2 && $imgQQ != $img3) {
@@ -166,6 +167,7 @@ class User extends Authenticatable
         if (empty($user) && !empty($nickname) && $flag) {  //判断是否真实存在或者重复
             list($province, $city) = City::randCity();
             $avatar = QiniuHelper::fetchImg($qqInfo[0])[0]['key'];
+
             if (!empty($avatar)) {
                 $data = [
                     'session_key' => $sessionKey,

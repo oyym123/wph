@@ -7,7 +7,7 @@
 require('./bootstrap');
 
 window.VueRouter = require('vue-router');
-import VueResource from 'vue-resource'
+//import VueResource from 'vue-resource'
 window.Vue = require('vue');
 Vue.use(VueResource);
 //import WeuiDistpicker from 'weui-distpicker'
@@ -48,7 +48,7 @@ const routes = [
 
 const router = new VueRouter({
 
-    routes // （缩写）相当于 routes: routes
+  //  routes // （缩写）相当于 routes: routes
 
 });
 
@@ -61,5 +61,5 @@ const router = new VueRouter({
 // });
 
 const app = new Vue({
-    router
+    //router
 }).$mount('#app');

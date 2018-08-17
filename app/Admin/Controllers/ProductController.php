@@ -139,8 +139,8 @@ class ProductController extends Controller
             ])->default(0.1);
             $form->select('type', '产品类型')->options(ProductType::getList(1));
             $form->image('img_cover', '产品封面图');
-            $form->image('imgs', '产品子图');
-
+            // $form->image('imgs', '产品子图');
+            $form->multipleImage('imgs', '产品子图')->removable();
             $form->switch('buy_by_diff', '是否可以差价购买')->states(Product::$buyByDiff)->default(1);
             $form->switch('is_shop', '是否加入购物币专区')->states(Product::getIsShop())->default(1);
             $form->switch('status', '状态')->states(Base::getStates())->default(1);
