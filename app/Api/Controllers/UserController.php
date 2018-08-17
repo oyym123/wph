@@ -100,7 +100,6 @@ class UserController extends WebController
             $data = [
                 'session_key' => $result['session_key'],
                 'open_id' => $result['openid'],
-                'email' => rand(10000, 99999) . '@163.com',
                 'nickname' => $request->nickname ?: '佚名',
                 'name' => $request->nickname ?: '佚名',
                 'avatar' => $avatar ?: 'default_user_photo10.png',
@@ -115,6 +114,7 @@ class UserController extends WebController
                 Redis::hdel('token', $model->token);
                 DB::table('users')->where('id', $model->id)->update($data);
             } else {
+                $data['email'] = rand(10000, 99999) . '@163.com';
                 $model = (new User())->saveData($data);
                 $inviteCode = md5(md5($model->id));
                 if ($model->id) {

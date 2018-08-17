@@ -94,7 +94,7 @@ class HomeController extends WebController
                     'id' => 4,
                     'title' => '常见问题',
                     'img' => env('QINIU_URL_IMAGES') . 'changjianwenti2018.png',
-                    'url' => 'html',
+                    'url' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/common-problems',
                 ]
             ]
         ];

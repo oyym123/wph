@@ -91,6 +91,10 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('/shopping-rule', function () {
         return view('api.user.shopping-rule');
     });
+
+    Route::get('/common-problems', function () {
+        return view('api.user.common-problems');
+    });
     /**  我的推广  */
     Route::get('invite/index', 'InviteController@Index'); //我的推广主页
     Route::get('invite/invite-list', 'InviteController@inviteList'); //我的推广主页
