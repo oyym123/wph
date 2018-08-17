@@ -163,8 +163,7 @@ class Period extends Common
                 'title' => $product->title,
                 'img_cover' => self::getImg($product->img_cover),
                 'sell_price' => $product->sell_price,
-                'bid_step' => $product->bid_step,
-                'pay_amount' => $product->pay_amount,
+                'bid_step' => $product->pay_amount,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
             ];
         }
@@ -225,7 +224,7 @@ class Period extends Common
             'guide' => [
                 [
                     'id' => 1,
-                    'title' => '新手指引',
+                    'title' => '竞拍指南',
                     'img' => env('QINIU_URL_IMAGES') . '1485314751522.jpg',
                     'function' => 'html',
                     'params' => [
