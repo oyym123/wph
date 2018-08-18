@@ -296,6 +296,9 @@ class OrderController extends WebController
             }
             $result = $result + $res;
         }
+        if (empty($result)) {
+            self::showMsg('没有数据', 2);
+        }
         self::showMsg($result);
     }
 
