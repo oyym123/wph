@@ -69,8 +69,8 @@ class EvaluateController extends WebController
 
     /**
      * @SWG\Post(path="/api/evaluate/upload-img",
-     *   tags={"demo"},
-     *   summary="",
+     *   tags={"晒单"},
+     *   summary="上传单张图片",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="img", in="formData", default="", description="图片", required=true,
      *     type="string",
