@@ -88,7 +88,7 @@ class AutoBid extends Common
                 'period_id' => $request->period_id,
             ];
             (new Expend())->bidPay($expend);
-            return ['提交成功'];
+            return ['status' => 20];
         }
     }
 
