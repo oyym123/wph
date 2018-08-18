@@ -358,7 +358,7 @@ class Period extends Common
                 'end_time' => $period->bid_end_time,
                 'bid_price' => $period->bid_price,
                 'flag' => $flag,
-                'diff_price' => abs($period->bid_price - $averagePrice),
+                'diff_price' => number_format(abs($period->bid_price - $averagePrice), 2),
                 'nickname' => $period->user ? $period->user->nickname : '',
             ];
         }
