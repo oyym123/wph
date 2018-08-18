@@ -156,10 +156,14 @@ class AutoBid extends Common
             'status' => self::STATUS_IN_PROGRESS
         ])->where('remain_times', '>', 0)->first();
         if ($model) {
+            $percent = number_format(($model->remain_times / $model->times), 2) * 100;
+            if ($percent != 100) {
+                $percent = substr($percent, 0, 2);
+            }
             return [
                 'remain_times' => $model->remain_times,
                 'total_times' => $model->times,
-                'percent' => number_format(($model->remain_times / $model->times), 2) * 100
+                'percent' => $percent
             ];
         }
         return [
