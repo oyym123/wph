@@ -28,12 +28,7 @@ class Evaluate extends Common
 
     public function saveData($data)
     {
-        $model = self::where(['order_id' => $data['order_id']])->first();
-        if ($model) {
-            self::showMsg(['您已评价过！', 0]);
-        } else {
-            return self::create($data);
-        }
+        return self::create($data);
     }
 
     /** 获取晒单列表 */

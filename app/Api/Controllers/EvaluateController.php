@@ -28,7 +28,7 @@ class EvaluateController extends WebController
      *   @SWG\Parameter(name="sn", in="formData", default="1", description="订单号", required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="content", in="formData", default="很好的产品", description="内容", required=true,
+     *   @SWG\Parameter(name="contents", in="formData", default="很好的产品", description="内容", required=true,
      *     type="string",
      *   ),
      *   @SWG\Parameter(name="imgs[1]", in="formData", default="1.png", description="图片1", required=true,
@@ -49,7 +49,11 @@ class EvaluateController extends WebController
     {
         $this->auth();
         $request = $this->request;
-        $order = (new Order())->getOrder(['buyer_id' => $this->userId, 'sn' => $request->sn]);
+        $order = (new Order())->getOrder([
+            'status' => Order::STATUS_CONFIRM_RECEIVING,
+            'buyer_id' => $this->userId,
+            'sn' => $request->sn
+        ]);
         $imgs = Upload::manyImg($request->file('imgs'));
         $data = [
             'imgs' => json_encode($imgs),
