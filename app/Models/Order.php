@@ -110,9 +110,9 @@ class Order extends Common
             'audit_at' => $order->created_at,
             'prepare' => $order->created_at,
             'delivery_at' => $order->seller_shipped_at,
-            'delivery_company' => Shipping::companyName($order->shipping_company),
+            'delivery_company' => $order->shipping_company,
             'delivery_number' => $order->shipping_number,
-            'delivery_detail' => Shipping::shippingLogs($order->shipping_company, $order->shipping_number),
+            //'delivery_detail' => Shipping::shippingLogs($order->shipping_company, $order->shipping_number),
             'signed_at' => $order->signed_at,
             'product_info' => [
                 'img_cover' => $product->getImgCover(),

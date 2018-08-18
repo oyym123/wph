@@ -28,6 +28,7 @@ class Evaluate extends Common
 
     public function saveData($data)
     {
+        DB::table('order')->where(['id' => $data['order_id']])->update(['status' => Order::STATUS_COMPLETE]);
         return self::create($data);
     }
 

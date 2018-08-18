@@ -376,9 +376,9 @@ class OrderController extends WebController
      *                      [audit_at] => 2018-07-31 23:48:48 （审核时间）
      *                      [prepare] => 2018-07-31 23:48:48   （准备时间）
      *                      [delivery_at] => 2018-08-05 20:10:54 （发货时间）
-     *                      [delivery_company] => 申通快递         （快递公司）
-     *                      [delivery_number] => 3370492175597    （订单号）
-     *                      [delivery_detail] => Array
+     *                      [delivery_company] => 京东快递         （快递公司）
+     *                      [delivery_number] => 3370492175597    （快运单号号）
+     *                      [delivery_detail] => Array  [这个字段暂时不用]
      *                          (
      *                              [6] => Array
      *                              (
