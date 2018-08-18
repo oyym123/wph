@@ -366,8 +366,8 @@ class Period extends Common
             'img' => $product->getImgCover(),
             'title' => $product->title,
             'present_price' => $data[0]['bid_price'],
-            'max_price' => min($bidPrices),
-            'min_price' => max($bidPrices),
+            'max_price' => max($bidPrices),
+            'min_price' => min($bidPrices),
             'average_price' => $averagePrice,
             'detail' => $data,
             'list' => $list
