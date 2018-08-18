@@ -118,7 +118,7 @@ class Product extends Common
                 'sell_price' => $product->sell_price,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
                 'img_cover' => $product->getImgCover(),
-                'imgs' => self::getImgs($product->imgs),
+                'imgs' => array_merge(self::getImgs($product->imgs),[$product->getImgCover()]),
                 'evaluate' => (new Evaluate())->getList(['product_id' => $productId])
             ];
         } else {
