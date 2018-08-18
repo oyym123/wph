@@ -27,7 +27,7 @@ class Income extends Common
         'order_id',
     ];
 
-    const STATUS_ALREADY_WITHDRAW = 10; //已提现
+    const STATUS_ALREADY_WITHDRAW = 0; //已提现
 
     /** 结算所有未竞拍用户的返回拍币金额 */
     public static function settlement($periodId, $userId)

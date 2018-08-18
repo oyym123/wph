@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\Invite;
 
+use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -24,8 +25,8 @@ class InviteController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('推广代理');
+            $content->description('');
 
             $content->body($this->grid());
         });
@@ -44,7 +45,7 @@ class InviteController extends Controller
             $content->header('header');
             $content->description('description');
 
-            $content->body($this->form()->edit($id));
+            //  $content->body($this->form()->edit($id));
         });
     }
 
@@ -60,7 +61,7 @@ class InviteController extends Controller
             $content->header('header');
             $content->description('description');
 
-            $content->body($this->form());
+            //  $content->body($this->form());
         });
     }
 
@@ -74,9 +75,21 @@ class InviteController extends Controller
         return Admin::grid(Invite::class, function (Grid $grid) {
 
             $grid->id('ID')->sortable();
-
-            $grid->created_at();
-            $grid->updated_at();
+            $grid->user_id('ID/用户昵称')->display(function ($released) {
+                return $released . '【' . User::find($released)->nickname . '】';
+            });
+            $grid->level_1('ID/徒弟')->display(function ($released) {
+                return $released . '【' . User::find($released)->nickname . '】';
+            });
+            $grid->level_2('ID/徒孙')->display(function ($released) {
+                return $released . '【' . User::find($released)->nickname . '】';
+            });
+            $grid->created_at('创建时间');
+            $grid->updated_at('修改时间');
+            $grid->filter(function ($filter) {
+                $filter->between('created_at', '创建时间')->datetime();
+                $filter->between('updated_at', '修改时间')->datetime();
+            });
         });
     }
 

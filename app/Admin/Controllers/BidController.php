@@ -4,6 +4,9 @@ namespace App\Admin\Controllers;
 
 use App\Models\Bid;
 
+use App\Models\Common;
+use App\Models\Product;
+use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -24,8 +27,8 @@ class BidController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('投标记录');
+            $content->description('列表');
 
             $content->body($this->grid());
         });
@@ -44,7 +47,7 @@ class BidController extends Controller
             $content->header('header');
             $content->description('description');
 
-            $content->body($this->form()->edit($id));
+            // $content->body($this->form()->edit($id));
         });
     }
 
@@ -60,7 +63,7 @@ class BidController extends Controller
             $content->header('header');
             $content->description('description');
 
-            $content->body($this->form());
+            //  $content->body($this->form());
         });
     }
 
@@ -72,11 +75,41 @@ class BidController extends Controller
     protected function grid()
     {
         return Admin::grid(Bid::class, function (Grid $grid) {
+            $fillable = [
+                'product_id',
+                'period_id',
+                'bid_price',
+                'pay_amount',
+                'pay_type',
+                'user_id',
+                'status',
+                'bid_step',
+                'nickname',
+                'product_title',
+                'end_time',
+            ];
+            $grid->filter(function ($filter) {
+                // 在这里添加字段过滤器
+                $filter->in('status', '状态')->select(Common::commonStatus());
+                $filter->in('is_real', '是否真人')->select(\App\User::getIsReal());
+                $filter->between('created_at', '创建时间')->datetime();
+                $filter->between('updated_at', '修改时间')->datetime();
+            });
 
             $grid->id('ID')->sortable();
+            $grid->user_id('用户id')->sortable();
+            $grid->nickname('昵称');
+            $grid->is_real('身份')->display(function ($released) {
+                return \App\User::getIsReal($released);
+            });
 
-            $grid->created_at();
-            $grid->updated_at();
+            $grid->period_id('期数id')->sortable();
+            $grid->pay_amount('支付的金额')->sortable();
+            $grid->product_id('ID/产品')->sortable();
+            $grid->product_title('产品');
+
+            $grid->created_at('创建时间');
+            $grid->updated_at('修改时间');
         });
     }
 

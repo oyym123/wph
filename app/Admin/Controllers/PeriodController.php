@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Models\Auctioneer;
 use App\Models\Period;
 
+use App\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -25,9 +26,8 @@ class PeriodController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
-
+            $content->header('产品期数');
+            $content->description('列表');
             $content->body($this->grid());
         });
     }
@@ -61,7 +61,7 @@ class PeriodController extends Controller
             $content->header('header');
             $content->description('description');
 
-            $content->body($this->form());
+            //  $content->body($this->form());
         });
     }
 
@@ -73,13 +73,26 @@ class PeriodController extends Controller
     protected function grid()
     {
         return Admin::grid(Period::class, function (Grid $grid) {
-
+            $grid->filter(function ($filter) {
+                // 在这里添加字段过滤器
+                $filter->in('status', '状态')->select(Period::getStatus());
+                $filter->in('real_person', '是否有真人参与')->select(User::getIsReal());
+                $filter->between('created_at', '创建时间')->datetime();
+                $filter->between('updated_at', '修改时间')->datetime();
+            });
             $grid->id('ID')->sortable();
             $grid->code('期数代码');
             $grid->product_id('产品id')->sortable();
-            $grid->product_id('产品id')->sortable();
-            $grid->status('状态');
-
+            $grid->user_id('中标者ID');
+            $grid->bid_price('中标者价格');
+            $grid->bid_id('中标id');
+            $grid->order_id('订单id');
+            $grid->real_person('是否有真人参与')->display(function ($released) {
+                return User::getIsReal($released);
+            });
+            $grid->status('状态')->display(function ($released) {
+                return Period::getStatus($released);
+            });
             $grid->created_at('创建时间');
             $grid->updated_at('修改时间');
         });
