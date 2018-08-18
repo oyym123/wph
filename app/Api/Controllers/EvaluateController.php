@@ -167,9 +167,6 @@ class EvaluateController extends WebController
      *   tags={"晒单"},
      *   summary="晒单规则",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="", required=true,
-     *     type="string",
-     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
