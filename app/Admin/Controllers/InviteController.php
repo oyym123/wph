@@ -79,9 +79,15 @@ class InviteController extends Controller
                 return $released . '【' . User::find($released)->nickname . '】';
             });
             $grid->level_1('ID/徒弟')->display(function ($released) {
+                if ($released == 0) {
+                    return '';
+                }
                 return $released . '【' . User::find($released)->nickname . '】';
             });
             $grid->level_2('ID/徒孙')->display(function ($released) {
+                if ($released == 0) {
+                    return '';
+                }
                 return $released . '【' . User::find($released)->nickname . '】';
             });
             $grid->created_at('创建时间');
