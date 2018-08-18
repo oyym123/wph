@@ -409,6 +409,7 @@ class OrderController extends WebController
      *                              [img_cover] => http://od83l5fvw.bkt.clouddn.com/images/1505283933090.png
      *                              [sell_price] => 0.60
      *                              [nickname] => 小米
+     *                              [save_price] => 89 【节约比例】
      *                          )
      *
      *                      [address_info] => Array

@@ -28,6 +28,18 @@ class Expend extends Common
         self::create($data);
     }
 
+    /** 用户每一期支付的费用 */
+    public function periodExpend($period, $userId)
+    {
+        $expends = Expend::where([
+            'period_id' => $period,
+            'user_id' => $userId
+        ])->get();
+        foreach ($expends as $expend) {
+
+        }
+    }
+
     /** 支出明细 */
     public function detail($userId)
     {

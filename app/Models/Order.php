@@ -118,6 +118,7 @@ class Order extends Common
                 'img_cover' => $product->getImgCover(),
                 'sell_price' => $product->sell_price,
                 'nickname' => $product->nickname,
+                'save_price' => number_format(($order->pay_amount / $product->sell_price), 2) * 100
             ],
             'address_info' => [
                 'username' => $address->user_name,
