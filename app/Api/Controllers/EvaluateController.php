@@ -89,7 +89,11 @@ class EvaluateController extends WebController
     public function uploadImg()
     {
         $this->auth();
-        self::showMsg(['url' => Upload::oneImg($this->request->img)]);
+        $img = Upload::oneImg($this->request->img);
+        self::showMsg([
+            'url' => $img,
+            'full_url' => env('QINIU_URL_IMAGES') . $img
+        ]);
     }
 
     /**
