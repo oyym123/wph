@@ -297,32 +297,37 @@ class Period extends Common
      */
     public function saveData($productId)
     {
-        $dayStart = date('Y-m-d', time()) . ' 00:00:00';
-        $dayEnd = date('Y-m-d', time()) . ' 23:59:59';
-
-        $check = DB::table('period')
-            ->whereBetween('created_at', [$dayStart, $dayEnd])
-            ->where('product_id', '=', $productId)
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        $period = $check ? intval(substr($check->code, -4)) : 0;
-        $code = date('Ymd', time()) . str_pad($period + 1, 4, '0', STR_PAD_LEFT);
-        $data = [
+        $res = DB::table('period')->where([
             'product_id' => $productId,
-            'auctioneer_id' => Auctioneer::randAuctioneer(),
-            'status' => self::STATUS_IN_PROGRESS,
-            'robot_rate' => config('bid.robot_rate'),
-            'person_rate' => mt_rand(100, 150) / 100,
-            'code' => $code,
-        ];
-        $model = self::create($data);
-        $redis = app('redis')->connection('first');
-        //设置倒计时初始时间和初始价格
-        $redis->setex('period@countdown' . $model->id, config('bid.init_countdown'), 1);
-        RobotPeriod::batchSave($model->id, $productId);
-    }
+            'status' => self::STATUS_IN_PROGRESS
+        ])->first();
+        if (!$res) { //确保数据库中没有一个产品同时进行竞拍
+            $dayStart = date('Y-m-d', time()) . ' 00:00:00';
+            $dayEnd = date('Y-m-d', time()) . ' 23:59:59';
 
+            $check = DB::table('period')
+                ->whereBetween('created_at', [$dayStart, $dayEnd])
+                ->where('product_id', '=', $productId)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            $period = $check ? intval(substr($check->code, -4)) : 0;
+            $code = date('Ymd', time()) . str_pad($period + 1, 4, '0', STR_PAD_LEFT);
+            $data = [
+                'product_id' => $productId,
+                'auctioneer_id' => Auctioneer::randAuctioneer(),
+                'status' => self::STATUS_IN_PROGRESS,
+                'robot_rate' => config('bid.robot_rate'),
+                'person_rate' => mt_rand(100, 150) / 100,
+                'code' => $code,
+            ];
+            $model = self::create($data);
+            $redis = app('redis')->connection('first');
+            //设置倒计时初始时间和初始价格
+            $redis->setex('period@countdown' . $model->id, config('bid.init_countdown'), 1);
+            RobotPeriod::batchSave($model->id, $productId);
+        }
+    }
 
     /** 历史成交走势图 */
     public function historyTrend($productId)
