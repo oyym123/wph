@@ -40,17 +40,17 @@ class WebController extends Controller
                 self::showMsg($info, $status);
             }
         }
-
-        $allowIp = ['218.17.209.172', '127.0.0.1'];
-        if (in_array(Helper::getIP(), $allowIp)) {
-            $path = self::isWindows() ? 'G:/logs/wph.log' : '/www/logs/wph.log';
-            if (!empty($_POST)) {
-                Helper::writeLog($_POST, $path);
-            }
-            if (!empty($_GET)) {
-                Helper::writeLog($_GET, $path);
-            }
-        }
+//
+//        $allowIp = ['218.17.209.172', '127.0.0.1'];
+//        if (in_array(Helper::getIP(), $allowIp)) {
+//            $path = self::isWindows() ? 'G:/logs/wph.log' : '/www/logs/wph.log';
+//            if (!empty($_POST)) {
+//                Helper::writeLog($_POST, $path);
+//            }
+//            if (!empty($_GET)) {
+//                Helper::writeLog($_GET, $path);
+//            }
+//        }
     }
 
 

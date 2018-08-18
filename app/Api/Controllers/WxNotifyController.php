@@ -67,6 +67,10 @@ class WxNotifyController extends Controller
                 if (!Income::create($income)) {
                     throw new \Exception('充值失败');
                 }
+
+                //
+
+                //拍币充值成功
                 DB::table('users')->where(['id' => $order->buyer_id])->increment('bid_currency', $amount);
                 //标记已付款
                 DB::table('order')->where(['id' => $order->id])->update(['status' => Order::STATUS_PAYED]);

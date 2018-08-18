@@ -65,6 +65,9 @@ class Invite extends Common
         return [count($level), $user];
     }
 
+
+
+
     public function detail($userId)
     {
         list($count1, $user1) = $this->inviteList($userId);

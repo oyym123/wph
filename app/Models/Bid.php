@@ -317,6 +317,10 @@ class Bid extends Common
     /** 获取竞拍记录 */
     public function bidRecord($periodId)
     {
+        $cacheKey = 'bid@bidRecord' . $periodId . $this->limit;
+        if ($this->hasCache($cacheKey)) {
+            return $this->getCache($cacheKey);
+        }
         $data = [];
         $bids = Bid::has('user')->where(['period_id' => $periodId])->limit($this->limit)->orderBy('bid_price', 'desc')->get();
         foreach ($bids as $key => $bid) {
@@ -330,7 +334,7 @@ class Bid extends Common
                 'bid_type' => $key == 0 ? self::TYPE_LEAD : self::TYPE_OUT, //0 =出局 1=领先
             ];
         }
-        return $data;
+        return $this->putCache($cacheKey, $data, 0.02); //缓存一秒
     }
 
     /** 竞拍最新的状态 */
