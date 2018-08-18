@@ -195,7 +195,7 @@ class Bid extends Common
                             'buyer_id' => $bid->user_id,
                             'expired_at' => config('bid.order_expired_at'), //过期时间
                         ];
-                        
+
                         $address = UserAddress::defaultAddress($bid->user_id);
                         if ($address) {
                             $orderInfo['address_id'] = $address->id; //收货人地址
@@ -351,6 +351,18 @@ class Bid extends Common
                     'g' => $bid->end_time,
                     'h' => ($x = $redis->ttl('period@countdown' . $bid->period_id)) > 0 ? $x : 0,
                     'i' => round($bid->bid_price, 2) * 10
+                ];
+            } else {
+                $res[] = [
+                    'a' => $id,
+                    'b' => 0,
+                    'c' => 0.00,
+                    'd' => '当前价',
+                    'e' => 0,
+                    'f' => 0,
+                    'g' => 0,
+                    'h' => ($x = $redis->ttl('period@countdown' . $bid->period_id)) > 0 ? $x : 0,
+                    'i' => 0
                 ];
             }
         }
