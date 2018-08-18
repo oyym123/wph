@@ -48,11 +48,20 @@ class EvaluateController extends WebController
             'buyer_id' => $this->userId,
             'sn' => $request->sn
         ]);
-        // $imgs = Upload::manyImg($request->file('imgs'));
+        //$imgs = Upload::manyImg($request->file('imgs'));
         $imgs = $request->imgs;
         if (is_array($imgs)) {
             $imgs = json_encode($imgs);
         }
+        
+        if (count(json_decode($imgs, true)) < 3) {
+            self::showMsg('至少传' . 3 . '张图片!', 4);
+        }
+
+        if (count(json_decode($imgs, true)) > 9) {
+            self::showMsg('最多传' . 9 . '张图片!', 4);
+        }
+
         $data = [
             'imgs' => $imgs,
             'order_id' => $order->id,
