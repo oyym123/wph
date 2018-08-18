@@ -188,6 +188,8 @@ class Period extends Common
             $proxy = AutoBid::isAutoBid($this->userId, $period->id);
         }
         $redis = app('redis')->connection('first');
+        $expend = (new Expend())->periodExpend($period->id, $this->userId);
+
         $data = [
             'detail' => [
                 'id' => $period->id,
@@ -237,9 +239,9 @@ class Period extends Common
                 ],
             ],
             'expended' => [
-                'used_real_bids' => 0,
-                'used_gift_bids' => 0,
-                'used_money' => '0.00',
+                'used_real_bids' => $expend['bid_currency'],
+                'used_gift_bids' => $expend['gift_currency'],
+                'used_money' => number_format($expend['bid_currency'], 2),
                 'is_buy_differential_able' => $product->buy_by_diff,
                 'buy_differential_money' => '0.00',
                 'order_sn' => '',

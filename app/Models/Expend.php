@@ -35,8 +35,25 @@ class Expend extends Common
             'period_id' => $period,
             'user_id' => $userId
         ])->get();
-        foreach ($expends as $expend) {
-
+        if (count($expends) > 0) {
+            $bidCurrency = $giftCurrency = [];
+            foreach ($expends as $expend) {
+                if ($expend->type == self::TYPE_BID_CURRENCY) {
+                    $bidCurrency[] = $expend->amount;
+                } else {
+                    $giftCurrency[] = $expend->amount;
+                }
+            }
+            $data = [
+                'bid_currency' => array_sum($bidCurrency),
+                'gift_currency' => array_sum($giftCurrency),
+            ];
+            return $data;
+        } else {
+            return [
+                'bid_currency' => 0,
+                'gift_currency' => 0,
+            ];
         }
     }
 
