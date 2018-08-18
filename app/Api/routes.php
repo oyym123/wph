@@ -102,6 +102,9 @@ Route::group(['middleware' => 'web'], function () {
         return view('api.user.user-agreement');
     });
 
+    Route::get('/evaluate-rule', function () { //晒单示例
+        return view('api.user.evaluate-rule');
+    });
     /**  我的推广  */
     Route::get('invite/index', 'InviteController@Index'); //我的推广主页
     Route::get('invite/invite-list', 'InviteController@inviteList'); //我的推广主页
@@ -115,6 +118,7 @@ Route::group(['middleware' => 'web'], function () {
 
 
     /** 晒单 */
+    Route::get('evaluate/rule', 'EvaluateController@rule'); //晒单规则
     Route::post('evaluate/upload-img', 'EvaluateController@uploadImg'); //提交晒单
     Route::post('evaluate/submit', 'EvaluateController@submit'); //提交晒单
     Route::get('evaluate/lists', 'EvaluateController@lists'); //首页晒单列表
@@ -140,7 +144,6 @@ Route::group(['middleware' => 'web'], function () {
     /** 会员卡与积分 */
     Route::any('user-point-card', 'UserPointCardController@index');
     Route::any('user/member-card', 'UserController@memberCard');
-
 
     Route::any('weixin-oauth-callback', 'WeixinOauthCallbackController@index');
     Route::any('weixin-oauth-callback/test', 'WeixinOauthCallbackController@test');

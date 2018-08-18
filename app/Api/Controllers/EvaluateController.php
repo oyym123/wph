@@ -161,4 +161,27 @@ class EvaluateController extends WebController
         $model = new Evaluate();
         self::showMsg($model->detail($this->request->id));
     }
+
+    /**
+     * @SWG\Get(path="/api/evaluate/rule",
+     *   tags={"晒单"},
+     *   summary="晒单规则",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="name", in="query", default="", description="", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function rule()
+    {
+        $data = [
+            'example' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/evaluate-rule',
+            'first' => '(1) 虚拟商品：上传竞拍成功页面截图或对应账户收货信息截图，留言超过8个字，即可获得1个赠币奖励！',
+            'second' => '(2) 实物商品：上传至少3张商品照片，并留言超过8个字，即可获得1个赠币；真人露脸出镜额外奖励2个赠币。'
+        ];
+        self::showMsg($data);
+    }
 }
