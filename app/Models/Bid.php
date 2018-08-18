@@ -361,7 +361,7 @@ class Bid extends Common
                     'e' => 0,
                     'f' => 0,
                     'g' => 0,
-                    'h' => ($x = $redis->ttl('period@countdown' . $bid->period_id)) > 0 ? $x : 0,
+                    'h' => ($x = $redis->ttl('period@countdown' . $id)) > 0 ? $x : 0,
                     'i' => 0
                 ];
             }
