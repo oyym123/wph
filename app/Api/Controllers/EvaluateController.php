@@ -31,13 +31,7 @@ class EvaluateController extends WebController
      *   @SWG\Parameter(name="contents", in="formData", default="很好的产品", description="内容", required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="imgs[1]", in="formData", default="1.png", description="图片1", required=true,
-     *     type="string",
-     *   ),
-     *   @SWG\Parameter(name="imgs[2]", in="header", default="2.png", description="图片2", required=true,
-     *     type="string",
-     *   ),
-     *   @SWG\Parameter(name="imgs[3]", in="formData", default="3.png", description="图片3", required=true,
+     *   @SWG\Parameter(name="imgs", in="formData", default="1.png", description="图片1", required=true,
      *     type="string",
      *   ),
      *   @SWG\Response(
@@ -54,9 +48,13 @@ class EvaluateController extends WebController
             'buyer_id' => $this->userId,
             'sn' => $request->sn
         ]);
-        $imgs = Upload::manyImg($request->file('imgs'));
+        // $imgs = Upload::manyImg($request->file('imgs'));
+        $imgs = $request->imgs;
+        if (is_array($imgs)) {
+            $imgs = json_encode($imgs);
+        }
         $data = [
-            'imgs' => json_encode($imgs),
+            'imgs' => $imgs,
             'order_id' => $order->id,
             'product_id' => $order->product_id,
             'period_id' => $order->period_id,
@@ -67,6 +65,31 @@ class EvaluateController extends WebController
         if ($evaluate->saveData($data)) {
             self::showMsg('感谢您的晒单！', 0);
         }
+    }
+
+    /**
+     * @SWG\Post(path="/api/evaluate/upload-img",
+     *   tags={"demo"},
+     *   summary="",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="img", in="formData", default="", description="图片", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="
+     *              [data] => Array
+     *              (
+     *                  url => cbfee5b55c1b0ef98c0b0fc564f8310e.png
+     *              )
+     *
+     *     "
+     *   )
+     * )
+     */
+    public function uploadImg()
+    {
+        $this->auth();
+        self::showMsg(['url' => Upload::oneImg($this->request->img)]);
     }
 
     /**
