@@ -296,7 +296,7 @@ class OrderController extends WebController
             }
             $result = $result + $res;
         }
-        if (empty($result)) {
+        if (empty($result) && $this->offset == 0) {
             self::showMsg('没有数据', 2);
         }
         self::showMsg($result);
