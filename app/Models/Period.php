@@ -229,7 +229,7 @@ class Period extends Common
                 [
                     'id' => 1,
                     'title' => '竞拍指南',
-                    'img' => self::getImg('weipaizhinan.png'),
+                    'img' => self::getImg('weipaizhinan2.png'),
                     'function' => 'html',
                     'params' => [
                         'key' => 'url',

@@ -73,7 +73,7 @@ class HomeController extends WebController
                 [
                     'id' => 0,
                     'title' => '推广',
-                    'img' => env('QINIU_URL_IMAGES') . 'tuiguang1.png',
+                    'img' => env('QINIU_URL_IMAGES') . 'tuiguang2.png',
                     'url' => 'invite.html',
                 ],
                 [
