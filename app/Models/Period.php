@@ -153,12 +153,11 @@ class Period extends Common
             self::showMsg('没有数据', self::CODE_NO_DATA);
         }
 
-        $data = [];
+        $res = [];
         $collection = new Collection();
         foreach ($periods as $period) {
-
             $product = Product::find($period->product_id);
-            $data[] = [
+            $res[] = [
                 'id' => $period->id,
                 'product_id' => $product->id,
                 'period_code' => $period->code,
@@ -170,7 +169,10 @@ class Period extends Common
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
             ];
         }
-        return $this->putCache($cacheKey, $data, 0.1);
+        if (empty($res) && $this->offset == 0) {
+            self::showMsg('没有数据', 2);
+        }
+        return $this->putCache($cacheKey, $res, 0.1);
     }
 
     /** 获取产品详情 */
