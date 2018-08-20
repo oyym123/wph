@@ -211,7 +211,7 @@ class ProductController extends WebController
      */
     public function type()
     {
-        self::showMsg([100 => ['id' => 0, 'title' => '全部']] + ProductType::getList());
+        self::showMsg(ProductType::getList());
     }
 
     /**
