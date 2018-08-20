@@ -27,7 +27,7 @@ class ProductController extends WebController
      *   tags={"产品"},
      *   summary="产品列表",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="type", in="query", default="", description="类型",
+     *   @SWG\Parameter(name="type", in="query", default="", description="类型,0=全部",
      *     type="string",
      *   ),
      *   @SWG\Parameter(name="token", in="header", default="", description="用户token" ,
@@ -204,9 +204,6 @@ class ProductController extends WebController
      *   tags={"产品"},
      *   summary="产品分类",
      *   description="Author: OYYM",
-     *   @SWG\Parameter(name="name", in="query", default="", description="",
-     *     type="string",
-     *   ),
      *   @SWG\Response(
      *       response=200,description="successful operation"
      *   )
@@ -214,7 +211,7 @@ class ProductController extends WebController
      */
     public function type()
     {
-        self::showMsg(ProductType::getList());
+        self::showMsg([100 => ['id' => 0, 'title' => '全部']] + ProductType::getList());
     }
 
     /**
