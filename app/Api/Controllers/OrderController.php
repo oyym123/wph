@@ -54,6 +54,7 @@ class OrderController extends WebController
      *              is_long_history => 是否很长时间
      *              sn => 订单号
      *              bid_type => 竞拍类型 （1 = 正常竞拍 , 2 = 差价购买）
+     *              order_type=> 订单类型 （ 1 = 竞拍类型 , 2 = 差价购买 ,3 = 购物币购买）
      *              order_status => 订单类型 （ 10 = 未支付 , 15 = 已付款 ,20 = 待发货 , 25 = 已发货 , 50 = 买家已签收 , 100 = 已完成）
      *              result_status => 结果类型 （100= 全部 , 0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）
      *              pay_status => 支付状态 （10=>未支付 , 20=已支付）
@@ -76,8 +77,8 @@ class OrderController extends WebController
         $user = $this->userIdent;
         $res = [];
         $data = array(
-            'period_id' => 4372346,
-            'product_id' => 626,
+            'period_id' => 0,
+            'product_id' => 13,
             'period_code' => '',
             'title' => '',
             'img_cover' => '',
@@ -93,6 +94,7 @@ class OrderController extends WebController
             'sn' => '',
             'bid_type' => 0,
             'order_status' => 0,
+            'order_type' => 1,
             'result_status' => 99,
             'pay_status' => Pay::STATUS_UNPAID,
             'pay_time' => '',
@@ -229,6 +231,7 @@ class OrderController extends WebController
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 3;
+                        $data['order_type'] = $order->type;
                         $data['nickname'] = $user->nickname;
                         $data['label'] = Order::getStatus($order->status);
                         $data['sn'] = $order->sn;
@@ -257,6 +260,7 @@ class OrderController extends WebController
                         $data['sell_price'] = $product->sell_price;
                         $data['save_price'] = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
                         $data['pay_price'] = $order->pay_amount;
+                        $data['order_type'] = $order->type;
                         $data['result_status'] = 4;
                         $data['nickname'] = $user->nickname;
                         $data['label'] = Order::getStatus($order->status);
@@ -282,6 +286,7 @@ class OrderController extends WebController
                         $data['title'] = $product->title;
                         $data['img_cover'] = $product->getImgCover();
                         $data['bid_step'] = $period->bid_step;
+                        $data['order_type'] = $order->type;
                         $data['sell_price'] = $product->sell_price;
                         $data['save_price'] = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
                         $data['pay_price'] = $order->pay_amount;
@@ -373,10 +378,12 @@ class OrderController extends WebController
      *   ),
      *   @SWG\Response(
      *       response=200,description="
+     *                      [sn] => 201807312348483696031716 (订单状态)
      *                      [status] => 50 (订单状态)
      *                      [begin_at] => 2018-07-31 23:48:48 (开始时间)
      *                      [amount] => 0.60  (成交价)
      *                      [audit_at] => 2018-07-31 23:48:48 （审核时间）
+     *                      [prepare] => 2018-07-31 23:48:48   （准备时间）
      *                      [prepare] => 2018-07-31 23:48:48   （准备时间）
      *                      [delivery_at] => 2018-08-05 20:10:54 （发货时间）
      *                      [delivery_company] => 京东快递         （快递公司）

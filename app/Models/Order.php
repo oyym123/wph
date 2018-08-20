@@ -109,6 +109,7 @@ class Order extends Common
             'amount' => $order->pay_amount,
             'audit_at' => $order->created_at,
             'prepare' => $order->created_at,
+            'sn' => $order->sn,
             'delivery_at' => $order->seller_shipped_at,
             'delivery_company' => $order->shipping_company,
             'delivery_number' => $order->shipping_number,
