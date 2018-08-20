@@ -378,7 +378,7 @@ class OrderController extends WebController
      *   ),
      *   @SWG\Response(
      *       response=200,description="
-     *                      [sn] => 201807312348483696031716 (订单状态)
+     *                      [sn] => 201807312348483696031716
      *                      [status] => 50 (订单状态)
      *                      [begin_at] => 2018-07-31 23:48:48 (开始时间)
      *                      [amount] => 0.60  (成交价)

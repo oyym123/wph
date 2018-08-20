@@ -163,6 +163,7 @@ class Period extends Common
                 'product_id' => $product->id,
                 'period_code' => $period->code,
                 'title' => $product->title,
+                'status' => 0, //正在进行中
                 'img_cover' => self::getImg($product->img_cover),
                 'sell_price' => $product->sell_price,
                 'bid_step' => $product->pay_amount,

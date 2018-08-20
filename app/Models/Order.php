@@ -204,7 +204,19 @@ class Order extends Common
     /** 获取最终支付价格 */
     public function getPayAmount($data)
     {
-        return $data['amount'] - ($this->getDiscountAmount($data['product_id'], $data['user_id']));
+        $discountAmount = $this->getDiscountAmount($data['product_id'], $data['user_id']);
+        if ($data['is_shop'] == 1) {
+            $amount = $data['shopping_currency'];
+        } else {
+            if (($data['shopping_currency'] - $discountAmount) < 0) {
+                $amount = $data['shopping_currency'];
+            } else {
+                $amount = $discountAmount;
+            }
+        }
+        $price = $data['amount'] - $amount;
+        if($price>=0){}
+        return ;
     }
 
     /** 获取拍期数表信息 */
