@@ -198,25 +198,34 @@ class Order extends Common
     /** 获取购物可以币抵消的价格 */
     public function getDiscountAmount($productId, $userId)
     {
-        Vouchers::getAmount($productId, $userId);
+       return Vouchers::getAmount($productId, $userId);
     }
 
     /** 获取最终支付价格 */
     public function getPayAmount($data)
     {
-        $discountAmount = $this->getDiscountAmount($data['product_id'], $data['user_id']);
-        if ($data['is_shop'] == 1) {
-            $amount = $data['shopping_currency'];
-        } else {
-            if (($data['shopping_currency'] - $discountAmount) < 0) {
-                $amount = $data['shopping_currency'];
-            } else {
-                $amount = $discountAmount;
+        //购物币全价购买时,并且使用购物币,且该产品允许购物币全款购买
+        if ($data['type'] == Order::TYPE_SHOP && $data['used_shopping'] == 1 && $data['is_shop'] == 1) {
+            $discountAmount = $data['shopping_currency'];
+        } elseif ($data['type'] == Order::TYPE_BUY_BY_DIFF && $data['used_shopping'] == 1) { //差价购买时,并且使用购物币
+            $amount = $this->getDiscountAmount($data['product_id'], $data['user_id']);
+            if (($data['shopping_currency'] - $amount) < 0) {
+                $discountAmount = $data['shopping_currency'];
+            } else {  //竞拍成功购买时,不允许折扣
+                $discountAmount = $amount;
             }
+        } else {
+            $discountAmount = 0;
         }
-        $price = $data['amount'] - $amount;
-        if($price>=0){}
-        return ;
+
+        $price = $data['amount'] - $discountAmount; //最终价格
+        if ($price < 0) {
+            $payAmount = 0;
+            $discountAmount = $data['amount'];
+        } else {
+            $payAmount = $price;
+        }
+        return [$payAmount, $discountAmount]; //返回支付价格 和 折扣价格
     }
 
     /** 获取拍期数表信息 */

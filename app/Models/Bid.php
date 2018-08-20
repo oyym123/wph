@@ -103,6 +103,9 @@ class Bid extends Common
             }
             $data['id'] = DB::table('bid')->insertGetId($data);
             $this->setLastPersonId($redis, $data);
+            $data['province'] = $this->userIdent->province;
+            $data['city'] = $this->userIdent->city;
+            $this->setThreePersonId($redis, $data);
             //加入竞拍队列，进入数据库Bid表,暂时不启用redis队列
             //dispatch(new BidTask($redis, $data));
             $res = [
@@ -116,6 +119,23 @@ class Bid extends Common
     public function setLastPersonId($redis, $data)
     {
         $redis->hset('bid@lastPersonId', $data['period_id'], json_encode($data));
+    }
+
+    /** 缓存最后三条记录 */
+    public function setThreePersonId($redis, $data)
+    {
+        $res = $this->getThreePersonId($redis, $data['period_id']);
+        $result[] = $data;
+        $result[] = $res[0];
+        $result[] = $res[1];
+        $redis->hset('bid@threePersonId', $data['period_id'], json_encode($result));
+    }
+
+    /** 获取最后三条记录 */
+    public function getThreePersonId($redis, $periodId)
+    {
+        $lastPersonIds = json_decode($redis->hget('bid@threePersonId', $periodId), true);
+        return $lastPersonIds;
     }
 
     /** 获取最后一个竞拍人的id */
@@ -286,7 +306,7 @@ class Bid extends Common
                 'end_time' => $time,
                 'is_real' => User::TYPE_ROBOT
             ];
-            $this->setLastPersonId($redis, $data);
+
             if ($data['status'] == self::STATUS_SUCCESS) {
                 //竞拍成功则立即保存
                 $bid = Bid::create($data);
@@ -304,10 +324,17 @@ class Bid extends Common
                 //redis缓存也改变
                 $data['id'] = $bid->id;
                 $this->setLastPersonId($redis, $data);
+                $data['province'] = $robotPeriod->province;
+                $data['city'] = $robotPeriod->city;
+                $this->setThreePersonId($redis, $data);
             } else {
                 $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
                 $data['id'] = DB::table('bid')->insertGetId($data);
                 $this->setLastPersonId($redis, $data);
+
+                $data['province'] = $robotPeriod->province;
+                $data['city'] = $robotPeriod->city;
+                $this->setThreePersonId($redis, $data);
                 //加入竞拍队列，3秒之后进入数据库Bid表
                 //dispatch(new BidTask($data));
             }
@@ -317,24 +344,36 @@ class Bid extends Common
     /** 获取竞拍记录 */
     public function bidRecord($periodId)
     {
-        $cacheKey = 'bid@bidRecord' . $periodId . $this->limit;
-        if ($this->hasCache($cacheKey)) {
-            return $this->getCache($cacheKey);
-        }
         $data = [];
-        $bids = Bid::has('user')->where(['period_id' => $periodId])->limit($this->limit)->orderBy('bid_price', 'desc')->get();
-        foreach ($bids as $key => $bid) {
-            $user = $bid->user;
-            $data[] = [
-                'bid_price' => $bid->bid_price,
-                'bid_time' => $bid->end_time,
-                'nickname' => $bid->nickname,
-                'avatar' => '',
-                'area' => $user->province . $user->city,
-                'bid_type' => $key == 0 ? self::TYPE_LEAD : self::TYPE_OUT, //0 =出局 1=领先
-            ];
+        $redis = app('redis')->connection('first');
+        if ($this->limit == 3) {
+            foreach ($this->getThreePersonId($redis, $periodId) as $key => $bid) {
+                if ($bid['bid_price']) {
+                    $data[] = [
+                        'bid_price' => $bid['bid_price'],
+                        'bid_time' => $bid['end_time'],
+                        'nickname' => $bid['nickname'],
+                        'avatar' => '',
+                        'area' => $bid['province'] . $bid['city'],
+                        'bid_type' => $key == 0 ? self::TYPE_LEAD : self::TYPE_OUT, //0 =出局 1=领先
+                    ];
+                }
+            }
+        } else {
+            $bids = Bid::has('user')->where(['period_id' => $periodId])->limit($this->limit)->orderBy('bid_price', 'desc')->get();
+            foreach ($bids as $key => $bid) {
+                $user = $bid->user;
+                $data[] = [
+                    'bid_price' => $bid->bid_price,
+                    'bid_time' => $bid->end_time,
+                    'nickname' => $bid->nickname,
+                    'avatar' => '',
+                    'area' => $user->province . $user->city,
+                    'bid_type' => $key == 0 ? self::TYPE_LEAD : self::TYPE_OUT, //0 =出局 1=领先
+                ];
+            }
         }
-        return $this->putCache($cacheKey, $data, 0.02); //缓存一秒
+        return $data;
     }
 
     /** 竞拍最新的状态 */

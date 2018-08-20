@@ -39,6 +39,8 @@ class RobotPeriod extends Common
                 'user_id' => $user->id,
                 'avatar' => $user->avatar,
                 'nickname' => $user->nickname,
+                'province' => $user->province,
+                'city' => $user->city,
             ];
             self::create($data);
         }

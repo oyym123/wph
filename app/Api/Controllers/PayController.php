@@ -38,31 +38,123 @@ class PayController extends WebController
 
 
     /**
-     * @SWG\Get(path="/api/pay/confirm",
+     * @SWG\Post(path="/api/pay/confirm",
      *   tags={"支付"},
-     *   summary="订单提交页面",
+     *   summary="确认订单",
      *   description="Author: OYYM",
      *   @SWG\Parameter(name="token", in="header", default="1", description="用户token" ,required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="product_id", in="query", default="1", description="产品id" ,required=true,
+     *   @SWG\Parameter(name="product_id", in="formData", default="14", description="产品id", required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="period_id", in="query", default="1", description="期数id【从我的竞拍】" ,
+     *   @SWG\Parameter(name="period_id", in="formData", default="396", description="期数id【有的话就传，没有不传】",
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="sn", in="query", default="1", description="订单号" ,
+     *   @SWG\Parameter(name="sn", in="formData", default="2342352133", description="订单号【有的话就传，没有不传】",
      *     type="string",
      *   ),
      *   @SWG\Response(
-     *       response=200,description="successful operation"
+     *       response=200,description="
+    [data] => Array
+    (
+    [address_info] => Array 【地址信息,没有数据address_info为空】
+    (
+    [address_id] => 23
+    [username] => 王小明
+    [telephone] => 18779284935
+    [address] => 吉林省 通化市 东昌区西路103号
+    )
+    [pay_amount] => 29 【实际支付价格】
+    [discount_amount] => 1.00 【折扣价格】
+    [sell_price] => 30.00   【市场价】
+    [product_id] => 14  【产品id】
+    [period_id] => 397  【期数id】
+    [sn] =>  2342352133 【订单号】
+    [img_cover] => http://pccz39pca.bkt.clouddn.com/images/1496208238144.png
+    )
+     *     "
      *   )
      * )
      */
     public function confirm()
     {
+        $this->auth();
+        $request = $this->request;
+        $orderObj = new Order();
+        $product = (new Product())->getCacheProduct($request->product_id);
+        $address = UserAddress::defaultAddress($this->userId);
+        $addressInfo = [];
+        if ($address) {
+            $addressInfo = [
+                'address_id' => $address->id,
+                'username' => $address->user_name,
+                'telephone' => $address->telephone,
+                'address' => str_replace('||', ' ', $address->str_address) . $address->detail_address
+            ];
+        }
 
+        $payAmount = $product->sell_price;
+        $isShop = $periodId = 0;
 
+        //预先当成全购物币购买处理
+        $type = Order::TYPE_SHOP;
+
+        if ($request->period_id) { //当有期数id,表示参与过竞拍
+            $period = (new Period())->getPeriod([
+                'id' => $request->period_id,
+                'product_id' => $product->id,
+                'status' => Period::STATUS_OVER
+            ]);
+            if ($period) {
+                $periodId = $period->id;
+                if ($period->user_id == $this->userId) {
+                    $type = Order::TYPE_BID;
+                    $payAmount = $period->bid_price;
+                } else {
+                    $type = Order::TYPE_BUY_BY_DIFF;
+                }
+            }
+        } else {
+            $type = Order::TYPE_SHOP;
+            if ($product->is_shop) {
+                $isShop = $product->is_shop;
+            }
+        }
+
+        $data = [
+            'amount' => $payAmount,
+            'product_id' => $product->id,
+            'shopping_currency' => $this->userIdent->shopping_currency,
+            'user_id' => $this->userId,
+            'type' => $type, //购买类型
+            'used_shopping' => 1,  //默认使用购物币
+            'is_shop' => $isShop
+        ];
+        list($amount, $discountAmount) = $orderObj->getPayAmount($data);
+
+        if ($request->sn) {
+            $order = Order::where([
+                'sn' => $request->sn,
+                'buyer_id' => $this->userId,
+            ])->first();
+            if ($order) {
+                $periodId = $order->period_id;
+                $amount = $order->pay_amount;
+                $discountAmount = $order->discount_amount;
+            }
+        }
+        $res = [
+            'address_info' => $addressInfo,
+            'pay_amount' => $amount, //实际支付价格
+            'discount_amount' => $discountAmount,//使用的购物币
+            'sell_price' => $product->sell_price,//市场价
+            'product_id' => $product->id, //产品id
+            'period_id' => $periodId, //
+            'sn' => $request->sn,
+            'img_cover' => $product->getImgCover()
+        ];
+        self::showMsg($res);
     }
 
     /**
@@ -142,13 +234,13 @@ class PayController extends WebController
      *   @SWG\Parameter(name="product_id", in="formData", default="2", description="产品id", required=true,
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="period_id", in="formData", default="396【有的话就传，没有不传】", description="期数id",
+     *   @SWG\Parameter(name="period_id", in="formData", default="396", description="期数id",
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="sn", in="formData", default="2", description="订单号【有的话就传，没有不传】",
+     *   @SWG\Parameter(name="sn", in="formData", default="2", description="订单号",
      *     type="string",
      *   ),
-     *   @SWG\Parameter(name="used_shopping", in="formData", default="2", description="是否使用购物币【1=使用,0=不使用】", required=true,
+     *   @SWG\Parameter(name="used_shopping", in="formData", default="1", description="是否使用购物币【1=使用,0=不使用】", required=true,
      *     type="string",
      *   ),
      *   @SWG\Parameter(name="message", in="formData", default="2", description="留言", required=true,
@@ -180,7 +272,10 @@ class PayController extends WebController
         }
         $res = [];
         $payAmount = $product->sell_price;
-        $isShop = 0;
+        $isShop = $periodId = 0;
+
+        //预先当成全购物币购买处理
+        $type = Order::TYPE_SHOP;
 
         if ($request->period_id) { //当有期数id,表示参与过竞拍
             $period = (new Period())->getPeriod([
@@ -188,17 +283,31 @@ class PayController extends WebController
                 'product_id' => $product->id,
                 'status' => Period::STATUS_OVER
             ]);
-            if ($period->user_id == $this->userId) {
-                $type = Order::TYPE_BID;
-                $payAmount = $period->bid_price;
-            } else {
-                $type = Order::TYPE_BUY_BY_DIFF;
+            if ($period) {
+                $periodId = $period->id;
+                if ($period->user_id == $this->userId) {
+                    $type = Order::TYPE_BID;
+                    $payAmount = $period->bid_price;
+                } else {
+                    $type = Order::TYPE_BUY_BY_DIFF;
+                }
             }
-        } else {  //否则都当成差价购处理
+        } else {
             $type = Order::TYPE_SHOP;
             if ($product->is_shop) {
                 $isShop = $product->is_shop;
             }
+        }
+
+        $status = Order::STATUS_WAIT_PAY;
+        $order = null;
+        if ($request->sn) {
+            $order = Order::where([
+                'sn' => $request->sn,
+                'buyer_id' => $this->userId,
+            ])->first();
+            $type = $order->type;
+            $periodId = $order->period_id;
         }
 
         $data = [
@@ -206,32 +315,25 @@ class PayController extends WebController
             'product_id' => $product->id,
             'shopping_currency' => $this->userIdent->shopping_currency,
             'user_id' => $this->userId,
-            'is_shop' => $isShop //当is_shop = 1时表示全购物币购买
+            'type' => $type, //购买类型
+            'used_shopping' => $request->used_shopping,  //是否使用购物币
+            'is_shop' => $isShop
         ];
-
-        $order = null;
-        $amount = $product->sell_price;
-
-        if ($request->sn) {
-            $order = Order::where([
-                'sn' => $request->sn,
-                'buyer_id' => $this->userId
-            ])->first();
-        }
-
-        if ($request->used_shopping) {
-            $amount = $orderObj->getPayAmount($data);
-        }
+        list($amount, $discountAmount) = $orderObj->getPayAmount($data);
 
         DB::beginTransaction();
         try {
+            if ($amount == 0) {
+                $status = Order::STATUS_SHIPPED;//待签收
+            }
             $orderInfo = [
                 'pay_type' => Pay::TYPE_WEI_XIN,
                 'pay_amount' => $amount,
                 'product_amount' => $product->sell_price,
                 'product_id' => $product->id,
-                'period_id' => (new Period())->nextPeriod($product->id),
-                'status' => Order::STATUS_WAIT_PAY,
+                'period_id' => $periodId,
+                'discount_amount' => $discountAmount,
+                'status' => $status,
                 'type' => $type,
                 'buyer_id' => $this->userId,
                 'address_id' => $address->id, //收货人地址
@@ -242,11 +344,23 @@ class PayController extends WebController
                 'expired_at' => config('bid.order_expired_at'), //过期时间
             ];
 
-            if ($order) {
-                $order = Order::where(['id' => $order->id])->update($orderInfo);
+            if ($order && $order->status == Order::STATUS_WAIT_PAY) {
+                if (Order::where(['id' => $order->id])->update($orderInfo)) {
+                    $order = Order::find($order->id);
+                } else {
+                    throw new \Exception('更新订单失败！');
+                }
             } else {
                 $orderInfo['sn'] = $orderObj->createSn();
                 $order = $orderObj->createOrder($orderInfo);
+            }
+
+            if ($order->pay_amount == 0) {
+                //表示使用了购物币打折,需要从用户账户中扣除
+                DB::table('users')->where([
+                    'id' => $order->buyer_id
+                ])->decrement('shopping_currency', $order->discount_amount);
+                self::showMsg('您已支付成功!', 4);
             }
 
             $pay = new Pay();

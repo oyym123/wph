@@ -75,6 +75,11 @@ class WxNotifyController extends Controller
                 //标记已付款
                 DB::table('order')->where(['id' => $order->id])->update(['status' => Order::STATUS_PAYED]);
             } else {
+                if ($order->discount_amount > 0) { //表示使用了购物币打折,需要从用户账户中扣除
+                    DB::table('users')->where([
+                        'id' => $order->buyer_id
+                    ])->decrement('shopping_currency', $order->discount_amount);
+                }
                 //标记已发货
                 DB::table('order')->where(['id' => $order->id])->update(['status' => Order::STATUS_SHIPPED]);
             }

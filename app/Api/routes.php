@@ -65,6 +65,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('bid/auto-info', 'BidController@autoInfo');
 
     /** 支付 */
+    Route::post('pay/confirm', 'PayController@confirm'); //确认订单
     Route::get('pay/recharge-center', 'PayController@rechargeCenter'); //充值中心
     Route::post('pay/recharge', 'PayController@recharge'); //充值
     Route::post('pay/pay', 'PayController@pay'); //立即购买
