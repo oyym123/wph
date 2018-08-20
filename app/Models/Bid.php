@@ -350,7 +350,7 @@ class Bid extends Common
             foreach ($this->getThreePersonId($redis, $periodId) as $key => $bid) {
                 if ($bid['bid_price']) {
                     $data[] = [
-                        'bid_price' => $bid['bid_price'],
+                        'bid_price' => number_format($bid['bid_price'], 2),
                         'bid_time' => $bid['end_time'],
                         'nickname' => $bid['nickname'],
                         'avatar' => '',
