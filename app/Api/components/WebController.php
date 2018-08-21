@@ -221,13 +221,13 @@ class WebController extends Controller
         //声明CODE，获取小程序传过来的CODE
         $appid = env('WEIXIN_APP_ID');
         $secret = env('WEIXIN_SECRET');
-        if (self::isWindows() || $code == 1) { //测试
-            $res = '{"session_key":"O+rLUsjqo2GsMX9G9Mt9pw==","openid":"oZ5zW5TnpqKWtmku1ZUiSO0yXiRU"}';
-        } else {
-            //api接口
-            $api = "https://api.weixin.qq.com/sns/jscode2session?appid={$appid}&secret={$secret}&js_code={$code}&grant_type=authorization_code";
-            $res = Helper::get($api);
-        }
+//        if (self::isWindows() || $code == 1) { //测试
+//            $res = '{"session_key":"O+rLUsjqo2GsMX9G9Mt9pw==","openid":"oZ5zW5TnpqKWtmku1ZUiSO0yXiRU"}';
+//        } else {
+        //api接口
+        $api = "https://api.weixin.qq.com/sns/jscode2session?appid={$appid}&secret={$secret}&js_code={$code}&grant_type=authorization_code";
+        $res = Helper::get($api);
+        //}
         if (strpos($res, 'openid') !== false) {
             return $res;
         } else {
