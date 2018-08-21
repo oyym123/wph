@@ -54,8 +54,8 @@ class EvaluateController extends WebController
             $imgs = json_encode($imgs);
         }
         
-        if (count(json_decode($imgs, true)) < 3) {
-            self::showMsg('至少传' . 3 . '张图片!', 4);
+        if (count(json_decode($imgs, true)) < 2) {
+            self::showMsg('至少传' . 2 . '张图片!', 4);
         }
 
         if (count(json_decode($imgs, true)) > 9) {
