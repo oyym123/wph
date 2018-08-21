@@ -25,6 +25,8 @@ class RobotPeriod extends Common
         'status',
         'avatar',
         'nickname',
+        'province',
+        'city',
     ];
 
     protected $table = 'robot_period';
