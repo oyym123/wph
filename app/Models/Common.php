@@ -202,13 +202,14 @@ class Common extends Model
         return $arr;
     }
 
-    public static function getStates()
+    public static function getStates($on = '有效', $off = '无效')
     {
         return [
-            'on' => ['value' => self::STATUS_ENABLE, 'text' => '有效', 'color' => 'success'],
-            'off' => ['value' => self::STATUS_DISABLE, 'text' => '无效', 'color' => 'danger'],
+            'on' => ['value' => self::STATUS_ENABLE, 'text' => $on, 'color' => 'success'],
+            'off' => ['value' => self::STATUS_DISABLE, 'text' => $off, 'color' => 'danger'],
         ];
     }
+
 
     public static function isReview()
     {

@@ -167,8 +167,8 @@ class Bid extends Common
                 if ($this->getLastBidInfo($redis, $period->id, 'bid_price') / $product->sell_price < 1) {
                     continue;
                 }
-                //到达平均售价时，机器人将不再参与竞拍,设置一个一年时间的key,当机器人参与的时候，判断是不是存在这个
-                $redis->setex('realPersonBid@periodId' . $period->id, 60 * 24 * 365, $period->id);
+
+
                 //当竞拍结束时
                 if ($redis->ttl('period@countdown' . $period->id) < 0) {
                     $redis->setex('period@countdown' . $period->id, 10000, 'success');
