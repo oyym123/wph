@@ -52,11 +52,12 @@ class Bid extends Common
         $product = $products->getCacheProduct($period->product_id);
         $countdown = $redis->ttl('period@countdown' . $period->id);
         $rate = $period->bid_price / $product->sell_price;
+        $lastPrice = $this->getLastBidInfo($redis, $period->id, 'bid_price');
         $time = date('Y-m-d H:i:s', time());
         $data = [
             'product_id' => $period->product_id,
             'period_id' => $periodId,
-            'bid_price' => round($period->bid_price + $product->bid_step, 2),
+            'bid_price' => round($lastPrice + $product->bid_step, 2),
             'user_id' => $this->userId,
             'status' => $this->isCanWinBid($period, $rate, $redis),
             'bid_step' => $product->bid_step,
@@ -283,16 +284,28 @@ class Bid extends Common
                 echo $this->writeLog(['period_id' => $period->id, 'info' => '该时段已经竞拍过一次啦']);
                 continue;
             }
+//            $lastPrice = $redis->get('bid@lastPrice' . $period->id);
+//            if ($lastPrice) {
+//                $lastBid = 0;
+//            } else {
+//                $lastBid = $lastPrice + $product->bid_step;
+//            }
+
+            $lastPrice = $this->getLastBidInfo($redis, $period->id, 'bid_price');
+
+            // $redis->setex('bid@lastPrice' . $period->id, 10000, $lastBid);
 
             $robotPeriod = RobotPeriod::getInfo($period->id);
             DB::table('period')->where(['id' => $period->id])->increment('bid_price', 0.1);//自增0.1
+
+
             $rate = $period->bid_price / $product->sell_price;
 
             $time = date('Y-m-d H:i:s', time());
             $data = [
                 'product_id' => $period->product_id,
                 'period_id' => $period->id,
-                'bid_price' => $period->bid_price + $product->bid_step,
+                'bid_price' => $lastPrice + $product->bid_step,
                 'user_id' => $robotPeriod->user_id,
                 'status' => $this->isCanWinBid($period, $rate, $redis),
                 'bid_step' => $product->bid_step,
