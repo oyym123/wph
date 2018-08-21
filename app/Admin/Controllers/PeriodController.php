@@ -6,6 +6,7 @@ use App\Models\Auctioneer;
 use App\Models\Common;
 use App\Models\Period;
 
+use App\Models\Product;
 use App\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -83,7 +84,11 @@ class PeriodController extends Controller
             });
             $grid->id('ID')->sortable();
             $grid->code('期数代码');
-            $grid->product_id('产品id')->sortable();
+            $grid->product_id('产品图片')->display(function ($released) {
+               $product= Product::find($released);
+                return '<a href="product?id='.$product->id.'" target="_blank" ><img src="' .
+                    $product->getImgCover(). '?imageView/1/w/65/h/45" ></a>';
+            });
             $grid->user_id('中标者ID');
             $grid->bid_price('中标者价格');
             $grid->bid_id('中标id');
