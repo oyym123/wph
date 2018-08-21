@@ -93,7 +93,7 @@ class Period extends Common
     /** 获取产品列表 */
     public function getProductList($type = 1, $data = [])
     {
-        $cacheKey = 'period@getProductList' . $this->offset;
+        $cacheKey = 'period@getProductList' . $type . 'offset=' . $this->offset;
         if ($this->hasCache($cacheKey)) {
             return $this->getCache($cacheKey);
         }
