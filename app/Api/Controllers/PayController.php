@@ -144,13 +144,14 @@ class PayController extends WebController
                 $discountAmount = $order->discount_amount;
             }
         }
+
         $res = [
             'address_info' => $addressInfo,
-            'pay_amount' => $amount, //实际支付价格
-            'discount_amount' => $discountAmount,//使用的购物币
             'sell_price' => $product->sell_price,//市场价
+            'discount_amount' => $discountAmount,//使用的购物币
+            'pay_amount' => $amount, //实际支付价格
             'product_id' => $product->id, //产品id
-            'period_id' => $periodId, //
+            'period_id' => $periodId,
             'sn' => $request->sn,
             'img_cover' => $product->getImgCover()
         ];

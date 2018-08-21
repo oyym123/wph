@@ -155,7 +155,8 @@ class OrderController extends WebController
                     $orders = Order::has('period')
                         ->where([
                             'buyer_id' => $this->userId,
-                            'type' => Order::TYPE_BID
+                            'type' => Order::TYPE_BID,
+                            'status' => Order::STATUS_COMPLETE
                         ])->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $period = $order->period;
