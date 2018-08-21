@@ -152,24 +152,36 @@ class OrderController extends WebController
                     }
                     break;
                 case 1: //我拍中
-                    $orders = Order::has('period')
-                        ->where([
-                            'buyer_id' => $this->userId,
-                            //'type' => Order::TYPE_BID,
-                            'status' => Order::STATUS_COMPLETE
-                        ])->offset($this->offset)->limit($this->limit)->get();
+                    $orders = Order::where([
+                        'buyer_id' => $this->userId,
+                        //'type' => Order::TYPE_BID,
+                        'status' => Order::STATUS_COMPLETE
+                    ])->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
-                        $period = $order->period;
                         $product = $order->product;
-                        $data['period_id'] = $period->id;
-                        $data['product_id'] = $period->product_id;
-                        $data['period_code'] = $period->code;
+                        if ($order->period_id == 0) {
+                            $periodId = 0;
+                            $periodCode = '';
+                            $bidStep = '';
+                            $savePrice = ($x = round(((1 - ($order->pay_amount / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
+                        } else {
+                            $period = $order->period;
+                            $periodId = $period->id;
+                            $periodCode = $period->code;
+                            $bidStep = $period->bid_step;
+                            $savePrice = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
+                        }
+
+                        $data['period_id'] = $periodId;
+                        $data['product_id'] = $order->product_id;
+                        $data['period_code'] = $periodCode;
                         $data['title'] = $product->title;
                         $data['img_cover'] = $product->getImgCover();
-                        $data['bid_step'] = $period->bid_step;
-                        $data['save_price'] = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
+                        $data['bid_step'] = $bidStep;
+                        $data['save_price'] = $savePrice;
+                        $data['order_type'] = $order->type;
                         $data['sell_price'] = $product->sell_price;
-                        $data['pay_price'] = $period->bid_price;
+                        $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 1;
                         $data['nickname'] = $user->nickname;
                         $data['label'] = Order::getStatus($order->status); //出价次数
@@ -220,14 +232,25 @@ class OrderController extends WebController
                         ])
                         ->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
-                        $period = $order->period;
+
                         $product = $order->product;
-                        $data['period_id'] = $period->id;
-                        $data['product_id'] = $period->product_id;
-                        $data['period_code'] = $period->code;
+                        if ($order->period_id == 0) {
+                            $periodId = 0;
+                            $periodCode = '';
+                            $bidStep = '';
+                        } else {
+                            $period = $order->period;
+                            $periodId = $period->id;
+                            $periodCode = $period->code;
+                            $bidStep = $period->bid_step;
+                        }
+
+                        $data['period_id'] = $periodId;
+                        $data['product_id'] = $order->product_id;
+                        $data['period_code'] = $periodCode;
                         $data['title'] = $product->title;
                         $data['img_cover'] = $product->getImgCover();
-                        $data['bid_step'] = $period->bid_step;
+                        $data['bid_step'] = $bidStep;
                         $data['bid_type'] = $order->type;
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $order->pay_amount;
@@ -243,23 +266,33 @@ class OrderController extends WebController
                     }
                     break;
                 case 4: //待签收
-                    $orders = Order::has('period')
-                        ->where([
-                            'buyer_id' => $this->userId,
-                            'status' => Order::STATUS_SHIPPED
-                        ])
+                    $orders = Order::where([
+                        'buyer_id' => $this->userId,
+                        'status' => Order::STATUS_SHIPPED
+                    ])
                         ->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
-                        $period = $order->period;
                         $product = $order->product;
-                        $data['period_id'] = $period->id;
-                        $data['product_id'] = $period->product_id;
-                        $data['period_code'] = $period->code;
+                        if ($order->period_id == 0) {
+                            $periodId = 0;
+                            $periodCode = '';
+                            $bidStep = '';
+                            $savePrice = ($x = round(((1 - ($order->pay_amount / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
+                        } else {
+                            $period = $order->period;
+                            $periodId = $period->id;
+                            $periodCode = $period->code;
+                            $bidStep = $period->bid_step;
+                            $savePrice = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
+                        }
+                        $data['period_id'] = $periodId;
+                        $data['product_id'] = $order->product_id;
+                        $data['period_code'] = $periodCode;
                         $data['title'] = $product->title;
                         $data['img_cover'] = $product->getImgCover();
-                        $data['bid_step'] = $period->bid_step;
+                        $data['bid_step'] = $bidStep;
                         $data['sell_price'] = $product->sell_price;
-                        $data['save_price'] = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
+                        $data['save_price'] = $savePrice;
                         $data['pay_price'] = $order->pay_amount;
                         $data['order_type'] = $order->type;
                         $data['result_status'] = 4;
@@ -272,24 +305,36 @@ class OrderController extends WebController
                     }
                     break;
                 case 5: //待晒单
-                    $orders = Order::has('period')
-                        ->where([
-                            'buyer_id' => $this->userId,
-                            'status' => Order::STATUS_CONFIRM_RECEIVING
-                        ])
+                    $orders = Order::where([
+                        'buyer_id' => $this->userId,
+                        'status' => Order::STATUS_CONFIRM_RECEIVING
+                    ])
                         ->offset($this->offset)->limit($this->limit)->get();
+
                     foreach ($orders as $order) {
-                        $period = $order->period;
                         $product = $order->product;
-                        $data['period_id'] = $period->id;
-                        $data['product_id'] = $period->product_id;
-                        $data['period_code'] = $period->code;
+                        if ($order->period_id == 0) {
+                            $periodId = 0;
+                            $periodCode = '';
+                            $bidStep = '';
+                            $savePrice = ($x = round(((1 - ($order->pay_amount / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
+                        } else {
+                            $period = $order->period;
+                            $periodId = $period->id;
+                            $periodCode = $period->code;
+                            $bidStep = $period->bid_step;
+                            $savePrice = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
+                        }
+
+                        $data['period_id'] = $periodId;
+                        $data['product_id'] = $order->product_id;
+                        $data['period_code'] = $periodCode;
                         $data['title'] = $product->title;
                         $data['img_cover'] = $product->getImgCover();
-                        $data['bid_step'] = $period->bid_step;
+                        $data['bid_step'] = $bidStep;
                         $data['order_type'] = $order->type;
                         $data['sell_price'] = $product->sell_price;
-                        $data['save_price'] = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
+                        $data['save_price'] = $savePrice;
                         $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 5;
                         $data['label'] = Order::getStatus($order->status);
