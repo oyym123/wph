@@ -228,8 +228,7 @@ class OrderController extends WebController
                     $orders = Order::where([
                         'buyer_id' => $this->userId,
                         'status' => Order::STATUS_WAIT_PAY
-                    ])
-                        ->offset($this->offset)->limit($this->limit)->get();
+                    ])->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $product = $order->product;
                         if ($order->period_id == 0) {
