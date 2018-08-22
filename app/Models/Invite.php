@@ -26,14 +26,17 @@ class Invite extends Common
     public function checkoutCode($inviteCode, $userId)
     {
         $user = DB::table('users')->where(['invite_code' => $inviteCode])->first();
-        $flag = self::where([
+        $flag1 = self::where([
             'level_1' => $userId,
             'user_id' => $user->id,
-        ])->orWhere([
+        ])->first();
+
+        $flag2 = self::where([
             'level_2' => $userId,
             'user_id' => $user->id,
         ])->first();
-        if ($flag) {  //不允许乱伦
+
+        if ($flag1 || $flag2) {  //不允许乱伦
             return false;
         }
         return true;
