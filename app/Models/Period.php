@@ -153,10 +153,7 @@ class Period extends Common
         } else {
             $periods = DB::table('period')->where($where)->offset($this->offset)->limit($this->limit)->get();
         }
-
-        if (count($periods) == 0 && $this->offset == 0) {
-            self::showMsg('没有数据', 2);
-        }
+        
 
         $res = [];
         $collection = new Collection();
