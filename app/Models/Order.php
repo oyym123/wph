@@ -118,7 +118,7 @@ class Order extends Common
             'product_info' => [
                 'img_cover' => $product->getImgCover(),
                 'sell_price' => $product->sell_price,
-                'nickname' => $product->nickname,
+                'nickname' => $order->user->nickname,
                 'save_price' => ($x = round(((1 - ($order->pay_amount / $product->sell_price)) * 100), 1)) > 0 ? $x : '0.0'
             ],
             'address_info' => [
