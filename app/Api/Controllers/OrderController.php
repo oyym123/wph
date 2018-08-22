@@ -152,7 +152,8 @@ class OrderController extends WebController
                     }
                     break;
                 case 1: //我拍中
-                    $orders = Order::where([
+                    $orders = Order::has('product')
+                        ->where([
                         'buyer_id' => $this->userId,
                         //'type' => Order::TYPE_BID,
                         'status' => Order::STATUS_COMPLETE
@@ -225,7 +226,8 @@ class OrderController extends WebController
                     }
                     break;
                 case 3: //待付款
-                    $orders = Order::where([
+                    $orders = Order::has('product')
+                        ->where([
                         'buyer_id' => $this->userId,
                         'status' => Order::STATUS_WAIT_PAY
                     ])->offset($this->offset)->limit($this->limit)->get();
@@ -263,7 +265,8 @@ class OrderController extends WebController
                     }
                     break;
                 case 6: //待发货
-                    $orders = Order::where([
+                    $orders = Order::has('product')
+                        ->where([
                         'buyer_id' => $this->userId,
                         'status' => Order::STATUS_WAIT_SHIP
                     ])
@@ -302,7 +305,8 @@ class OrderController extends WebController
                     }
                     break;
                 case 4: //待签收
-                    $orders = Order::where([
+                    $orders = Order::has('product')
+                        ->where([
                         'buyer_id' => $this->userId,
                         'status' => Order::STATUS_SHIPPED
                     ])
@@ -341,7 +345,8 @@ class OrderController extends WebController
                     }
                     break;
                 case 5: //待晒单
-                    $orders = Order::where([
+                    $orders = Order::has('product')
+                        ->where([
                         'buyer_id' => $this->userId,
                         'status' => Order::STATUS_CONFIRM_RECEIVING
                     ])
