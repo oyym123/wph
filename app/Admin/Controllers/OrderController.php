@@ -92,9 +92,9 @@ class OrderController extends Controller
             $grid->pay_amount('支付金额')->sortable();
             $grid->period_id('期数id')->sortable();
             $grid->product_id('产品图片')->display(function ($released) {
-                $product= Product::find($released);
-                return '<a href="product?id='.$product->id.'" target="_blank" ><img src="' .
-                    $product->getImgCover(). '?imageView/1/w/65/h/45" ></a>';
+                $product = Product::find($released);
+                return '<a href="product?id=' . $product->id . '" target="_blank" ><img src="' .
+                    $product->getImgCover() . '?imageView/1/w/65/h/45" ></a>';
             });
             $grid->status('状态')->display(function ($released) {
                 return Order::getStatus($released);
@@ -139,7 +139,7 @@ class OrderController extends Controller
                 if ($form->model()->shipping_number) {
                     DB::table('product')->where(['id' => $form->model()->id])->update([
                         'seller_shipped_at' => date('Y-m-d H:i:s', time()),
-                        'collection_count' => rand(100, 9999)
+                        'status' => Order::STATUS_SHIPPED
                     ]);
                 }
             });
