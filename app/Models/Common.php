@@ -229,6 +229,18 @@ class Common extends Model
         return $data;
     }
 
+    /** 改变时间 */
+    public static function changeTime($time, $seconds, $flag = 1)
+    {
+
+        if ($flag = 1) {
+            $res = date('Y-m-d H:i:s', (strtotime($time) + $seconds));
+        } else {
+            $res = date('Y-m-d H:i:s', (strtotime($time) - $seconds));
+        }
+        return $res;
+    }
+
     /** 转换日期格式 */
     public function getCreatedAtAttribute($value)
     {

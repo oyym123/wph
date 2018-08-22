@@ -139,6 +139,8 @@ class OrderController extends Controller
             $form->text('str_address', '收货人地址');
             $form->text('shipping_company', '快递公司');
             $form->text('shipping_number', '快运单号');
+            $form->display('created_at', '创建时间');
+            $form->display('updated_at', '修改时间');
             $form->saved(function (Form $form) {
                 if ($form->model()->shipping_number) {
                     DB::table('order')->where(['id' => $form->model()->id])->update([

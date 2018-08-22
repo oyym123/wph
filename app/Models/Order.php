@@ -37,6 +37,8 @@ class Order extends Common
         'expired_at', //过期时间
         'type', //类型
         'ip', //ip
+        'created_at',
+        'updated_at',
         'signed_at', //签收时间
         'recharge_card_id', //充值卡id
         'gift_amount', //赠送的金额
@@ -108,8 +110,8 @@ class Order extends Common
             'status' => $order->status,
             'begin_at' => $order->created_at,
             'amount' => $order->pay_amount,
-            'audit_at' => $order->created_at,
-            'prepare' => $order->created_at,
+            'audit_at' => self::changeTime($order->created_at, 600),
+            'prepare' => self::changeTime($order->created_at, 3600),
             'sn' => $order->sn,
             'delivery_at' => $order->seller_shipped_at,
             'delivery_company' => $order->shipping_company,
