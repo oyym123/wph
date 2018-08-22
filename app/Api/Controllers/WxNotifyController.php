@@ -12,6 +12,7 @@ namespace App\Api\Controllers;
 use App\Api\components\WebController;
 use App\Helpers\Helper;
 use App\Models\Income;
+use App\Models\Invite;
 use App\Models\Order;
 use App\Models\Pay;
 use Illuminate\Support\Facades\DB;
@@ -68,8 +69,8 @@ class WxNotifyController extends Controller
                     throw new \Exception('充值失败');
                 }
 
-                //
-
+                //分成
+                (new Invite())->shareMoney($order->buyer_id, $order->pay_amount);
                 //拍币充值成功
                 DB::table('users')->where(['id' => $order->buyer_id])->increment('bid_currency', $amount);
                 //标记已付款

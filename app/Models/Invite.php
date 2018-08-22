@@ -57,11 +57,33 @@ class Invite extends Common
     /** 分成 */
     public function shareMoney($userId, $amount)
     {
-        //level_1
+        $invite = self::where([
+            'user_id' => $userId
+        ])->first();
+        $user = DB::table('users')->where(['id' => $userId])->select('nickname')->first();
 
+        if ($invite->level_1) {
+            $data = [
+                'user_id' => $invite->level_1,
+                'type' => self::TYPE_INVITE_CURRENCY,
+                'amount' => $amount * config('bid.divide_proportion_level_1'),
+                'return_proportion' => config('bid.divide_proportion_level_1'),
+                'name' => $user->nickname . '充值了' . $amount . '拍币',
+            ];
+            Income::create($data);
+        }
 
+        if ($invite->level_2) {
+            $data = [
+                'user_id' => $invite->level_2,
+                'type' => self::TYPE_INVITE_CURRENCY,
+                'amount' => $amount * config('bid.divide_proportion_level_2'),
+                'return_proportion' => config('bid.divide_proportion_level_2'),
+                'name' => $user->nickname . '充值了' . $amount . '拍币',
+            ];
+            Income::create($data);
+        }
     }
-
 
     public function inviteList($userId, $type = 'first')
     {
