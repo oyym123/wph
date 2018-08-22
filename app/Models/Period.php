@@ -102,7 +102,6 @@ class Period extends Common
         if ($this->hasCache($cacheKey)) {
             return $this->getCache($cacheKey);
         }
-
         $where = [
             'deleted_at' => null,
             'status' => self::STATUS_IN_PROGRESS
@@ -114,9 +113,8 @@ class Period extends Common
                 ->where(['user_id' => $this->userId])
                 ->groupBy('period_id')
                 ->get()->toArray();
-            $where = $where + [
-                    'id' => array_column($expend, 'period_id'),
-                ];
+            $field = 'id';
+            $ids = array_column($expend, 'period_id');
             if (empty($expend)) {
                 self::showMsg('没有我在拍数据', self::CODE_NO_DATA);
             }
@@ -126,9 +124,8 @@ class Period extends Common
                 'status' => Collection::STATUS_COLLECTION_YES
             ])->get()->toArray();
 
-            $where = $where + [
-                    'product_id' => array_column($collectIds, 'product_id'),
-                ];
+            $field = 'product_id';
+            $ids = array_column($collectIds, 'product_id');
             if (empty($collectIds)) {
                 self::showMsg('没有数据', self::CODE_NO_DATA);
             }
@@ -151,9 +148,12 @@ class Period extends Common
                         'period.status' => self::STATUS_IN_PROGRESS
                     ] + $where)->offset($this->offset)->limit($this->limit)->get();
         } else {
-            $periods = DB::table('period')->where($where)->offset($this->offset)->limit($this->limit)->get();
+            $whereIn = function ($query) use ($field, $ids) {
+                $query->whereIn($field, $ids);
+            };
+            $periods = DB::table('period')->where($where)->where($whereIn)->offset($this->offset)->limit($this->limit)->get();
         }
-        
+
 
         $res = [];
         $collection = new Collection();
