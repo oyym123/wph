@@ -93,8 +93,12 @@ class OrderController extends Controller
             $grid->period_id('期数id')->sortable();
             $grid->product_id('产品图片')->display(function ($released) {
                 $product = Product::find($released);
-                return '<a href="product?id=' . $product->id . '" target="_blank" ><img src="' .
-                    $product->getImgCover() . '?imageView/1/w/65/h/45" ></a>';
+                if ($product) {
+                    return '<a href="product?id=' . $product->id . '" target="_blank" ><img src="' .
+                        $product->getImgCover() . '?imageView/1/w/65/h/45" ></a>';
+                } else {
+                    return '';
+                }
             });
             $grid->status('状态')->display(function ($released) {
                 return Order::getStatus($released);
