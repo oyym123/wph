@@ -106,7 +106,7 @@ class Period extends Common
             'deleted_at' => null,
             'status' => self::STATUS_IN_PROGRESS
         ];
-
+        $whereIn = $ids = [];
         if ($type == 2) {   //我在拍
             $expend = DB::table('expend')
                 ->select('period_id')
@@ -148,13 +148,14 @@ class Period extends Common
                         'period.status' => self::STATUS_IN_PROGRESS
                     ] + $where)->offset($this->offset)->limit($this->limit)->get();
         } else {
-            $whereIn = function ($query) use ($field, $ids) {
-                $query->whereIn($field, $ids);
-            };
+            if ($ids) {
+                $whereIn = function ($query) use ($field, $ids) {
+                    $query->whereIn($field, $ids);
+                };
+            }
             $periods = DB::table('period')->where($where)->where($whereIn)->offset($this->offset)->limit($this->limit)->get();
         }
-
-
+        
         $res = [];
         $collection = new Collection();
         foreach ($periods as $period) {
