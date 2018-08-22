@@ -23,23 +23,34 @@ class Invite extends Common
         'user_id',
     ];
 
-    public function checkoutCode($inviteCode)
+    public function checkoutCode($inviteCode, $userId)
     {
-        return DB::table('users')->where(['invite_code' => $inviteCode])->first();
+        $user = DB::table('users')->where(['invite_code' => $inviteCode])->first();
+        $flag = self::where([
+            'level_1' => $userId,
+            'user_id' => $user->id,
+        ])->orWhere([
+            'level_2' => $userId,
+            'user_id' => $user->id,
+        ])->first();
+        if ($flag) {  //不允许乱伦
+            return false;
+        }
+        return true;
     }
 
     public function saveData($userId, $inviteCode)
     {
         $level_2 = DB::table('users')->where(['invite_code' => $inviteCode])->first();
         $level_1 = DB::table('users')->where(['invite_code' => $level_2->be_invited_code])->first();
-        if (empty($level_1) || empty($level_2->be_invited_code)) {
-            $data['level_1'] = $level_2->id;
-            $data['level_2'] = 0;
+        if (empty($level_1) || empty($level_2->be_invited_code)) { //防止数据为空
+            $data['level_1'] = $level_2->id; //爸爸辈
+            $data['level_2'] = 0; //表示是爷爷辈
         } else {
             $data['level_1'] = $level_1->id;
             $data['level_2'] = $level_2->id;
         }
-        $data['user_id'] = $userId;
+        $data['user_id'] = $userId; //儿子辈
         self::create($data);
     }
 
@@ -64,8 +75,6 @@ class Invite extends Common
         }
         return [count($level), $user];
     }
-
-
 
 
     public function detail($userId)
