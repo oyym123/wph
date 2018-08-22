@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Common;
 use App\Models\Invite;
 
 use App\Models\User;
@@ -75,21 +76,33 @@ class InviteController extends Controller
         return Admin::grid(Invite::class, function (Grid $grid) {
 
             $grid->id('ID')->sortable();
-            $grid->user_id('ID/用户昵称')->display(function ($released) {
-                return $released . '【' . User::find($released)->nickname . '】';
-            });
-            $grid->level_1('ID/徒弟')->display(function ($released) {
+            $grid->level_1('用户')->display(function ($released) {
                 if ($released == 0) {
                     return '';
                 }
-                return $released . '【' . User::find($released)->nickname . '】';
+                $user = User::find($released);
+                return '<a href="users?id=' . $user->id . '" target="_blank" ><img src="' .
+                    Common::getImg($user->avatar) . '?imageView/1/w/65/h/45" ></a>';
+
             });
-            $grid->level_2('ID/徒孙')->display(function ($released) {
+
+            $grid->level_2('徒弟')->display(function ($released) {
                 if ($released == 0) {
                     return '';
                 }
-                return $released . '【' . User::find($released)->nickname . '】';
+                $user = User::find($released);
+                return '<a href="users?id=' . $user->id . '" target="_blank" ><img src="' .
+                    Common::getImg($user->avatar) . '?imageView/1/w/65/h/45" ></a>';
             });
+
+            $grid->user_id('徒孙')->display(function ($released) {
+
+                $user = User::find($released);
+                
+                return '<a href="users?id=' . $user->id . '" target="_blank" ><img src="' .
+                    Common::getImg($user->avatar) . '?imageView/1/w/65/h/45" ></a>';
+            });
+
             $grid->created_at('创建时间');
             $grid->updated_at('修改时间');
             $grid->filter(function ($filter) {
