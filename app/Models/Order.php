@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
@@ -118,7 +119,7 @@ class Order extends Common
             'product_info' => [
                 'img_cover' => $product->getImgCover(),
                 'sell_price' => $product->sell_price,
-                'nickname' => $order->user->nickname,
+                'nickname' => User::find($order->buyer_id)->nickname,
                 'save_price' => ($x = round(((1 - ($order->pay_amount / $product->sell_price)) * 100), 1)) > 0 ? $x : '0.0'
             ],
             'address_info' => [
