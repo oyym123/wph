@@ -150,10 +150,6 @@ class ProductController extends Controller
             $form->display('updated_at', '修改时间');
 
             $form->saved(function (Form $form) {
-                $diff = strtotime($form->model()->updated_at) - strtotime($form->model()->created_at);
-                if (abs($diff) < 3) { //表示只在创建的时候增加期数
-
-                }
                 $payAmount = $form->model()->type == 1 ? 10 : 1;
                 if ($form->model()->is_bid == Product::BID_YES) {
                     DB::table('product')->where(['id' => $form->model()->id])->update([
@@ -168,16 +164,14 @@ class ProductController extends Controller
 
                     if ($period) {
                         $error = new MessageBag([
-                            'title' => 'title...',
-                            'message' => '已经有正在竞拍的产品，请勿重复添加',
+                            'title' => '操作错误!',
+                            'message' => '该产品正在竞拍，请勿重复添加',
                         ]);
                         return back()->with(compact('error'));
                     } else {
                         (new Period())->saveData($form->model()->id);
                     }
                 }
-
-
                 //清除产品缓存
                 Cache::forget('product@find' . $form->model()->id);
             });
