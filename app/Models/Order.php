@@ -65,7 +65,7 @@ class Order extends Common
         $data = [
             self::TYPE_BID => '竞拍类型',
             self::TYPE_BUY_BY_DIFF => '差价购买',
-            //self::TYPE_SHOP => '购物币全款购买',
+            self::TYPE_SHOP => '购物币购买',
             //   self::TYPE_AUTO_BID => '自动竞拍支付订单',
             self::TYPE_RECHARGE => '充值',
         ];
@@ -198,7 +198,7 @@ class Order extends Common
     /** 获取购物可以币抵消的价格 */
     public function getDiscountAmount($productId, $userId)
     {
-       return Vouchers::getAmount($productId, $userId);
+        return Vouchers::getAmount($productId, $userId);
     }
 
     /** 获取最终支付价格 */
