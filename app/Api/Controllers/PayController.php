@@ -325,7 +325,7 @@ class PayController extends WebController
         DB::beginTransaction();
         try {
             if ($amount == 0) {
-                $status = Order::STATUS_SHIPPED;//待签收
+                $status = Order::STATUS_WAIT_SHIP;//待签收
             }
             $orderInfo = [
                 'pay_type' => Pay::TYPE_WEI_XIN,

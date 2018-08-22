@@ -15,6 +15,7 @@ use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\MessageBag;
 
 class ProductController extends Controller
 {
@@ -143,6 +144,7 @@ class ProductController extends Controller
             $form->multipleImage('imgs', '产品子图')->removable();
             $form->switch('buy_by_diff', '是否可以差价购买')->states(Product::$buyByDiff)->default(1);
             $form->switch('is_shop', '是否加入购物币专区')->states(Product::getIsShop())->default(1);
+            $form->switch('is_bid', '是否加入竞拍列表')->states(Product::getIsBid())->default(1);
             $form->switch('status', '状态')->states(Base::getStates())->default(1);
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '修改时间');
@@ -150,14 +152,32 @@ class ProductController extends Controller
             $form->saved(function (Form $form) {
                 $diff = strtotime($form->model()->updated_at) - strtotime($form->model()->created_at);
                 if (abs($diff) < 3) { //表示只在创建的时候增加期数
-                    $period = new Period();
-                    $period->saveData($form->model()->id);
+
                 }
                 $payAmount = $form->model()->type == 1 ? 10 : 1;
-                DB::table('product')->where(['id' => $form->model()->id])->update([
-                    'pay_amount' => $payAmount,
-                    'collection_count' => rand(100, 9999)
-                ]);
+                if ($form->model()->is_bid == Product::BID_YES) {
+                    DB::table('product')->where(['id' => $form->model()->id])->update([
+                        'pay_amount' => $payAmount,
+                        'collection_count' => rand(100, 9999)
+                    ]);
+
+                    $period = Period::where([
+                        'product_id' => $form->model()->id,
+                        'status' => Period::STATUS_IN_PROGRESS
+                    ])->first();
+
+                    if ($period) {
+                        $error = new MessageBag([
+                            'title' => 'title...',
+                            'message' => '已经有正在竞拍的产品，请勿重复添加',
+                        ]);
+                        return back()->with(compact('error'));
+                    } else {
+                        (new Period())->saveData($form->model()->id);
+                    }
+                }
+
+
                 //清除产品缓存
                 Cache::forget('product@find' . $form->model()->id);
             });

@@ -80,8 +80,8 @@ class WxNotifyController extends Controller
                         'id' => $order->buyer_id
                     ])->decrement('shopping_currency', $order->discount_amount);
                 }
-                //标记已发货
-                DB::table('order')->where(['id' => $order->id])->update(['status' => Order::STATUS_SHIPPED]);
+                //标记待发货
+                DB::table('order')->where(['id' => $order->id])->update(['status' => Order::STATUS_WAIT_SHIP]);
             }
 
             $pay = [

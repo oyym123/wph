@@ -56,7 +56,7 @@ class OrderController extends WebController
      *              bid_type => 竞拍类型 （1 = 正常竞拍 , 2 = 差价购买）
      *              order_type=> 订单类型 （ 1 = 竞拍类型 , 2 = 差价购买 ,3 = 购物币购买）
      *              order_status => 订单类型 （ 10 = 未支付 , 15 = 已付款 ,20 = 待发货 , 25 = 已发货 , 50 = 买家已签收 , 100 = 已完成）
-     *              result_status => 结果类型 （100= 全部 , 0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 , 4 = 待签收 , 5 = 待晒单）
+     *              result_status => 结果类型 （100= 全部 , 0 = 我在拍 , 1= 我拍中 , 2 = 差价购 , 3= 待付款 ,6=待发货 4 = 待签收 , 5 = 待晒单）
      *              pay_status => 支付状态 （10=>未支付 , 20=已支付）
      *              pay_time => 支付时间
      *              pay_price => 支付价格
@@ -225,14 +225,12 @@ class OrderController extends WebController
                     }
                     break;
                 case 3: //待付款
-                    $orders = Order::has('period')
-                        ->where([
-                            'buyer_id' => $this->userId,
-                            'status' => Order::STATUS_WAIT_PAY
-                        ])
+                    $orders = Order::where([
+                        'buyer_id' => $this->userId,
+                        'status' => Order::STATUS_WAIT_PAY
+                    ])
                         ->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
-
                         $product = $order->product;
                         if ($order->period_id == 0) {
                             $periodId = 0;
@@ -255,6 +253,45 @@ class OrderController extends WebController
                         $data['sell_price'] = $product->sell_price;
                         $data['pay_price'] = $order->pay_amount;
                         $data['result_status'] = 3;
+                        $data['order_type'] = $order->type;
+                        $data['nickname'] = $user->nickname;
+                        $data['label'] = Order::getStatus($order->status);
+                        $data['sn'] = $order->sn;
+                        $data['order_time'] = $order->created_at;
+                        $data['order_status'] = $order->status;
+                        $data['used_voucher_bids'] = Vouchers::getAmount($product->id, $this->userId);
+                        $res[] = $data;
+                    }
+                    break;
+                case 6: //待发货
+                    $orders = Order::where([
+                        'buyer_id' => $this->userId,
+                        'status' => Order::STATUS_WAIT_SHIP
+                    ])
+                        ->offset($this->offset)->limit($this->limit)->get();
+                    foreach ($orders as $order) {
+                        $product = $order->product;
+                        if ($order->period_id == 0) {
+                            $periodId = 0;
+                            $periodCode = '';
+                            $bidStep = '';
+                        } else {
+                            $period = $order->period;
+                            $periodId = $period->id;
+                            $periodCode = $period->code;
+                            $bidStep = $period->bid_step;
+                        }
+
+                        $data['period_id'] = $periodId;
+                        $data['product_id'] = $order->product_id;
+                        $data['period_code'] = $periodCode;
+                        $data['title'] = $product->title;
+                        $data['img_cover'] = $product->getImgCover();
+                        $data['bid_step'] = $bidStep;
+                        $data['bid_type'] = $order->type;
+                        $data['sell_price'] = $product->sell_price;
+                        $data['pay_price'] = $order->pay_amount;
+                        $data['result_status'] = 6;
                         $data['order_type'] = $order->type;
                         $data['nickname'] = $user->nickname;
                         $data['label'] = Order::getStatus($order->status);

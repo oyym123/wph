@@ -17,6 +17,9 @@ class Product extends Common
     const SHOPPING_YES = 1; //加入购物币专区
     const SHOPPING_NO = 0;  //不加入购物币专区
 
+    const BID_YES = 1; //加入竞拍列表
+    const BID_NO = 0;  //不加入竞拍列表
+
     public static $buyByDiff = [
         self::BUY_BY_DIFF_NO => '不可差价购',
         self::BUY_BY_DIFF_YES => '可差价购',
@@ -28,6 +31,17 @@ class Product extends Common
         $data = [
             self::SHOPPING_YES => '加入购物币专区',
             self::SHOPPING_NO => '不加入购物币专区',
+        ];
+        return $key != 999 ? $data[$key] : $data;
+    }
+
+
+    /** 加入购物币专区 */
+    public static function getIsBid($key = 999)
+    {
+        $data = [
+            self::BID_YES => '加入竞拍列表',
+            self::BID_NO => '不加入竞拍列表',
         ];
         return $key != 999 ? $data[$key] : $data;
     }

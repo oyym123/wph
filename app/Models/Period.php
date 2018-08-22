@@ -155,7 +155,7 @@ class Period extends Common
             }
             $periods = DB::table('period')->where($where)->where($whereIn)->offset($this->offset)->limit($this->limit)->get();
         }
-        
+
         $res = [];
         $collection = new Collection();
         foreach ($periods as $period) {
