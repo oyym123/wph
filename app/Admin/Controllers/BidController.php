@@ -75,19 +75,7 @@ class BidController extends Controller
     protected function grid()
     {
         return Admin::grid(Bid::class, function (Grid $grid) {
-            $fillable = [
-                'product_id',
-                'period_id',
-                'bid_price',
-                'pay_amount',
-                'pay_type',
-                'user_id',
-                'status',
-                'bid_step',
-                'nickname',
-                'product_title',
-                'end_time',
-            ];
+
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器
                 $filter->in('status', '状态')->select(Common::commonStatus());
@@ -97,7 +85,12 @@ class BidController extends Controller
             });
 
             $grid->id('ID')->sortable();
-            $grid->user_id('用户id')->sortable();
+
+            $grid->user_id('用户')->display(function ($released) {
+                $user = User::find($released);
+                return '<a href="users?id=' . $user->id . '" target="_blank" ><img src="' .
+                    Common::getImg($user->avatar) . '?imageView/1/w/65/h/45" ></a>';
+            });
             $grid->nickname('昵称');
             $grid->is_real('身份')->display(function ($released) {
                 return \App\User::getIsReal($released);
@@ -105,7 +98,12 @@ class BidController extends Controller
 
             $grid->period_id('期数id')->sortable();
             $grid->pay_amount('支付的金额')->sortable();
-            $grid->product_id('ID/产品')->sortable();
+            $grid->bid_price('当前价格')->sortable();
+            $grid->product_id('产品图片')->display(function ($released) {
+                $product = Product::find($released);
+                return '<a href="product?id=' . $product->id . '" target="_blank" ><img src="' .
+                    $product->getImgCover() . '?imageView/1/w/65/h/45" ></a>';
+            });
             $grid->product_title('产品');
 
             $grid->created_at('创建时间');

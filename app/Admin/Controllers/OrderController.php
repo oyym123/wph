@@ -9,13 +9,17 @@
 namespace App\Admin\Controllers;
 
 
+use App\Models\Common;
 use App\Models\Order;
+use App\Models\Product;
+use App\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -65,7 +69,7 @@ class OrderController extends Controller
             $content->header('header');
             $content->description('description');
 
-            $content->body($this->form());
+            //  $content->body($this->form());
         });
     }
 
@@ -77,35 +81,21 @@ class OrderController extends Controller
     protected function grid()
     {
         return Admin::grid(Order::class, function (Grid $grid) {
-            $fillable = [
-                'sn',
-                'pay_type',
-                'pay_amount',
-                'period_id',
-                'product_id',
-                'product_amount',
-                'discount_amount', //折扣的价格
-                'status',
-                'buyer_id',
-                'evaluation_status', //评价状态
-                'address_id', //收货人地址
-                'shipping_number', //快运单号
-                'shipping_company', //快递公司拼音
-                'seller_shipped_at', //卖家发货时间
-                'str_address', //收货地址
-                'str_username', //收货人姓名
-                'str_phone_number', //手机号
-                'expired_at', //过期时间
-                'type', //类型
-                'ip', //ip
-                'signed_at', //签收时间
-                'recharge_card_id', //充值卡id
-                'gift_amount', //赠送的金额
-            ];
             $grid->id('ID')->sortable();
+
+            $grid->buyer_id('买家')->display(function ($released) {
+                $user = User::find($released);
+                return '<a href="users?id=' . $user->id . '" target="_blank" ><img src="' .
+                    Common::getImg($user->avatar) . '?imageView/1/w/65/h/45" ></a>';
+            });
+
             $grid->pay_amount('支付金额')->sortable();
             $grid->period_id('期数id')->sortable();
-            $grid->product_id('产品id')->sortable();
+            $grid->product_id('产品图片')->display(function ($released) {
+                $product= Product::find($released);
+                return '<a href="product?id='.$product->id.'" target="_blank" ><img src="' .
+                    $product->getImgCover(). '?imageView/1/w/65/h/45" ></a>';
+            });
             $grid->status('状态')->display(function ($released) {
                 return Order::getStatus($released);
             });
@@ -113,8 +103,9 @@ class OrderController extends Controller
             $grid->type('类型')->display(function ($released) {
                 return Order::getType($released);
             });
-            $grid->buyer_id('买家id');
+
             $grid->str_address('收货人地址');
+            $grid->shipping_company('快递公司');
             $grid->shipping_number('快运单号');
             $grid->seller_shipped_at('发货时间');
             $grid->created_at('创建时间');
@@ -138,8 +129,20 @@ class OrderController extends Controller
     {
         return Admin::form(Order::class, function (Form $form) {
             $form->display('id', 'ID');
-            $form->display('created_at', 'Created At');
-            $form->display('updated_at', 'Updated At');
+            $form->display('sn', '订单号');
+            $form->display('pay_amount', '支付金额');
+            $form->select('status', '状态')->options(Order::getStatus());
+            $form->text('str_address', '收货人地址');
+            $form->text('shipping_company', '快递公司');
+            $form->text('shipping_number', '快运单号');
+            $form->saved(function (Form $form) {
+                if ($form->model()->shipping_number) {
+                    DB::table('product')->where(['id' => $form->model()->id])->update([
+                        'seller_shipped_at' => date('Y-m-d H:i:s', time()),
+                        'collection_count' => rand(100, 9999)
+                    ]);
+                }
+            });
         });
     }
 }

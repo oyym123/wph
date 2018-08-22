@@ -21,12 +21,9 @@ class HomeController extends Controller
 
             $content->header('管理中心');
             // $content->description('Description...');
-
-            $content->row(Dashboard::title());
-
+            //$content->row(Dashboard::title());
 
             $content->row(function (Row $row) {
-
                 $row->column(4, function (Column $column) {
                     $start = date('Y-m-d', time()) . ' 00:00:00';
                     $end = date('Y-m-d', time()) . ' 23:59:59';
@@ -35,7 +32,6 @@ class HomeController extends Controller
                         User::counts(1));
                     $column->append($infoBox1);
                 });
-
 
                 $row->column(4, function (Column $column) {
                     $start = date('Y-m-d', time()) . ' 00:00:00';
