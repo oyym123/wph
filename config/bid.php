@@ -15,4 +15,6 @@ return [
     'user_gift_currency' => 5, //新用户赠币数量
     'order_expired_at' => date('Y-m-d H:i:s', time() + 86400 * 1000), //订单过期时间
     'bid_currency_expired_at' => date('Y-m-d H:i:s', time() + 86400 * 30), //返还的购物币过期时间
+    'divide_proportion_level_1' => 0.05, //一级邀请人分成比 5%
+    'divide_proportion_level_2' => 0.03, //二级邀请人分成比 3%
 ];

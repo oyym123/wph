@@ -44,8 +44,8 @@ class Invite extends Common
         $level_2 = DB::table('users')->where(['invite_code' => $inviteCode])->first();
         $level_1 = DB::table('users')->where(['invite_code' => $level_2->be_invited_code])->first();
         if (empty($level_1) || empty($level_2->be_invited_code)) { //防止数据为空
-            $data['level_1'] = $level_2->id; //爸爸辈
-            $data['level_2'] = 0; //表示是爷爷辈
+            $data['level_1'] = 0; //表示是爷爷辈
+            $data['level_2'] = $level_2->id; //爸爸辈
         } else {
             $data['level_1'] = $level_1->id;
             $data['level_2'] = $level_2->id;
@@ -54,16 +54,25 @@ class Invite extends Common
         self::create($data);
     }
 
+    /** 分成 */
+    public function shareMoney($userId, $amount)
+    {
+        //level_1
+
+
+    }
+
+
     public function inviteList($userId, $type = 'first')
     {
         if ($type == 'first') {
             $level = self::where([
-                'level_1' => $userId
-            ])->where('level_2', '=', 0)->offset($this->offset)->limit($this->limit)->get()->toArray();
+                'level_2' => $userId
+            ])->offset($this->offset)->limit($this->limit)->get()->toArray();
         } else {
             $level = self::where([
                 'level_1' => $userId
-            ])->where('level_2', '<>', 0)->offset($this->offset)->limit($this->limit)->get()->toArray();
+            ])->offset($this->offset)->limit($this->limit)->get()->toArray();
         }
         $user = [];
         $users = DB::table('users')->whereIn('id', array_column($level, 'user_id'))->get();
