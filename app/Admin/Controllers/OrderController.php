@@ -141,7 +141,7 @@ class OrderController extends Controller
             $form->text('shipping_number', '快运单号');
             $form->saved(function (Form $form) {
                 if ($form->model()->shipping_number) {
-                    DB::table('product')->where(['id' => $form->model()->id])->update([
+                    DB::table('order')->where(['id' => $form->model()->id])->update([
                         'seller_shipped_at' => date('Y-m-d H:i:s', time()),
                         'status' => Order::STATUS_SHIPPED
                     ]);
