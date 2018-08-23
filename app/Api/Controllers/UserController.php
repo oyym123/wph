@@ -556,7 +556,7 @@ class UserController extends WebController
     public function performanceIncome()
     {
         $this->auth();
-        self::showMsg((new Income())->detail($this->userId));
+        self::showMsg((new Income())->detail($this->userId, ['type' => Income::TYPE_INVITE_CURRENCY]));
     }
 
     /**
