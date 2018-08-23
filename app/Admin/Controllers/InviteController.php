@@ -4,8 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\Common;
 use App\Models\Invite;
-
-use App\Models\User;
+use App\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -98,7 +97,7 @@ class InviteController extends Controller
             $grid->user_id('徒孙')->display(function ($released) {
 
                 $user = User::find($released);
-                
+
                 return '<a href="users?id=' . $user->id . '" target="_blank" ><img src="' .
                     Common::getImg($user->avatar) . '?imageView/1/w/65/h/45" ></a>';
             });
