@@ -84,7 +84,11 @@ class OrderController extends Controller
             $grid->id('ID')->sortable();
 
             $grid->buyer_id('买家')->display(function ($released) {
+
                 $user = User::find($released);
+                if (!$user) {
+                    return '';
+                }
                 return '<a href="users?id=' . $user->id . '" target="_blank" ><img src="' .
                     Common::getImg($user->avatar) . '?imageView/1/w/65/h/45" ></a>';
             });
