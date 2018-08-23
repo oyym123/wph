@@ -581,7 +581,7 @@ class UserController extends WebController
     public function performanceWithdraw()
     {
         $this->auth();
-        $result = (new Income())->detail($this->userId, ['type' => Income::TYPE_INVITE_CURRENCY]);
+        $result = (new Withdraw())->detail($this->userId);
         self::showMsg($result);
     }
 
