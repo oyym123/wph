@@ -187,7 +187,10 @@ class Bid extends Common
                         'bid_id' => $bid->id
                     ]);
                     //新增该产品新的期数
-                    $periods->saveData($period->product_id);
+                    if ($product->status == self::STATUS_ENABLE) {
+                        $periods->saveData($period->product_id);
+                    }
+
                     //同时清除期数缓存
                     $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
 
@@ -330,7 +333,9 @@ class Bid extends Common
                     'bid_id' => $bid->id
                 ]);
                 //新增该产品新的期数
-                $periods->saveData($period->product_id);
+                if ($product->status == self::STATUS_ENABLE) {
+                    $periods->saveData($period->product_id);
+                }
                 //同时清除期数缓存
                 $this->delCache('period@allInProgress' . Period::STATUS_IN_PROGRESS);
                 //redis缓存也改变
