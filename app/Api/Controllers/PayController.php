@@ -321,7 +321,7 @@ class PayController extends WebController
             'is_shop' => $isShop
         ];
         list($amount, $discountAmount) = $orderObj->getPayAmount($data);
-
+        $flag = 0;
         DB::beginTransaction();
         try {
             if ($amount == 0) {
@@ -361,28 +361,28 @@ class PayController extends WebController
                 DB::table('users')->where([
                     'id' => $order->buyer_id
                 ])->decrement('shopping_currency', $order->discount_amount);
-                $res = 1;
-            }
-
-            $pay = new Pay();
-            $data = [
-                'details' => $product->title,
-                'order_id' => $order->id,
-                'open_id' => $this->userIdent->open_id,
-                'sn' => $order->sn,
-                'amount' => $order->pay_amount
-            ];
-            $res = $pay->WxPay($data);
-            if ($res['state'] == 0) {
-                throw new \Exception($res['result_msg']);
+                $flag = 1;
+            } else {
+                $pay = new Pay();
+                $data = [
+                    'details' => $product->title,
+                    'order_id' => $order->id,
+                    'open_id' => $this->userIdent->open_id,
+                    'sn' => $order->sn,
+                    'amount' => $order->pay_amount
+                ];
+                $res = $pay->WxPay($data);
+                if ($res['state'] == 0) {
+                    throw new \Exception($res['result_msg']);
+                }
             }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             self::showMsg($e->getMessage(), 4); // 等待处理
         }
-        
-        if ($res === 1) { //表示购物币购买
+
+        if ($flag === 1) { //表示购物币购买
             self::showMsg('您已支付成功!', 4);
         } else {
             self::showMsg($res);
