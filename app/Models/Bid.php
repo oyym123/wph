@@ -177,8 +177,10 @@ class Bid extends Common
                 if (($this->getLastBidInfo($redis, $period->id, 'bid_price') / $product->sell_price) > $period->person_rate) {
                     //竞拍开关
                     $redis->setex('realPersonBid@periodId' . $period->id, 86400 * 10, $period->id);
-                } else {
-                    continue;
+                }
+                $flag = ($x = $redis->ttl('realPersonBid@periodId' . $bid->period_id)) > 0 ? 1 : 0;
+                if (empty($flag)) {
+                    continue; //没有让机器人退出时，就不可结拍
                 }
                 //当竞拍结束时
                 if ($redis->ttl('period@countdown' . $period->id) < 0) {
