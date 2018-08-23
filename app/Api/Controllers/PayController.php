@@ -370,7 +370,7 @@ class PayController extends WebController
                 'order_id' => $order->id,
                 'open_id' => $this->userIdent->open_id,
                 'sn' => $order->sn,
-                'amount' => 0.01
+                'amount' => $order->pay_amount
             ];
             $res = $pay->WxPay($data);
             if ($res['state'] == 0) {
