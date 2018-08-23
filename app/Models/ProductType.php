@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
-class ProductType extends Model
+class ProductType extends Common
 {
     use SoftDeletes;
     protected $table = 'product_type';
@@ -19,7 +19,8 @@ class ProductType extends Model
     public static function getList($flag = null)
     {
         $data = [];
-        foreach (ProductType::all() as $item) {
+        $model = ProductType::where(['status' => self::STATUS_ENABLE])->get();
+        foreach ($model as $item) {
             if ($flag) {
                 $data[$item->id] = $item->name;
             } else {
