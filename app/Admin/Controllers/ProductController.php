@@ -109,12 +109,6 @@ class ProductController extends Controller
         });
     }
 
-    public function period()
-    {
-        $model = new Period();
-        $model->saveData(2);
-    }
-
     /**
      * Make a form builder.
      *
@@ -147,8 +141,10 @@ class ProductController extends Controller
 //            $form->switch('is_shop', '是否加入购物币专区')->states(Product::getIsShop())->default(1);
 //            $form->switch('is_bid', '是否加入竞拍列表')->states(Product::getIsBid())->default(1);
 
-            $form->switch('status', '售出类型')->states(Common::getStates('竞拍列表', '购物币专区'))->default(1)
+            $form->switch('is_shop', '售出类型')->states(Common::getStates('竞拍列表', '购物币专区'))->default(1)
                 ->help('加入竞拍列表 或 购物币专区');
+            $form->switch('status', '状态')->states(Common::getStates())->default(1)
+                ->help('当设置无效时，【竞拍】该产品将终止下一期竞拍，【购物币专区】将不会有该产品');
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '修改时间');
 
@@ -158,7 +154,8 @@ class ProductController extends Controller
                 if ($form->model()->collection_count <= 0) {
                     $collectionCount = rand(100, 9999);
                 }
-                if ($form->model()->status == 1) {
+                $status = $form->model()->status;
+                if ($form->model()->is_shop == 1 && $status) {
                     DB::table('product')->where(['id' => $form->model()->id])->update([
                         'pay_amount' => $payAmount,
                         'is_bid' => Product::BID_YES,
@@ -182,7 +179,7 @@ class ProductController extends Controller
                 } else {
                     DB::table('product')->where(['id' => $form->model()->id])->update([
                         'pay_amount' => $payAmount,
-                        'is_shop' => Product::SHOPPING_YES,
+                        'is_shop' => $status,
                         'collection_count' => $collectionCount
                     ]);
                 }
