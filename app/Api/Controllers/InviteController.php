@@ -93,4 +93,32 @@ class InviteController extends WebController
         list($count, $user) = $model->inviteList($this->userId, $flag);
         self::showMsg($user);
     }
+
+    /**
+     * @SWG\Get(path="/api/invite/detail",
+     *   tags={"我的推广"},
+     *   summary="推广说明",
+     *   description="Author: OYYM",
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function detail()
+    {
+        $data = [
+            'get_invite_currency' => [
+                'id' => 1,
+                'title' => '如何获得推广金额',
+                'img' => '',
+                'function' => 'html',
+                'params' => [
+                    'key' => 'url',
+                    'type' => 'String',
+                    'value' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/balance-desc',
+                ],
+            ],
+        ];
+        self::showMsg($data);
+    }
 }
