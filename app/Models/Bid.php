@@ -165,9 +165,11 @@ class Bid extends Common
             if ($bid) {
                 $product = $products->getCacheProduct($period->product_id);
                 //当投标的价格小于售价时 , 则一直都不能竞拍成功
-                if ($this->getLastBidInfo($redis, $period->id, 'bid_price') / $product->sell_price > $period->person_rate) {
+                if (($this->getLastBidInfo($redis, $period->id, 'bid_price') / $product->sell_price) > $period->person_rate) {
                     //竞拍开关
                     $redis->setex('realPersonBid@periodId' . $period->id, 86400 * 10, $period->id);
+                } else {
+                    continue;
                 }
                 //当竞拍结束时
                 if ($redis->ttl('period@countdown' . $period->id) < 0) {
