@@ -109,6 +109,7 @@ Route::group(['middleware' => 'web'], function () {
     /**  我的推广  */
     Route::get('invite/index', 'InviteController@Index'); //我的推广主页
     Route::get('invite/invite-list', 'InviteController@inviteList'); //我的推广主页
+    Route::get('invite/detail', 'InviteController@detail'); //我的推广主页
 
     /** 订单中心 */
     Route::get('order/cancel-order', 'OrderController@cancelOrder'); //我的竞拍
