@@ -425,7 +425,8 @@ class Bid extends Common
                     'f' => $bid->status,
                     'g' => $bid->end_time,
                     'h' => ($x = $redis->ttl('period@countdown' . $bid->period_id)) > 0 ? $x : 0,
-                    'i' => round($bid->bid_price, 2) * 10
+                    'i' => round($bid->bid_price, 2) * 10,
+                    'j' => ($x = $redis->ttl('realPersonBid@periodId' . $bid->period_id)) > 0 ? 1 : 0
                 ];
             } else {
                 $res[] = [
@@ -437,7 +438,8 @@ class Bid extends Common
                     'f' => 0,
                     'g' => 0,
                     'h' => ($x = $redis->ttl('period@countdown' . $id)) > 0 ? $x : 0,
-                    'i' => 0
+                    'i' => 0,
+                    'j' => 0
                 ];
             }
         }
