@@ -35,10 +35,14 @@ class Invite extends Common
 //            'level_2' => $userId,
 //            'user_id' => $user->id,
 //        ])->first();
-//
-//        if ($flag1 || $flag2) {  //不允许乱伦
-//            return false;
-//        }
+
+        $flag = self::where([
+            'user_id' => $user->id,
+        ])->first();
+
+        if ($flag) {  //不允许乱伦
+            return false;
+        }
 
         if ($user) {
             return true;
