@@ -95,7 +95,9 @@ class InviteController extends Controller
             });
 
             $grid->user_id('徒孙')->display(function ($released) {
-
+                if ($released == 0) {
+                    return '';
+                }
                 $user = User::find($released);
 
                 return '<a href="users?id=' . $user->id . '" target="_blank" ><img src="' .
