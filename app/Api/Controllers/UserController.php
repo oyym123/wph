@@ -615,10 +615,6 @@ class UserController extends WebController
         $this->auth();
         $request = $this->request;
 
-        if (empty($this->userIdent->cashout_account)) {
-            self::showMsg('请您先设置提现账号!', 4);
-        }
-
         if (!empty($this->userIdent->cashout_password)) {
             self::showMsg('您已经设置过密码，请勿重复设置,如果忘记密码，请联系管理员!', 4);
         }
@@ -670,6 +666,10 @@ class UserController extends WebController
     {
         $this->auth();
         $request = $this->request;
+        if (empty($this->userIdent->cashout_account)) {
+            self::showMsg('请您先设置提现账号!', 4);
+        }
+
         if ($request->amount <= 0) {
             self::showMsg('提现金额必须大于0元');
         }
