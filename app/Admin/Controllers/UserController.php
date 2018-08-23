@@ -10,6 +10,9 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Widgets\Box;
+use Encore\Admin\Widgets\Collapse;
+use Illuminate\Support\MessageBag;
 
 class UserController extends Controller
 {
@@ -57,8 +60,31 @@ class UserController extends Controller
         return Admin::content(function (Content $content) {
             $content->header('会员管理');
             $content->description('创建会员');
-            //  $content->body($this->form());
+
+            $model = Admin::form(User::class, function (Form $form) {
+                $form->display('id', 'ID');
+                $form->text('name', '名字');
+                $form->text('email', '邮箱');
+                $form->image('avatar', '头像');
+                $form->currency('invite_currency', '推广币');
+                $form->currency('shopping_currency', '购物币');
+                $form->currency('gift_currency', '赠币');
+                $form->currency('bid_currency', '拍币');
+                $form->switch('status', '状态')->states(Common::getStates())->default(1);
+                $form->display('created_at', '创建时间');
+                $form->display('updated_at', '修改时间');
+                $form->saved(function (Form $form) {
+                    $payAmount = $form->model()->type == 1 ? 10 : 1;
+                    $success = new MessageBag([
+                        'title' => 'title...',
+                        'message' => 'message....',
+                    ]);
+                    return back()->with(compact('success'));
+                });
+            });
+            $content->body($model);
         });
+
     }
 
     /**

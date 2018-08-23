@@ -47,17 +47,26 @@ class Bid extends Common
         $period = $periods->getPeriod(['id' => $periodId, 'status' => Period::STATUS_IN_PROGRESS]);
         $products = new Product();
         $redis = app('redis')->connection('first');
-        DB::table('period')->where(['id' => $periodId])->increment('bid_price', 0.1);//自增0.1
-        DB::table('period')->where(['id' => $periodId])->update(['real_person' => Period::REAL_PERSON_YES]);//有真人参与
         $product = $products->getCacheProduct($period->product_id);
         $countdown = $redis->ttl('period@countdown' . $period->id);
         $rate = $period->bid_price / $product->sell_price;
         $lastPrice = $this->getLastBidInfo($redis, $period->id, 'bid_price');
+        if ($lastPrice) {
+            $price = number_format($lastPrice + $product->bid_step, 2);
+        } else {
+            $price = number_format($product->bid_step, 2);
+        }
+
+        DB::table('period')->where(['id' => $periodId])->update([
+            'bid_price' => $price,
+            'real_person' => Period::REAL_PERSON_YES
+        ]);
+
         $time = date('Y-m-d H:i:s', time());
         $data = [
             'product_id' => $period->product_id,
             'period_id' => $periodId,
-            'bid_price' => round($lastPrice + $product->bid_step, 2),
+            'bid_price' => $price,
             'user_id' => $this->userId,
             'status' => $this->isCanWinBid($period, $rate, $redis),
             'bid_step' => $product->bid_step,
@@ -301,16 +310,20 @@ class Bid extends Common
             // $redis->setex('bid@lastPrice' . $period->id, 10000, $lastBid);
 
             $robotPeriod = RobotPeriod::getInfo($period->id);
-            DB::table('period')->where(['id' => $period->id])->increment('bid_price', 0.1);//自增0.1
 
-
+            if ($lastPrice) {
+                $price = number_format($lastPrice + $product->bid_step, 2);
+            } else {
+                $price = number_format($product->bid_step, 2);
+            }
+            DB::table('period')->where(['id' => $period->id])->update(['bid_price' => $price]);//自增0.1
             $rate = $period->bid_price / $product->sell_price;
 
             $time = date('Y-m-d H:i:s', time());
             $data = [
                 'product_id' => $period->product_id,
                 'period_id' => $period->id,
-                'bid_price' => $lastPrice + $product->bid_step,
+                'bid_price' => $price,
                 'user_id' => $robotPeriod->user_id,
                 'status' => $this->isCanWinBid($period, $rate, $redis),
                 'bid_step' => $product->bid_step,
