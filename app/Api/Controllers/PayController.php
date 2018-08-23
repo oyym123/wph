@@ -325,7 +325,7 @@ class PayController extends WebController
         DB::beginTransaction();
         try {
             if ($amount == 0) {
-                $status = Order::STATUS_WAIT_SHIP;//待签收
+                $status = Order::STATUS_WAIT_SHIP;//待发货
             }
             $orderInfo = [
                 'pay_type' => Pay::TYPE_WEI_XIN,
@@ -361,7 +361,7 @@ class PayController extends WebController
                 DB::table('users')->where([
                     'id' => $order->buyer_id
                 ])->decrement('shopping_currency', $order->discount_amount);
-                self::showMsg('您已支付成功!', 4);
+                $res = 1;
             }
 
             $pay = new Pay();
@@ -381,6 +381,11 @@ class PayController extends WebController
             DB::rollback();
             self::showMsg($e->getMessage(), 4); // 等待处理
         }
-        self::showMsg($res);
+        
+        if ($res === 1) { //表示购物币购买
+            self::showMsg('您已支付成功!', 4);
+        } else {
+            self::showMsg($res);
+        }
     }
 }
