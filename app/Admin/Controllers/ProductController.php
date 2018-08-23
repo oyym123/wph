@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Base;
+use App\Models\Common;
 use App\Models\Period;
 use App\Models\Product;
 
@@ -143,18 +144,25 @@ class ProductController extends Controller
             // $form->image('imgs', '产品子图');
             $form->multipleImage('imgs', '产品子图')->removable();
             $form->switch('buy_by_diff', '是否可以差价购买')->states(Product::$buyByDiff)->default(1);
-            $form->switch('is_shop', '是否加入购物币专区')->states(Product::getIsShop())->default(1);
-            $form->switch('is_bid', '是否加入竞拍列表')->states(Product::getIsBid())->default(1);
-            $form->switch('status', '状态')->states(Base::getStates())->default(1);
+//            $form->switch('is_shop', '是否加入购物币专区')->states(Product::getIsShop())->default(1);
+//            $form->switch('is_bid', '是否加入竞拍列表')->states(Product::getIsBid())->default(1);
+
+            $form->switch('status', '售出类型')->states(Common::getStates('竞拍列表', '购物币专区'))->default(1)
+                ->help('加入竞拍列表 或 购物币专区');
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '修改时间');
 
             $form->saved(function (Form $form) {
                 $payAmount = $form->model()->type == 1 ? 10 : 1;
-                if ($form->model()->is_bid == Product::BID_YES) {
+                $collectionCount = $form->model()->collection_count;
+                if ($form->model()->collection_count <= 0) {
+                    $collectionCount = rand(100, 9999);
+                }
+                if ($form->model()->status == 1) {
                     DB::table('product')->where(['id' => $form->model()->id])->update([
                         'pay_amount' => $payAmount,
-                        'collection_count' => rand(100, 9999)
+                        'is_bid' => Product::BID_YES,
+                        'collection_count' => $collectionCount
                     ]);
 
                     $period = Period::where([
@@ -171,6 +179,12 @@ class ProductController extends Controller
                     } else {
                         (new Period())->saveData($form->model()->id);
                     }
+                } else {
+                    DB::table('product')->where(['id' => $form->model()->id])->update([
+                        'pay_amount' => $payAmount,
+                        'is_shop' => Product::SHOPPING_YES,
+                        'collection_count' => $collectionCount
+                    ]);
                 }
                 //清除产品缓存
                 Cache::forget('product@find' . $form->model()->id);
