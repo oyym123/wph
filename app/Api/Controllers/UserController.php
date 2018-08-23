@@ -528,8 +528,8 @@ class UserController extends WebController
             'total_amount' => $result['total_amount'],
             'withdraw' => $result['withdraw'],
             'already_withdraw' => $result['already_withdraw'],
-            'income_list' => $result['income'],
-            'withdraw_list' => (new Withdraw())->detail($this->userId),
+//            'income_list' => $result['income'],
+//            'withdraw_list' => (new Withdraw())->detail($this->userId),
         ];
         self::showMsg($data);
     }
