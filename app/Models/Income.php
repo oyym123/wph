@@ -276,7 +276,7 @@ class Income extends Common
             ];
         }
         $withdraw = array_sum($withdraws);
-        $alWithdraw = $withdraw - $canWithdraw;
+        $alWithdraw = ($withdraw - $canWithdraw) >= 0 ? ($withdraw - $canWithdraw) : 0;
         $res = [
             'total_amount' => $withdraw,
             'withdraw' => $canWithdraw,
