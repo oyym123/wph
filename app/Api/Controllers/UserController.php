@@ -82,6 +82,7 @@ class UserController extends WebController
      */
     public function info()
     {
+        //分成
         $request = $this->request;
 
         $res = $this->weixin($request->code);
@@ -115,14 +116,14 @@ class UserController extends WebController
                 $data['email'] = rand(10000, 99999) . '@163.com';
                 $data['gift_currency'] = config('bid.user_gift_currency');
                 $model = (new User())->saveData($data);
-            }
-            if ($request->invite_code && empty($model->be_invited_code)) {
-                if ((new Invite())->checkoutCode($request->invite_code, $model->id)) {
-                    DB::table('users')->where('id', $model->id)->update([
-                        'invite_code' => $model->invite_code,
-                        'be_invited_code' => $request->invite_code
-                    ]);
-                    (new Invite())->saveData($model->id, $request->invite_code);
+                if ($request->invite_code && empty($model->be_invited_code)) {
+                    if ((new Invite())->checkoutCode($request->invite_code, $model->id)) {
+                        DB::table('users')->where('id', $model->id)->update([
+                            'invite_code' => $model->invite_code,
+                            'be_invited_code' => $request->invite_code
+                        ]);
+                        (new Invite())->saveData($model->id, $request->invite_code);
+                    }
                 }
             }
 
@@ -667,9 +668,7 @@ class UserController extends WebController
         if ($request->amount <= 0) {
             self::showMsg('提现金额必须大于0元');
         }
-
-        $withdraw = (new Income())->withdrawAmount($this->userId);
-
+        $withdraw = $this->userIdent->invite_currency;
         if ($request->amount > $withdraw) {
             self::showMsg('大于可提现金额 ' . $withdraw . '元，请重新选择提现金额');
         }

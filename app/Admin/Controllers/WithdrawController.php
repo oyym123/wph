@@ -3,6 +3,8 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Common;
+use App\Models\Income;
+use App\Models\Invite;
 use App\Models\User;
 use App\Models\Withdraw;
 
@@ -12,6 +14,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\DB;
 
 class WithdrawController extends Controller
 {
@@ -88,8 +91,10 @@ class WithdrawController extends Controller
             });
 
             $grid->id('ID')->sortable();
-            $grid->user_id('ID/用户昵称')->display(function ($released) {
-                return $released . '【' . User::find($released)->nickname . '】';
+            $grid->user_id('用户')->display(function ($released) {
+                $user = User::find($released);
+                return '<a href="users?id=' . $user->id . '" target="_blank" ><img src="' .
+                    Common::getImg($user->avatar) . '?imageView/1/w/65/h/45" ></a>';
             });
             $grid->amount('提现金额')->sortable();
             $grid->account('账号');
@@ -110,13 +115,19 @@ class WithdrawController extends Controller
      */
     protected function form()
     {
-
         return Admin::form(Withdraw::class, function (Form $form) {
-
             $form->display('id', 'ID');
+            $form->display('user_id', '用户ID');
+            $form->display('amount', '提现金额');
+            $form->display('account', '账号');
             $form->select('status', '状态')->options(Withdraw::getStatus());
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '修改时间');
+            $form->saved(function (Form $form) {
+                if ($form->model()->status == Withdraw::STATUS_COMPLETED) {
+                    DB::table('users')->where(['id' => $form->model()->user_id])->decrement('invite_currency', $form->model()->amount);
+                }
+            });
         });
     }
 }

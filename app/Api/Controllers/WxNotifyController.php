@@ -70,7 +70,7 @@ class WxNotifyController extends Controller
                 }
 
                 //分成
-                (new Invite())->shareMoney($order->buyer_id, $order->pay_amount);
+                (new Invite())->shareMoney($order->buyer_id, $order->pay_amount, $order->id);
                 //拍币充值成功
                 DB::table('users')->where(['id' => $order->buyer_id])->increment('bid_currency', $amount);
                 //标记已付款

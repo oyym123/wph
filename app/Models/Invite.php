@@ -26,20 +26,24 @@ class Invite extends Common
     public function checkoutCode($inviteCode, $userId)
     {
         $user = DB::table('users')->where(['invite_code' => $inviteCode])->first();
-        $flag1 = self::where([
-            'level_1' => $userId,
-            'user_id' => $user->id,
-        ])->first();
+//        $flag1 = self::where([
+//            'level_1' => $userId,
+//            'user_id' => $user->id,
+//        ])->first();
+//
+//        $flag2 = self::where([
+//            'level_2' => $userId,
+//            'user_id' => $user->id,
+//        ])->first();
+//
+//        if ($flag1 || $flag2) {  //不允许乱伦
+//            return false;
+//        }
 
-        $flag2 = self::where([
-            'level_2' => $userId,
-            'user_id' => $user->id,
-        ])->first();
-
-        if ($flag1 || $flag2) {  //不允许乱伦
-            return false;
+        if ($user) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     public function saveData($userId, $inviteCode)
@@ -58,7 +62,7 @@ class Invite extends Common
     }
 
     /** 分成 */
-    public function shareMoney($userId, $amount)
+    public function shareMoney($userId, $amount, $orderId)
     {
         $invite = self::where([
             'user_id' => $userId
@@ -72,8 +76,11 @@ class Invite extends Common
                 'amount' => $amount * config('bid.divide_proportion_level_1'),
                 'return_proportion' => config('bid.divide_proportion_level_1'),
                 'name' => $user->nickname . '充值了' . $amount . '拍币',
+                'order_id' => $orderId,
             ];
             Income::create($data);
+            //分成
+            DB::table('users')->where(['id' => $invite->level_1])->increment('invite_currency', $data['amount']);
         }
 
         if ($invite->level_2) {
@@ -83,8 +90,11 @@ class Invite extends Common
                 'amount' => $amount * config('bid.divide_proportion_level_2'),
                 'return_proportion' => config('bid.divide_proportion_level_2'),
                 'name' => $user->nickname . '充值了' . $amount . '拍币',
+                'order_id' => $orderId,
             ];
             Income::create($data);
+            //分成
+            DB::table('users')->where(['id' => $invite->level_2])->increment('invite_currency', $data['amount']);
         }
     }
 
