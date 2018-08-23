@@ -69,16 +69,16 @@ class HomeController extends Controller
 
             });
 
-            $content->row(function (Row $row) {
-                $row->column(6, function (Column $column) {
-                    $column->append(Dashboard::dependencies());
-                });
-                $row->column(6, function (Column $column) {
-
-                    $column->append(Dashboard::environment());
-                });
-
-            });
+//            $content->row(function (Row $row) {
+//                $row->column(6, function (Column $column) {
+//                    $column->append(Dashboard::dependencies());
+//                });
+//                $row->column(6, function (Column $column) {
+//
+//                    $column->append(Dashboard::environment());
+//                });
+//
+//            });
 
         });
     }
