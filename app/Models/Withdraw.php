@@ -52,6 +52,9 @@ class Withdraw extends Common
                 'status' => $this->getStatus($model->status),
             ];
         }
+        if (empty($data) && $this->offset == 0) {
+            self::showMsg('没有数据', 2);
+        }
         return $data;
     }
 
