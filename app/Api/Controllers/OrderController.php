@@ -104,7 +104,6 @@ class OrderController extends WebController
             'order_time' => '',
             'check_status' => 0,
             'return_voucher_bids' => 0,
-            'used_voucher_bids' => 0,
             'nickname' => $user->nickname,
             'show_confirm_trans' => 0,
         );
@@ -221,7 +220,6 @@ class OrderController extends WebController
                         $data['pay_price'] = $period->bid_price;
                         $data['result_status'] = 2;
                         $data['return_voucher_bids'] = $payAmount * config('bid.return_proportion');
-                        $data['used_voucher_bids'] = Vouchers::getAmount($period->product_id, $this->userId);
                         $res[] = $data;
                     }
                     break;
@@ -260,7 +258,6 @@ class OrderController extends WebController
                         $data['sn'] = $order->sn;
                         $data['order_time'] = $order->created_at;
                         $data['order_status'] = $order->status;
-                        $data['used_voucher_bids'] = Vouchers::getAmount($product->id, $this->userId);
                         $res[] = $data;
                     }
                     break;
@@ -300,7 +297,6 @@ class OrderController extends WebController
                         $data['sn'] = $order->sn;
                         $data['order_time'] = $order->created_at;
                         $data['order_status'] = $order->status;
-                        $data['used_voucher_bids'] = Vouchers::getAmount($product->id, $this->userId);
                         $res[] = $data;
                     }
                     break;
