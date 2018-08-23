@@ -117,7 +117,7 @@ class UserController extends WebController
                 $data['gift_currency'] = config('bid.user_gift_currency');
                 $model = (new User())->saveData($data);
             }
-            
+
             if ($request->invite_code && empty($model->be_invited_code)) {
                 if ((new Invite())->checkoutCode($request->invite_code, $model->id)) {
                     DB::table('users')->where('id', $model->id)->update([
@@ -523,7 +523,7 @@ class UserController extends WebController
     public function performance()
     {
         $this->auth();
-        $result = (new Income())->performance($this->userId);
+        $result = (new Income())->performance($this->userId, $this->userIdent->invite_currency);
         $data = [
             'total_amount' => $result['total_amount'],
             'withdraw' => $result['withdraw'],

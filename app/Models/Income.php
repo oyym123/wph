@@ -260,7 +260,7 @@ class Income extends Common
     }
 
     /** 我的绩效 */
-    public function performance($userId)
+    public function performance($userId, $canWithdraw)
     {
         $incomes = self::where([
             'user_id' => $userId,
@@ -268,22 +268,18 @@ class Income extends Common
         ])->offset($this->offset)->limit($this->limit)->get();
         $withdraws = $alreadyWithdraw = $data = [];
         foreach ($incomes as $income) {
-            if ($income->status == self::STATUS_ALREADY_WITHDRAW) {
-                $alreadyWithdraw[] = $income->amount;
-            } else {
-                $withdraws[] = $income->amount;
-            }
+            $withdraws[] = $income->amount;
             $data[] = [
                 'title' => $income->name,
                 'created_at' => $income->created_at,
                 'amount' => $income->amount
             ];
         }
-        $alWithdraw = array_sum($alreadyWithdraw);
         $withdraw = array_sum($withdraws);
+        $alWithdraw = $withdraw - $canWithdraw;
         $res = [
-            'total_amount' => $withdraw + $alWithdraw,
-            'withdraw' => $withdraw,
+            'total_amount' => $withdraw,
+            'withdraw' => $canWithdraw,
             'already_withdraw' => $alWithdraw,
             'income' => $data
         ];
