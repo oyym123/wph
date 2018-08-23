@@ -124,6 +124,10 @@ class UserController extends Controller
             $form->text('name', '名字');
             $form->text('email', '邮箱');
             $form->image('avatar', '头像');
+            $form->currency('invite_currency', '推广币');
+            $form->currency('shopping_currency', '购物币');
+            $form->currency('gift_currency', '赠币');
+            $form->currency('bid_currency', '拍币');
             $form->switch('status', '状态')->states(Common::getStates())->default(1);
             $form->display('created_at', '创建时间');
             $form->display('updated_at', '修改时间');
