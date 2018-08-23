@@ -109,9 +109,6 @@ class Income extends Common
                 'amount' => '+' . round($income->amount) . $this->getCurrencyStr($income->type),
             ];
         }
-        if (empty($data) && $this->offset == 0) {
-            self::showMsg('没有数据', 2);
-        }
         return $data;
     }
 
