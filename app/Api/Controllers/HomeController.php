@@ -60,7 +60,7 @@ class HomeController extends WebController
                 [
                     'id' => 1,
                     'title' => '新手指引',
-                    'img' => env('QINIU_URL_IMAGES') . '1485314751522.jpg',
+                    'img' => env('QINIU_URL_IMAGES') . 'weipaihangbanner.jpg',
                     'function' => 'html',
                     'params' => [
                         'key' => 'url',
