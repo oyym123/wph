@@ -78,8 +78,8 @@ class WxNotifyController extends Controller
             } else {
                 if ($order->type == Order::TYPE_BUY_BY_DIFF && ($order->discount_amount > 0)) { //差价购买
                     DB::table('vouchers')->where([
-                        'product_id' => $data['product_id'],
-                        'user_id' => $data['user_id']
+                        'product_id' => $order->product_id,
+                        'user_id' => $order->user_id
                     ])->decrement('amount', $order->discount_amount);
                 }
 
