@@ -153,10 +153,10 @@ class OrderController extends WebController
                 case 1: //我拍中
                     $orders = Order::has('product')
                         ->where([
-                        'buyer_id' => $this->userId,
-                        //'type' => Order::TYPE_BID,
-                        'status' => Order::STATUS_COMPLETE
-                    ])->offset($this->offset)->limit($this->limit)->get();
+                            'buyer_id' => $this->userId,
+                            //'type' => Order::TYPE_BID,
+                            'status' => Order::STATUS_COMPLETE
+                        ])->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $product = $order->product;
                         if ($order->period_id == 0) {
@@ -206,7 +206,7 @@ class OrderController extends WebController
                         $product = $period->product;
                         $payAmount = DB::table('bid')
                             ->where([
-                                'period_id' => $period,
+                                'period_id' => $period->id,
                                 'user_id' => $this->userId
                             ])->sum('pay_amount');
                         $data['period_id'] = $period->id;
@@ -226,9 +226,9 @@ class OrderController extends WebController
                 case 3: //待付款
                     $orders = Order::has('product')
                         ->where([
-                        'buyer_id' => $this->userId,
-                        'status' => Order::STATUS_WAIT_PAY
-                    ])->offset($this->offset)->limit($this->limit)->get();
+                            'buyer_id' => $this->userId,
+                            'status' => Order::STATUS_WAIT_PAY
+                        ])->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $product = $order->product;
                         if ($order->period_id == 0) {
@@ -264,9 +264,9 @@ class OrderController extends WebController
                 case 6: //待发货
                     $orders = Order::has('product')
                         ->where([
-                        'buyer_id' => $this->userId,
-                        'status' => Order::STATUS_WAIT_SHIP
-                    ])
+                            'buyer_id' => $this->userId,
+                            'status' => Order::STATUS_WAIT_SHIP
+                        ])
                         ->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $product = $order->product;
@@ -303,9 +303,9 @@ class OrderController extends WebController
                 case 4: //待签收
                     $orders = Order::has('product')
                         ->where([
-                        'buyer_id' => $this->userId,
-                        'status' => Order::STATUS_SHIPPED
-                    ])
+                            'buyer_id' => $this->userId,
+                            'status' => Order::STATUS_SHIPPED
+                        ])
                         ->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $product = $order->product;
@@ -343,9 +343,9 @@ class OrderController extends WebController
                 case 5: //待晒单
                     $orders = Order::has('product')
                         ->where([
-                        'buyer_id' => $this->userId,
-                        'status' => Order::STATUS_CONFIRM_RECEIVING
-                    ])
+                            'buyer_id' => $this->userId,
+                            'status' => Order::STATUS_CONFIRM_RECEIVING
+                        ])
                         ->offset($this->offset)->limit($this->limit)->get();
 
                     foreach ($orders as $order) {
