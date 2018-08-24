@@ -168,7 +168,7 @@ class Period extends Common
                 'title' => $product->title,
                 'status' => 0, //正在进行中
                 'img_cover' => self::getImg($product->img_cover),
-                'sell_price' => $bid->getLastBidInfo($redis, $period->id, 'bid_price'),
+                'sell_price' => number_format($bid->getLastBidInfo($redis, $period->id, 'bid_price'), 2),
                 'bid_step' => $product->pay_amount,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
             ];
