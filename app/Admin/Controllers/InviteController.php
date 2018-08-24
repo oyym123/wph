@@ -73,7 +73,7 @@ class InviteController extends Controller
     protected function grid()
     {
         return Admin::grid(Invite::class, function (Grid $grid) {
-
+            $grid->disableExport();
             $grid->id('ID')->sortable();
             $grid->level_1('用户')->display(function ($released) {
                 if ($released == 0) {

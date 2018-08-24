@@ -72,6 +72,7 @@ class AuctioneerController extends Controller
     protected function grid()
     {
         return Admin::grid(Auctioneer::class, function (Grid $grid) {
+            $grid->disableExport();
             $grid->id('ID')->sortable();
             $grid->name('名称')->color('');
             $grid->tags('标签');

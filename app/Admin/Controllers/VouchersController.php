@@ -73,7 +73,7 @@ class VouchersController extends Controller
     protected function grid()
     {
         return Admin::grid(Vouchers::class, function (Grid $grid) {
-
+            $grid->disableExport();
             $grid->id('ID')->sortable();
 
             $grid->created_at();

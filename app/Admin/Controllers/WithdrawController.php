@@ -83,6 +83,7 @@ class WithdrawController extends Controller
                     $actions->disableDelete();
                 }
             });
+            $grid->disableExport();
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器
                 $filter->in('status', '状态')->select(Withdraw::getStatus());

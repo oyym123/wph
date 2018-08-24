@@ -72,7 +72,7 @@ class RechargeCardController extends Controller
     protected function grid()
     {
         return Admin::grid(RechargeCard::class, function (Grid $grid) {
-
+            $grid->disableExport();
             $grid->id('ID')->sortable();
             $grid->amount('充值金额');
             $grid->gift_amount('赠送金额');

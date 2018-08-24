@@ -72,7 +72,7 @@ class ExpendController extends Controller
     protected function grid()
     {
         return Admin::grid(Expend::class, function (Grid $grid) {
-
+            $grid->disableExport();
             $grid->id('ID')->sortable();
 
             $grid->created_at();

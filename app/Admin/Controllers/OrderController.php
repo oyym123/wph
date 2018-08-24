@@ -81,6 +81,7 @@ class OrderController extends Controller
     protected function grid()
     {
         return Admin::grid(Order::class, function (Grid $grid) {
+            $grid->disableExport();
             $grid->id('ID')->sortable();
 
             $grid->buyer_id('买家')->display(function ($released) {

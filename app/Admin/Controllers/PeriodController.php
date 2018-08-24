@@ -75,6 +75,7 @@ class PeriodController extends Controller
     protected function grid()
     {
         return Admin::grid(Period::class, function (Grid $grid) {
+            $grid->disableExport();
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器
                 $filter->in('status', '状态')->select(Period::getStatus());
