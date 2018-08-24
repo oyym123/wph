@@ -10,6 +10,7 @@ namespace App\Api\Controllers;
 
 
 use App\Api\components\WebController;
+use App\Models\Common;
 use App\Models\Order;
 use App\Models\Pay;
 use App\Models\Period;
@@ -207,7 +208,8 @@ class OrderController extends WebController
                         $payAmount = DB::table('bid')
                             ->where([
                                 'period_id' => $period->id,
-                                'user_id' => $this->userId
+                                'user_id' => $this->userId,
+                                'pay_type' => Common::TYPE_BID_CURRENCY
                             ])->sum('pay_amount');
                         $data['period_id'] = $period->id;
                         $data['product_id'] = $period->product_id;

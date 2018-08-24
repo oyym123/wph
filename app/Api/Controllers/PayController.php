@@ -361,6 +361,12 @@ class PayController extends WebController
                 DB::table('users')->where([
                     'id' => $order->buyer_id
                 ])->decrement('shopping_currency', $order->discount_amount);
+                if ($type == Order::TYPE_BUY_BY_DIFF) {
+                    DB::table('vouchers')->where([
+                        'product_id' => $data['product_id'],
+                        'user_id' => $data['user_id']
+                    ])->decrement('amount', $order->discount_amount);
+                }
                 $flag = 1;
             } else {
                 $pay = new Pay();

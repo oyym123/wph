@@ -76,6 +76,13 @@ class WxNotifyController extends Controller
                 //标记已付款
                 DB::table('order')->where(['id' => $order->id])->update(['status' => Order::STATUS_PAYED]);
             } else {
+                if ($order->type == Order::TYPE_BUY_BY_DIFF && ($order->discount_amount > 0)) { //差价购买
+                    DB::table('vouchers')->where([
+                        'product_id' => $data['product_id'],
+                        'user_id' => $data['user_id']
+                    ])->decrement('amount', $order->discount_amount);
+                }
+
                 if ($order->discount_amount > 0) { //表示使用了购物币打折,需要从用户账户中扣除
                     DB::table('users')->where([
                         'id' => $order->buyer_id
