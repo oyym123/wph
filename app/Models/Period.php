@@ -155,9 +155,10 @@ class Period extends Common
             }
             $periods = DB::table('period')->where($where)->where($whereIn)->offset($this->offset)->limit($this->limit)->get();
         }
-
         $res = [];
         $collection = new Collection();
+        $redis = app('redis')->connection('first');
+        $bid = new Bid();
         foreach ($periods as $period) {
             $product = Product::find($period->product_id);
             $res[] = [
@@ -167,7 +168,7 @@ class Period extends Common
                 'title' => $product->title,
                 'status' => 0, //正在进行中
                 'img_cover' => self::getImg($product->img_cover),
-                'sell_price' => $product->sell_price,
+                'sell_price' => $bid->getLastBidInfo($redis, $period->id, 'bid_price'),
                 'bid_step' => $product->pay_amount,
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
             ];
