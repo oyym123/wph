@@ -37,7 +37,7 @@ class Evaluate extends Common
     public function getList($where = [])
     {
         $data = [];
-        $evaluates = Evaluate::where($where)->offset($this->offset)->limit($this->limit)->get();
+        $evaluates = Evaluate::where($where)->offset($this->offset)->limit($this->limit)->orderBy('created_at', 'desc')->get();
         $products = new Product();
         foreach ($evaluates as $evaluate) {
             $product = $products->getCacheProduct($evaluate->product_id);
