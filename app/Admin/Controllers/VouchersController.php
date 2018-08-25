@@ -81,6 +81,12 @@ class VouchersController extends Controller
         });
     }
 
+
+    public function show()
+    {
+        echo "<script>history.go(-1);</script>";
+    }
+
     /**
      * Make a form builder.
      *

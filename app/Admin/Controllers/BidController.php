@@ -27,7 +27,7 @@ class BidController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('投标记录');
+            $content->header('竞拍列表');
             $content->description('列表');
 
             $content->body($this->grid());
@@ -75,6 +75,13 @@ class BidController extends Controller
     protected function grid()
     {
         return Admin::grid(Bid::class, function (Grid $grid) {
+
+            $grid->actions(function ($actions) {
+                $actions->disableEdit();
+                $actions->disableView();
+            });
+
+            $grid->disableCreateButton();
             $grid->disableExport();
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器

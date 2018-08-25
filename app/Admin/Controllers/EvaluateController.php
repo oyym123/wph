@@ -31,6 +31,12 @@ class EvaluateController extends Controller
         });
     }
 
+
+    public function show()
+    {
+        echo "<script>history.go(-1);</script>";
+    }
+
     /**
      * Edit interface.
      *

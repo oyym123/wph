@@ -64,6 +64,12 @@ class AuctioneerController extends Controller
         });
     }
 
+
+    public function show()
+    {
+        echo "<script>history.go(-1);</script>";
+    }
+
     /**
      * Make a grid builder.
      *
@@ -72,6 +78,19 @@ class AuctioneerController extends Controller
     protected function grid()
     {
         return Admin::grid(Auctioneer::class, function (Grid $grid) {
+
+            $grid->tools(function ($tools) {
+                $tools->batch(function ($batch) {
+                    $batch->disableDelete();
+                });
+            });
+            $grid->actions(function ($actions) {
+                $actions->disableDelete();
+                $actions->disableView();
+            });
+
+            $grid->disableCreateButton();
+
             $grid->disableExport();
             $grid->id('ID')->sortable();
             $grid->name('名称')->color('');

@@ -44,8 +44,8 @@ class PeriodController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('产品期数');
+            $content->description('编辑');
 
             $content->body($this->form()->edit($id));
         });
@@ -67,6 +67,12 @@ class PeriodController extends Controller
         });
     }
 
+
+    public function show()
+    {
+        echo "<script>history.go(-1);</script>";
+    }
+
     /**
      * Make a grid builder.
      *
@@ -75,6 +81,12 @@ class PeriodController extends Controller
     protected function grid()
     {
         return Admin::grid(Period::class, function (Grid $grid) {
+
+            $grid->actions(function ($actions) {
+                $actions->disableView();
+            });
+
+            $grid->disableCreateButton();
             $grid->disableExport();
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器

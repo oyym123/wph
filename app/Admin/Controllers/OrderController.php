@@ -19,6 +19,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Encore\Admin\Show;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -50,9 +51,8 @@ class OrderController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('header');
-            $content->description('description');
-
+            $content->header('订单详情');
+            $content->description('编辑');
             $content->body($this->form()->edit($id));
         });
     }
@@ -66,11 +66,28 @@ class OrderController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('订单详情');
+            $content->description('新建');
 
             //  $content->body($this->form());
         });
+    }
+
+    public function show($id)
+    {
+        return Admin::content(function (Content $content) use ($id) {
+
+        $content->body(Admin::show(Order::findOrFail($id), function (Show $show) {
+            $show->panel()
+                ->tools(function ($tools) {
+                    $tools->disableEdit();
+                    $tools->disableList();
+                    $tools->disableDelete();
+                });
+
+        }));
+    });
+        echo "<script>history.go(-1);</script>";
     }
 
     /**
@@ -81,6 +98,26 @@ class OrderController extends Controller
     protected function grid()
     {
         return Admin::grid(Order::class, function (Grid $grid) {
+            $grid->filter(function ($filter) {
+
+                $filter->expand();
+                $filter->like('sn', '订单号');
+                $filter->in('status', '状态')->select(Order::getStatus());
+                $filter->in('type', '类型')->select(Order::getType());
+                $filter->between('created_at', '创建时间')->datetime();
+                $filter->between('updated_at', '修改时间')->datetime();
+            });
+            $grid->tools(function ($tools) {
+                $tools->batch(function ($batch) {
+                    $batch->disableDelete();
+                });
+            });
+            $grid->actions(function ($actions) {
+                $actions->disableDelete();
+                $actions->disableView();
+            });
+
+            $grid->disableCreateButton();
             $grid->disableExport();
             $grid->id('ID')->sortable();
 
@@ -119,13 +156,6 @@ class OrderController extends Controller
             $grid->seller_shipped_at('发货时间');
             $grid->created_at('创建时间');
             $grid->updated_at('修改时间');
-            $grid->filter(function ($filter) {
-                $filter->like('sn', '订单号');
-                $filter->in('status', '状态')->select(Order::getStatus());
-                $filter->in('type', '类型')->select(Order::getType());
-                $filter->between('created_at', '创建时间')->datetime();
-                $filter->between('updated_at', '修改时间')->datetime();
-            });
         });
     }
 

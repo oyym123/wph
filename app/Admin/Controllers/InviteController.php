@@ -65,6 +65,12 @@ class InviteController extends Controller
         });
     }
 
+
+    public function show()
+    {
+        echo "<script>history.go(-1);</script>";
+    }
+
     /**
      * Make a grid builder.
      *
@@ -73,6 +79,19 @@ class InviteController extends Controller
     protected function grid()
     {
         return Admin::grid(Invite::class, function (Grid $grid) {
+
+            $grid->tools(function ($tools) {
+                $tools->batch(function ($batch) {
+                    $batch->disableDelete();
+                });
+            });
+            $grid->actions(function ($actions) {
+                $actions->disableDelete();
+                $actions->disableEdit();
+                $actions->disableView();
+            });
+
+            $grid->disableCreateButton();
             $grid->disableExport();
             $grid->id('ID')->sortable();
             $grid->level_1('用户')->display(function ($released) {

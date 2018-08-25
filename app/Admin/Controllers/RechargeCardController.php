@@ -72,6 +72,11 @@ class RechargeCardController extends Controller
     protected function grid()
     {
         return Admin::grid(RechargeCard::class, function (Grid $grid) {
+
+            $grid->actions(function ($actions) {
+
+                $actions->disableView();
+            });
             $grid->disableExport();
             $grid->id('ID')->sortable();
             $grid->amount('充值金额');
@@ -84,6 +89,11 @@ class RechargeCardController extends Controller
         });
     }
 
+
+    public function show()
+    {
+        echo "<script>history.go(-1);</script>";
+    }
     /**
      * Make a form builder.
      *

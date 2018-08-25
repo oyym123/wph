@@ -48,6 +48,12 @@ class CollectionController extends Controller
         });
     }
 
+
+    public function show()
+    {
+        echo "<script>history.go(-1);</script>";
+    }
+
     /**
      * Create interface.
      *

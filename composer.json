@@ -11,7 +11,7 @@
         "php": ">=7.0.0",
         "aws/aws-sdk-php": "~3.0",
         "darkaonline/l5-swagger": "5.5.*",
-        "encore/laravel-admin": "1.5.*",
+        "encore/laravel-admin": "^1.5",
         "fideloper/proxy": "~3.3",
         "flc/alidayu": "^2.0",
         "flc/dysms": "^1.0",

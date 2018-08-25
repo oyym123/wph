@@ -69,6 +69,11 @@ class WithdrawController extends Controller
         });
     }
 
+    public function show()
+    {
+        echo "<script>history.go(-1);</script>";
+    }
+
     /**
      * Make a grid builder.
      *
@@ -77,12 +82,17 @@ class WithdrawController extends Controller
     protected function grid()
     {
         return Admin::grid(Withdraw::class, function (Grid $grid) {
-            $grid->actions(function ($actions) {
-                // 没有`delete-image`权限的角色不显示删除按钮
-                if (!Admin::user()->can('delete-image')) {
-                    $actions->disableDelete();
-                }
+
+            $grid->tools(function ($tools) {
+                $tools->batch(function ($batch) {
+                    $batch->disableDelete();
+                });
             });
+            $grid->actions(function ($actions) {
+                $actions->disableView();
+            });
+
+            $grid->disableCreateButton();
             $grid->disableExport();
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器

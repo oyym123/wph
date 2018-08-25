@@ -31,8 +31,8 @@ class ProductController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('商品管理');
+            $content->description('列表');
 
             $content->body($this->grid());
         });
@@ -53,6 +53,12 @@ class ProductController extends Controller
 
             $content->body($this->form()->edit($id));
         });
+    }
+
+
+    public function show()
+    {
+        echo "<script>history.go(-1);</script>";
     }
 
     /**
@@ -79,6 +85,11 @@ class ProductController extends Controller
     protected function grid()
     {
         return Admin::grid(Product::class, function (Grid $grid) {
+
+            $grid->actions(function ($actions) {
+                $actions->disableView();
+            });
+
             $grid->disableExport();
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器
