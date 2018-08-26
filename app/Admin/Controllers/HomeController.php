@@ -3,7 +3,9 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Order;
+use App\Models\Period;
 use App\Models\Product;
+use App\Models\Withdraw;
 use App\User;
 use Encore\Admin\Widgets\InfoBox;
 use App\Http\Controllers\Controller;
@@ -67,6 +69,56 @@ class HomeController extends Controller
                     $column->append($infoBox3);
                 });
 
+            });
+
+
+            $content->row(function (Row $row) {
+                $row->column(4, function (Column $column) {
+                    $infoBox1 = new InfoBox('平台总拍币数量', 'money', 'aqua',
+                        '/admin/users?is_real=1',
+                        User::all()->sum('bid_currency')
+                    );
+                    $column->append($infoBox1);
+                });
+
+                $row->column(4, function (Column $column) {
+
+                    $infoBox3 = new InfoBox('平台总购物币数量', 'money', 'blue', '/admin/users?is_real=1',
+                        User::all()->sum('shopping_currency')
+                    );
+                    $column->append($infoBox3);
+                });
+
+                $row->column(4, function (Column $column) {
+                    $infoBox2 = new InfoBox('平台会员推广可提金额', 'money', 'purple', '/admin/users?is_real=1',
+                        User::all()->sum('invite_currency')
+                    );
+                    $column->append($infoBox2);
+                });
+            });
+
+            $content->row(function (Row $row) {
+                $row->column(4, function (Column $column) {
+                    $infoBox1 = new InfoBox('平台已经提现总额', 'money', 'green', '/admin/users?is_real=1',
+                        Withdraw::where(['status' => Withdraw::STATUS_COMPLETED])->sum('amount')
+                    );
+                    $column->append($infoBox1);
+                });
+
+                $row->column(4, function (Column $column) {
+                    $infoBox2 = new InfoBox('平台拍卖流水总额(真实会员)', 'money', 'yellow', '/admin/order',
+                        Order::where('status', '<>', Order::STATUS_WAIT_PAY)->sum('pay_amount')
+                    );
+                    $column->append($infoBox2);
+                });
+
+                $row->column(4, function (Column $column) {
+                    $infoBox2 = new InfoBox('平台拍卖流水总额(含虚拟会员)', 'money', 'red    ', '/admin/period',
+                        number_format(Period::where(['real_bid' => User::TYPE_ROBOT])->sum('bid_price') * 10
+                            + Order::where('status', '<>', Order::STATUS_WAIT_PAY)->sum('pay_amount'), 2)
+                    );
+                    $column->append($infoBox2);
+                });
             });
 
 //            $content->row(function (Row $row) {

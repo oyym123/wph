@@ -240,6 +240,14 @@ class User extends Authenticatable
         }
     }
 
+    /** 所有拍币统计 */
+    public function bidCurrencyCount()
+    {
+        User::where()->sum('bid_currency');
+
+    }
+
+
     /** 获取用户信息表 */
     public function UserInfo()
     {

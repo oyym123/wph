@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Base;
+use App\Models\BidType;
 use App\Models\Common;
 use App\Models\Period;
 use App\Models\Product;
@@ -48,8 +49,8 @@ class ProductController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('商品');
+            $content->description('编辑');
 
             $content->body($this->form()->edit($id));
         });
@@ -70,8 +71,8 @@ class ProductController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
-            $content->description('description');
+            $content->header('商品');
+            $content->description('新建');
 
             $content->body($this->form());
         });
@@ -106,10 +107,11 @@ class ProductController extends Controller
             });
             $grid->title('标题')->color('');
             $grid->sell_price('市场价');
-            $grid->bid_step('每次竞拍价');
+            $grid->bid_step('每次涨价');
             $grid->type('产品类型')->display(function ($released) {
                 return ProductType::getOne($released, ['name'])->name;
             });
+            $grid->pay_amount('每次竞拍价');
             $grid->buy_by_diff('是否可以差价购')->display(function ($released) {
                 return $released ? '是' : '否';
             });
@@ -145,6 +147,7 @@ class ProductController extends Controller
             $form->currency('bid_step', '每次竞拍价格')->symbol('￥')->rules('required', [
                 'required' => '请填写市场价',
             ])->default(0.1);
+            $form->select('bid_type', '出价类型')->options(BidType::getList(1))->default(1);
             $form->select('type', '产品类型')->options(ProductType::getList(1));
             $form->image('img_cover', '产品封面图');
             // $form->image('imgs', '产品子图');
@@ -161,7 +164,10 @@ class ProductController extends Controller
             $form->display('updated_at', '修改时间');
 
             $form->saved(function (Form $form) {
-                $payAmount = $form->model()->type == 1 ? 10 : 1;
+                $payAmount = BidType::find($form->model()->bid_type)->amount;
+                if ($form->model()->type == 1) {
+                    $payAmount = 10;
+                }
                 $collectionCount = $form->model()->collection_count;
                 if ($form->model()->collection_count <= 0) {
                     $collectionCount = rand(100, 9999);

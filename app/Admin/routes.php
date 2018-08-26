@@ -35,6 +35,8 @@ Route::group([
         $router->resource('invite', 'InviteController');
         //订单管理
         $router->resource('order', 'OrderController');
+        //出价分类
+        $router->resource('bid-type', 'BidTypeController');
     });
 
     $router->get('/', 'HomeController@index');
