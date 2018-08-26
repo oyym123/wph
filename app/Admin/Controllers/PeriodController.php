@@ -28,7 +28,7 @@ class PeriodController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('产品期数');
+            $content->header('竞拍管理');
             $content->description('列表');
             $content->body($this->grid());
         });
@@ -44,7 +44,7 @@ class PeriodController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('产品期数');
+            $content->header('竞拍管理');
             $content->description('编辑');
 
             $content->body($this->form()->edit($id));
@@ -60,7 +60,7 @@ class PeriodController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('header');
+            $content->header('竞拍管理');
             $content->description('description');
 
             //  $content->body($this->form());

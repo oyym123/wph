@@ -177,6 +177,7 @@ class ProductController extends Controller
                     DB::table('product')->where(['id' => $form->model()->id])->update([
                         'pay_amount' => $payAmount,
                         'is_bid' => Product::BID_YES,
+                        'is_shop' => Product::SHOPPING_NO,
                         'collection_count' => $collectionCount
                     ]);
 

@@ -25,7 +25,7 @@ class ProductTypeController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('产品分类');
+            $content->header('商品分类');
             $content->description('列表');
 
             $content->body($this->grid());
@@ -42,7 +42,7 @@ class ProductTypeController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('产品类型');
+            $content->header('商品分类');
             $content->description('编辑');
 
             $content->body($this->form()->edit($id));
@@ -64,7 +64,7 @@ class ProductTypeController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('产品类型');
+            $content->header('商品分类');
             $content->description('新建');
 
             $content->body($this->form());
