@@ -199,10 +199,15 @@ class OrderController extends WebController
                         ->groupBy('period_id')
                         ->get()->toArray();
                     $periodIds = array_column($expend, 'period_id');
+                    $order = DB::table('order')
+                        ->select('period_id')
+                        ->where([
+                            'buyer_id' => $this->userId,
+                        ])->where('status', '<>', Order::STATUS_WAIT_PAY)->get()->toArray();
+                    $periodIds = array_diff($periodIds, array_column($order, 'period_id'));
                     $periods = Period::whereIn('id', $periodIds)->where([
                         'status' => Period::STATUS_OVER
                     ])->where('user_id', '<>', $this->userId)->offset($this->offset)->limit($this->limit)->get();
-
                     foreach ($periods as $period) {
                         $product = $period->product;
                         $payAmount = DB::table('bid')
