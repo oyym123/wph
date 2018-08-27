@@ -57,7 +57,9 @@ class WxNotifyController extends Controller
                 if ($incomes) {
                     exit('已经充值过了!');
                 }
-                $amount = $order->pay_amount + $order->gift_amount;
+                $amount = $order->pay_amount;
+                $giftAmount = $order->gift_amount;
+
                 $income = [
                     'type' => Income::TYPE_BID_CURRENCY,
                     'user_id' => $order->buyer_id,
@@ -73,6 +75,8 @@ class WxNotifyController extends Controller
                 (new Invite())->shareMoney($order->buyer_id, $order->pay_amount, $order->id);
                 //拍币充值成功
                 DB::table('users')->where(['id' => $order->buyer_id])->increment('bid_currency', $amount);
+                //送的赠币
+                DB::table('users')->where(['id' => $order->buyer_id])->increment('gift_currency', $giftAmount);
                 //标记已付款
                 DB::table('order')->where(['id' => $order->id])->update(['status' => Order::STATUS_PAYED]);
             } else {
