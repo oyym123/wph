@@ -326,6 +326,10 @@ class PayController extends WebController
         try {
             if ($amount == 0) {
                 $status = Order::STATUS_WAIT_SHIP;//待发货
+            } else {
+                if ($type == Order::TYPE_SHOP) {
+                    $flag = 2;
+                }
             }
             $orderInfo = [
                 'pay_type' => Pay::TYPE_WEI_XIN,
@@ -390,6 +394,8 @@ class PayController extends WebController
 
         if ($flag === 1) { //表示购物币购买
             self::showMsg('您已支付成功!', 4);
+        } elseif ($flag === 2) {
+            self::showMsg('抱歉,您的购物币不足!', 4);
         } else {
             self::showMsg($res);
         }
