@@ -71,6 +71,9 @@ class Expend extends Common
                 'amount' => '-' . round($expend->amount) . $this->getCurrencyStr($expend->type),
             ];
         }
+        if (empty($data) && $this->offset == 0) {
+            self::showMsg('没有数据', 2);
+        }
         return $data;
     }
 }
