@@ -63,6 +63,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::post('bid/auto', 'BidController@auto');
     Route::post('bid/newest-bid', 'BidController@newestBid');
     Route::get('bid/auto-info', 'BidController@autoInfo');
+    Route::get('bid/bid-socket', 'BidController@bidSocket');
 
     /** 支付 */
     Route::post('pay/confirm', 'PayController@confirm'); //确认订单
