@@ -287,11 +287,9 @@ class BidSocket
         $periodId = isset($recv_msg['period_id']) ? $recv_msg['period_id'] : '';
         $response = [];
         switch ($msg_type) {
-            case 'user':
-                $uname = $this->sockets[(int)$socket]['uname'];
+            case 'bid':
                 $msg_content = (new Bid())->newestBid($periodId);
-                $response['type'] = 'user';
-                $response['from'] = $uname;
+                $response['type'] = 'bid';
                 $response['content'] = $msg_content;
                 $response['period_id'] = $periodId;
                 break;
