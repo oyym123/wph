@@ -116,16 +116,17 @@ class UserController extends WebController
                 $data['email'] = rand(10000, 99999) . '@163.com';
                 $data['gift_currency'] = config('bid.user_gift_currency');
                 $model = (new User())->saveData($data);
-            }
 
-            if ($request->invite_code && empty($model->be_invited_code)) {
-                if ((new Invite())->checkoutCode($request->invite_code, $model->id)) {
-                    DB::table('users')->where('id', $model->id)->update([
-                        'invite_code' => $model->invite_code,
-                        'be_invited_code' => $request->invite_code
-                    ]);
-                    (new Invite())->saveData($model->id, $request->invite_code);
+                if ($request->invite_code && empty($model->be_invited_code)) {
+                    if ((new Invite())->checkoutCode($request->invite_code, $model->id)) {
+                        DB::table('users')->where('id', $model->id)->update([
+                            'invite_code' => $model->invite_code,
+                            'be_invited_code' => $request->invite_code
+                        ]);
+                        (new Invite())->saveData($model->id, $request->invite_code);
+                    }
                 }
+
             }
 
             Redis::hset('token', $token, $model->id);
