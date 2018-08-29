@@ -310,8 +310,8 @@ class UserController extends WebController
             'bid_currency' => $this->userIdent->bid_currency,
             'gift_currency' => $this->userIdent->gift_currency,
             'shopping_currency' => $this->userIdent->shopping_currency,
-            'expend' => (new Expend())->detail($this->userId),
-            'income' => (new Income())->detail($this->userId),
+//            'expend' => (new Expend())->detail($this->userId),
+//            'income' => (new Income())->detail($this->userId),
         ];
         self::showMsg($data);
     }
