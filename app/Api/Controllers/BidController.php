@@ -11,6 +11,7 @@ namespace App\Api\Controllers;
 use App\Models\AutoBid;
 use App\Models\Bid;
 use App\Api\components\WebController;
+use App\Models\BidSocket;
 
 class BidController extends WebController
 {
@@ -142,5 +143,11 @@ class BidController extends WebController
     {
         $this->auth();
         self::showMsg(AutoBid::isAutoBid($this->userId, $this->request->period_id));
+    }
+
+    public function bidSocket()
+    {
+        //长链接
+        $ws = new BidSocket("127.0.0.1", "8081");
     }
 }
