@@ -284,25 +284,9 @@ class BidSocket
     private function dealMsg($socket, $recv_msg)
     {
         $msg_type = $recv_msg['type'];
-        $msg_content = $recv_msg['content'];
         $periodId = isset($recv_msg['period_id']) ? $recv_msg['period_id'] : '';
         $response = [];
-
         switch ($msg_type) {
-            case 'login':
-                $this->sockets[(int)$socket]['uname'] = $msg_content;
-                // 取得最新的名字记录
-                $user_list = array_column($this->sockets, 'uname');
-                $response['type'] = 'login';
-                $response['content'] = $msg_content;
-                $response['user_list'] = $user_list;
-                break;
-            case 'logout':
-                $user_list = array_column($this->sockets, 'uname');
-                $response['type'] = 'logout';
-                $response['content'] = $msg_content;
-                $response['user_list'] = $user_list;
-                break;
             case 'user':
                 $uname = $this->sockets[(int)$socket]['uname'];
                 $msg_content = (new Bid())->newestBid($periodId);
