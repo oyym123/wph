@@ -15,7 +15,7 @@ date_default_timezone_set('Asia/shanghai');
 
 class BidSocket
 {
-    const LOG_PATH = '/tmp/';
+    const LOG_PATH = '/usr/local/node/';
     const LISTEN_SOCKET_NUM = 900;
 
     /**
