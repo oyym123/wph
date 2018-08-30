@@ -374,7 +374,7 @@ class Bid extends Common
                 //加入竞拍队列，3秒之后进入数据库Bid表
                 //dispatch(new BidTask($data));
             }
-                $this->socket($period->id);
+            $this->socket($period->id);
         }
     }
 
@@ -382,16 +382,20 @@ class Bid extends Common
     public function bidRecord($periodId)
     {
         $data = [];
-        $redis = app('redis')->connection('first');
         if ($this->limit == 3) {
+            $redis = app('redis')->connection('first');
             foreach ($this->getThreePersonId($redis, $periodId) as $key => $bid) {
                 if ($bid['bid_price']) {
                     $data[] = [
+                        'period_id' => $bid['period_id'],
                         'bid_price' => number_format($bid['bid_price'], 2),
+                        'num' => round($bid['bid_price'], 2) * 10,
                         'bid_time' => $bid['end_time'],
                         'nickname' => $bid['nickname'],
                         'avatar' => '',
+                        'status' => $bid['status'],
                         'area' => $bid['province'] . $bid['city'],
+                        'countdown' => ($x = $redis->ttl('period@countdown' . $bid['period_id'])) > 0 ? $x : 0,
                         'bid_type' => $key == 0 ? self::TYPE_LEAD : self::TYPE_OUT, //0 =出局 1=领先
                     ];
                 }
