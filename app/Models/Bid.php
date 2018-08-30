@@ -340,7 +340,7 @@ class Bid extends Common
                 'end_time' => $time,
                 'is_real' => User::TYPE_ROBOT
             ];
-            
+
             //暂时不用
             if (0) {
                 $this->socket($period->id);
@@ -491,7 +491,7 @@ class Bid extends Common
     public function socket($periodId)
     {
         set_time_limit(0);
-        exec("node /usr/local/node/client.js $periodId");
+        exec("/usr/sbin/node /usr/local/node/client.js $periodId");
         //shell_exec("node G:node/client.js $periodId");
     }
 }
