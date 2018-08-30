@@ -272,6 +272,7 @@ class Bid extends Common
         $periods = new Period();
         $products = new Product();
         $redis = app('redis')->connection('first');
+
         //获取所有正在进行中的期数,循环加入机器人竞拍，每8秒扫描一遍
         foreach ($periods->getAll() as $period) {
             //当有真人参与，且跟拍到平均价以上时，机器人将不跟拍
@@ -482,10 +483,11 @@ class Bid extends Common
     {
         return $this->belongsTo('App\Models\Period');
     }
-    
+
     public function socket($periodId)
     {
         set_time_limit(0);
-        shell_exec("node /usr/local/node/client.js $periodId");
+        exec("node /usr/local/node/client.js $periodId");
+        //shell_exec("node G:node/client.js $periodId");
     }
 }
