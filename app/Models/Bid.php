@@ -341,11 +341,6 @@ class Bid extends Common
                 'is_real' => User::TYPE_ROBOT
             ];
 
-            //暂时不用
-            if (0) {
-                $this->socket($period->id);
-            }
-
             if ($data['status'] == self::STATUS_SUCCESS) {
                 //竞拍成功则立即保存
                 $bid = Bid::create($data);
@@ -379,6 +374,7 @@ class Bid extends Common
                 //加入竞拍队列，3秒之后进入数据库Bid表
                 //dispatch(new BidTask($data));
             }
+                $this->socket($period->id);
         }
     }
 
