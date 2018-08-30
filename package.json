@@ -23,5 +23,7 @@
         "webpack": "^3.9.1",
         "weui-distpicker": "^0.1.1"
     },
-    "dependencies": {}
+    "dependencies": {
+        "ws": "^6.0.0"
+    }
 }
