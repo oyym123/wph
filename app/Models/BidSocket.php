@@ -288,7 +288,9 @@ class BidSocket
         $response = [];
         switch ($msg_type) {
             case 'bid':
-                $msg_content = (new Bid())->newestBid($periodId);
+                $bid =new Bid();
+                $bid->limit=3;
+                $msg_content = $bid->bidRecord($periodId);
                 $response['type'] = 'bid';
                 $response['content'] = $msg_content;
                 $response['period_id'] = $periodId;
