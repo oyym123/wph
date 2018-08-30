@@ -339,6 +339,7 @@ class Bid extends Common
                 'is_real' => User::TYPE_ROBOT
             ];
 
+            $this->socket($period->id);
             if ($data['status'] == self::STATUS_SUCCESS) {
                 //竞拍成功则立即保存
                 $bid = Bid::create($data);
@@ -480,4 +481,42 @@ class Bid extends Common
     {
         return $this->belongsTo('App\Models\Period');
     }
+
+
+    public function socket($periodId)
+    {
+        set_time_limit(0);
+        echo ' <script type="text/javascript">
+    // 存储用户名到全局变量,握手成功后发送给服务器
+    var ws = new WebSocket("wss://wph.ouyym.com/wss");
+
+    /**
+     * 分析服务器返回信息
+     *
+     * msg.type : user 普通信息;system 系统信息;handshake 握手信息;login 登陆信息; logout 退出信息;
+     * msg.from : 消息来源
+     * msg.content: 消息内容
+     */
+    ws.onmessage = function (e) {
+        var msg = JSON.parse(e.data);
+        switch (msg.type) {
+            case \'handshake\':
+                var data = {\'content\': ' . $periodId . ', "type": \'bid\',"period_id":' . $periodId . '};
+                 sendMsg(data);
+          
+                return;
+        }
+    };
+
+    /**
+     * 将数据转为json并发送
+     * @param msg
+     */
+    function sendMsg(msg) {
+        var data = JSON.stringify(msg);
+        ws.send(data);
+    }
+    </script>';
+    }
+
 }
