@@ -340,8 +340,12 @@ class Bid extends Common
                 'end_time' => $time,
                 'is_real' => User::TYPE_ROBOT
             ];
+            
+            //暂时不用
+            if (0) {
+                $this->socket($period->id);
+            }
 
-            $this->socket($period->id);
             if ($data['status'] == self::STATUS_SUCCESS) {
                 //竞拍成功则立即保存
                 $bid = Bid::create($data);
