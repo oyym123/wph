@@ -43,6 +43,7 @@ Route::group(['middleware' => 'web'], function () {
 
     //产品
     Route::get('product', 'ProductController@index');
+    Route::get('product/jd-product', 'ProductController@jdProduct');
     Route::get('product/type', 'ProductController@type');
     Route::get('product/detail', 'ProductController@detail');
 

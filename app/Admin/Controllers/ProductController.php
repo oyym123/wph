@@ -95,6 +95,8 @@ class ProductController extends Controller
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器
                 $filter->like('title', '标题');
+                $filter->in('status', '状态')->select(Common::commonStatus());
+                $filter->in('type', '产品类型')->select(ProductType::getList(1));
                 // 设置created_at字段的范围查询
                 $filter->between('created_at', '创建时间')->datetime();
                 $filter->between('updated_at', '修改时间')->datetime();
@@ -156,7 +158,7 @@ class ProductController extends Controller
 //            $form->switch('is_shop', '是否加入购物币专区')->states(Product::getIsShop())->default(1);
 //            $form->switch('is_bid', '是否加入竞拍列表')->states(Product::getIsBid())->default(1);
 
-            $form->switch('is_shop', '售出类型')->states(Common::getStates('竞拍列表', '购物币专区'))->default(1)
+            $form->switch('is_shop', '售出类型')->states(Common::getStates('购物币专区', '竞拍列表'))->default(0)
                 ->help('加入竞拍列表 或 购物币专区');
             $form->switch('status', '状态')->states(Common::getStates())->default(1)
                 ->help('当设置无效时，【竞拍】该产品将终止下一期竞拍，【购物币专区】将不会有该产品');

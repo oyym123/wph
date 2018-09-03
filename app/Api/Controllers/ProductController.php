@@ -308,4 +308,20 @@ class ProductController extends WebController
         $product->userId = $this->userId;
         self::showMsg($product->shopDetail($this->request->product_id));
     }
+
+    /**
+     * @SWG\Get(path="/api/product/jd-product",
+     *   tags={"产品"},
+     *   summary="获取京东信息",
+     *   description="Author: OYYM",
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function jdProduct()
+    {
+        $product = new Product();
+        $res = $product->getJd($this->request);
+    }
 }

@@ -37,6 +37,8 @@ Route::group([
         $router->resource('order', 'OrderController');
         //出价分类
         $router->resource('bid-type', 'BidTypeController');
+        //上传产品
+        $router->resource('upload-product', 'UploadProductController');
     });
 
     $router->get('/', 'HomeController@index');
