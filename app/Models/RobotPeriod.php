@@ -48,6 +48,15 @@ class RobotPeriod extends Common
         }
     }
 
+    /** 删除期数结束时的机器人，提升数据库查询效率 */
+    public function delRobot()
+    {
+        $periodIds = DB::table('period')->select('id')->where(['status' => Period::STATUS_OVER])->get()->toArray();
+        if ($periodIds) {
+            DB::table('robot_period')->whereIn('period_id', array_column($periodIds, 'id'))->delete();
+        }
+    }
+
     /** 获取关联的期数 */
     public static function getInfo($periodId)
     {

@@ -28,9 +28,10 @@ class Kernel extends ConsoleKernel
         //$schedule->command('backup:run')->daily()->at('02:00');
         // $schedule->command('inspire')->everyTenMinutes();
         //$schedule->command('test')->everyMinute();
-        $schedule->command('bid')->everyMinute();
-        $schedule->command('auto-bid')->everyMinute();
-        $schedule->command('checkout-bid')->everyMinute();
+        $schedule->command('bid')->daily()->at('02:00');
+        $schedule->command('auto-bid')->daily()->at('02:00');
+        $schedule->command('checkout-bid')->daily()->at('02:00');
+        $schedule->command('del-robot')->daily()->at('02:00');
         //$schedule->command('route:list')->dailyAt('02:00');
         // $schedule->command('inspire')
         //          ->hourly();
