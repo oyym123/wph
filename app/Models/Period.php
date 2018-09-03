@@ -207,6 +207,7 @@ class Period extends Common
                 'product_type' => $product->type,
                 'img_cover' => $product->getImgCover(),
                 'imgs' => array_merge(self::getImgs($product->imgs), [$product->getImgCover()]),
+                'desc_imgs' => self::getImgs($product->desc_imgs),
                 'sell_price' => $product->sell_price,
                 'bid_step' => $product->pay_amount,
                 'price_add_length' => $product->price_add_length,

@@ -154,6 +154,7 @@ class ProductController extends Controller
             $form->image('img_cover', '产品封面图');
             // $form->image('imgs', '产品子图');
             $form->multipleImage('imgs', '产品子图')->removable();
+            $form->multipleImage('desc_imgs', '产品详情图')->removable();
             $form->switch('buy_by_diff', '是否可以差价购买')->states(Product::$buyByDiff)->default(1);
 //            $form->switch('is_shop', '是否加入购物币专区')->states(Product::getIsShop())->default(1);
 //            $form->switch('is_bid', '是否加入竞拍列表')->states(Product::getIsBid())->default(1);

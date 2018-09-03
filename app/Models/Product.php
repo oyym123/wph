@@ -56,6 +56,18 @@ class Product extends Common
         }
     }
 
+    public function setDescImgsAttribute($pictures)
+    {
+        if (is_array($pictures)) {
+            $this->attributes['desc_imgs'] = json_encode($pictures);
+        }
+    }
+
+    public function getDescImgsAttribute($pictures)
+    {
+        return json_decode($pictures, true) ?: [];
+    }
+
     public function getImgsAttribute($pictures)
     {
         return json_decode($pictures, true) ?: [];
@@ -136,6 +148,7 @@ class Product extends Common
                 'is_favorite' => $collection->isCollect($this->userId, $product->id),
                 'img_cover' => $product->getImgCover(),
                 'imgs' => array_merge(self::getImgs($product->imgs), [$product->getImgCover()]),
+                'desc_imgs' => self::getImgs($product->desc_imgs),
                 'evaluate' => (new Evaluate())->getList(['product_id' => $productId])
             ];
         } else {
@@ -179,18 +192,33 @@ class Product extends Common
         }
         $url = $upload->jd_url;
         $output = self::getInfo("$url");
-        preg_match_all("/data-origin=\"(.*)(?)\" alt=\"(.*)(?)\"/", $output, $titles);
-        if (empty($titles[2][0])) {
-            exit();
+        preg_match_all("/cd.jd.com\/description(.*)(?)\'/siU", $output, $desc);
+
+        $descImage = $imgUrls = $descImages = $imgs = [];
+        if ($desc[1][0]) {
+            $descUrl = 'cd.jd.com/description' . $desc[1][0];
+            $outputDesc = self::getInfo("$descUrl");
+            preg_match_all("/\/\/img(.*)(?)(png|jpg)/siU", $outputDesc, $descImg);
+//            echo '<pre>';
+//            print_r($descImg);
+//            exit;
+            $descImages = $descImg[0];
+
         }
-        preg_match_all("/\"jfs(.*)(?)\]/", $output, $name);
+        preg_match_all("/data-origin=\"(.*)(?)\" alt=\"(.*)(?)\"/", $output, $titles);
+        $title = '';
+        if ($titles[2][0]) {
+            preg_match_all("/\"jfs(.*)(?)\]/", $output, $name);
+            $title = iconv('GBK', 'UTF-8', $titles[2][0]);
+            $str = str_replace('"', '', '"jfs' . $name[1][0]);
+            $imgUrls = explode(',', $str);
+        }
 
-        $title = iconv('GBK', 'UTF-8', $titles[2][0]);
-        $str = str_replace('"', '', '"jfs' . $name[1][0]);
-        $imgUrls = explode(',', $str);
+        foreach ($descImages as $image) {
+            $img = str_replace('//', '', $image);
+            $descImage[] = QiniuHelper::fetchImg($img)[0]['key'];
+        }
 
-
-        $imgs = [];
         foreach ($imgUrls as $imgUrl) {
             $imgs[] = QiniuHelper::fetchImg('img13.360buyimg.com/n1/s450x450_' . $imgUrl)[0]['key'];
         }
@@ -201,6 +229,7 @@ class Product extends Common
         $model->collection_count = rand(500, 9999);
         $model->img_cover = $imgs[0];
         $model->imgs = $imgs;
+        $model->desc_imgs = $descImage;
         $model->is_shop = $isShop;
         $model->pay_amount = $payAmount;
         $model->sell_price = $upload->sell_price;
