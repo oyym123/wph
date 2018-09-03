@@ -224,7 +224,7 @@ class Product extends Common
         }
         $model = new Product();
         $model->title = $title;
-        $model->type = rand(1, 5);
+        $model->type = $upload->product_type;
         $model->short_title = $title;
         $model->collection_count = rand(500, 9999);
         $model->img_cover = $imgs[0];
