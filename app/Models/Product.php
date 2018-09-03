@@ -177,6 +177,7 @@ class Product extends Common
 
     public static function getJd($uploadId, $flag = '')
     {
+        set_time_limit(0);
         $upload = UploadProduct::find($uploadId);
         $payAmount = BidType::find($upload->bid_type)->amount;
         if ($upload->product_type == 1) {
@@ -199,11 +200,7 @@ class Product extends Common
             $descUrl = 'cd.jd.com/description' . $desc[1][0];
             $outputDesc = self::getInfo("$descUrl");
             preg_match_all("/\/\/img(.*)(?)(png|jpg)/siU", $outputDesc, $descImg);
-//            echo '<pre>';
-//            print_r($descImg);
-//            exit;
-            $descImages = $descImg[0];
-
+            $descImages = array_slice($descImg[0], 0, 6);
         }
         preg_match_all("/data-origin=\"(.*)(?)\" alt=\"(.*)(?)\"/", $output, $titles);
         $title = '';

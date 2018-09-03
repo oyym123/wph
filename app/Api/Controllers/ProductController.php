@@ -322,6 +322,6 @@ class ProductController extends WebController
     public function jdProduct()
     {
         $product = new Product();
-        $res = $product->getJd(5);
+        $res = $product->getJd(7);
     }
 }
