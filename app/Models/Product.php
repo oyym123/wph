@@ -179,11 +179,16 @@ class Product extends Common
         }
         $url = $upload->jd_url;
         $output = self::getInfo("$url");
-        preg_match_all("/\"jfs(.*)(?)\]/", $output, $name);
         preg_match_all("/data-origin=\"(.*)(?)\" alt=\"(.*)(?)\"/", $output, $titles);
+        if (empty($titles[2][0])) {
+            exit();
+        }
+        preg_match_all("/\"jfs(.*)(?)\]/", $output, $name);
+
         $title = iconv('GBK', 'UTF-8', $titles[2][0]);
         $str = str_replace('"', '', '"jfs' . $name[1][0]);
         $imgUrls = explode(',', $str);
+
 
         $imgs = [];
         foreach ($imgUrls as $imgUrl) {
