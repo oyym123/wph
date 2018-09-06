@@ -110,7 +110,7 @@ class HomeController extends WebController
     /**
      * @SWG\Get(path="/api/home/deal-end",
      *   tags={"首页"},
-     *   summary="闪拍头条&已完成商品的接口数据",
+     *   summary="微拍头条&已完成商品的接口数据",
      *   description="Author: OYYM",
      *   @SWG\Response(
      *       response=200,description="

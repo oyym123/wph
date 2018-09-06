@@ -47293,7 +47293,7 @@ var staticRenderFns = [
               staticClass: "weui-footer__link",
               attrs: { href: "javascript:void(0);" }
             },
-            [_vm._v("微排行")]
+            [_vm._v("微拍行")]
           )
         ]),
         _vm._v(" "),

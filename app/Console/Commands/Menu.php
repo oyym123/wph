@@ -44,7 +44,7 @@ class Menu extends Command
 
         $buttons = [
             [
-                "name" => "微排行",
+                "name" => "微拍行",
                 "sub_button" => [
                     [
                         "type" => "click",

@@ -32,7 +32,7 @@ class UserController extends WebController
     {
         $data = [
             'title' => '注册成功',
-            'desc' => '您已成功注册成为微排行会员!',
+            'desc' => '您已成功注册成为微拍行会员!',
             'btn' => '观看视频',
             'url' => '../article'
         ];

@@ -15,7 +15,7 @@
 </div>
 <div style="color: #f09431;text-align: center;">
     <p style="font-size: xx-small">&nbsp;</p>
-    <img src="/images/user-center/huangguan.png"> 会员等级:微排行注册会员
+    <img src="/images/user-center/huangguan.png"> 会员等级:微拍行注册会员
 </div>
 <p style="font-size: xx-small">&nbsp;</p>
 <div style="background-color: white">

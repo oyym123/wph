@@ -132,7 +132,7 @@
                     <p>客服热线：<a id="J-callservice" data-num="4009912121" class="service_kefu">400-998-0550</a></p>
                     <p>服务时间：周一至周五 9:30-21:00，周六日：9:30-18:30</p></div>
                 <div id="question"></div>
-                <p class="copyright">所有解释权由微排行所有</p></div>
+                <p class="copyright">所有解释权由微拍行所有</p></div>
         </div>
     </div>
 </body>

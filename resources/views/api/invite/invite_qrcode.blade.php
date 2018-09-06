@@ -21,7 +21,7 @@
             <div align="center" style="background-color: #f8f8f8">
                 <div style="font-size:1px;">&nbsp;</div>
                 <div style="color: #696969;background-color: #f8f8f8">
-                    <b> &nbsp;推荐他人注册还可终身享受消费提成奖励！<br>微排行，期待您的加入！</b></div>
+                    <b> &nbsp;推荐他人注册还可终身享受消费提成奖励！<br>微拍行，期待您的加入！</b></div>
             </div>
             </div>
         </div>

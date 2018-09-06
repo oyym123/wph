@@ -21,7 +21,7 @@
     <div class="container">
         <header></header>
         <div class="com_box_tu">
-            <div class="title">一、微排行怎么玩</div>
+            <div class="title">一、微拍行怎么玩</div>
             <div class="tu tu_1"></div>
             <div class="title">二、如何参与拍卖</div>
             <h1>【第一步】选择心仪产品</h1>
