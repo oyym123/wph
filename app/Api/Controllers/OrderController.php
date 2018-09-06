@@ -152,12 +152,17 @@ class OrderController extends WebController
                     }
                     break;
                 case 1: //我拍中
+                    if ($request->type !== 100) {
+                        $status = [Order::STATUS_COMPLETE, Order::STATUS_WAIT_PAY];
+                    } else {
+                        $status = [Order::STATUS_COMPLETE];
+                    }
                     $orders = Order::has('product')
                         ->where([
                             'buyer_id' => $this->userId,
                             //'type' => Order::TYPE_BID,
-                            'status' => Order::STATUS_COMPLETE
-                        ])->offset($this->offset)->limit($this->limit)->get();
+                            // 'status' => Order::STATUS_COMPLETE
+                        ])->whereIn('status', $status)->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $product = $order->product;
                         if ($order->period_id == 0) {
