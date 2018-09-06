@@ -331,11 +331,19 @@ class Period extends Common
                 'person_rate' => mt_rand(100, 150) / 100,
                 'code' => $code,
             ];
-            $model = self::create($data);
+            $result = self::create($data);
+            $res = DB::table('period')->select(['id'])->where(['created_at' => $result->created_at])->get()->toArray();
+            $ids = array_column($res, 'id');
+            if (count($ids) == 2) {
+                self::find($ids[0])->forceDelete();
+                $id = $ids[1];
+            } else {
+                $id = $result->id;
+            }
             $redis = app('redis')->connection('first');
             //设置倒计时初始时间和初始价格
-            $redis->setex('period@countdown' . $model->id, config('bid.init_countdown'), 1);
-            RobotPeriod::batchSave($model->id, $productId);
+            $redis->setex('period@countdown' . $id, config('bid.init_countdown'), 1);
+            RobotPeriod::batchSave($id, $productId);
         }
     }
 

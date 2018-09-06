@@ -89,6 +89,7 @@ class ProductController extends Controller
 
             $grid->actions(function ($actions) {
                 $actions->disableView();
+                $actions->disableDelete();
             });
 
             $grid->disableExport();
@@ -176,7 +177,7 @@ class ProductController extends Controller
                     $collectionCount = rand(100, 9999);
                 }
                 $status = $form->model()->status;
-                if ($form->model()->is_shop == 1 && $status) {
+                if ($form->model()->is_shop == 0 && $status) {
                     DB::table('product')->where(['id' => $form->model()->id])->update([
                         'pay_amount' => $payAmount,
                         'is_bid' => Product::BID_YES,
@@ -198,7 +199,7 @@ class ProductController extends Controller
                     } else {
                         (new Period())->saveData($form->model()->id);
                     }
-                } else {
+                } elseif ($form->model()->is_shop == 1 && $status){
                     DB::table('product')->where(['id' => $form->model()->id])->update([
                         'pay_amount' => $payAmount,
                         'is_shop' => $status,

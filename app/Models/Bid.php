@@ -314,7 +314,6 @@ class Bid extends Common
             // $redis->setex('bid@lastPrice' . $period->id, 10000, $lastBid);
 
             $robotPeriod = RobotPeriod::getInfo($period->id);
-
             if ($lastPrice) {
                 $price = round($lastPrice + $product->bid_step, 2);
             } else {

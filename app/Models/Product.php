@@ -113,7 +113,7 @@ class Product extends Common
         if ($model = Product::find($id)) {
             return $model;
         }
-        self::showMsg('该产品不存在!', self::CODE_NO_DATA);
+        self::showMsg($id . '该产品不存在!', self::CODE_NO_DATA);
     }
 
     /** 购物币专区 */

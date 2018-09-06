@@ -14,6 +14,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\DB;
 
 class PeriodController extends Controller
 {
@@ -98,9 +99,9 @@ class PeriodController extends Controller
             $grid->id('ID')->sortable();
             $grid->code('期数代码');
             $grid->product_id('产品图片')->display(function ($released) {
-               $product= Product::find($released);
-                return '<a href="product?id='.$product->id.'" target="_blank" ><img src="' .
-                    $product->getImgCover(). '?imageView/1/w/65/h/45" ></a>';
+                $product = DB::table('product')->where(['id' => $released])->first();
+                return '<a href="product?id=' . $product->id . '" target="_blank" ><img src="' .
+                    Common::getImg($product->img_cover) . '?imageView/1/w/65/h/45" ></a>';
             });
             $grid->user_id('中标者ID');
             $grid->bid_price('中标者价格');
@@ -140,7 +141,7 @@ class PeriodController extends Controller
             $form->saved(function (Form $form) {
                 $redis = app('redis')->connection('first');
                 //竞拍开关
-                if($form->model()->status == Period::STATUS_IN_PROGRESS){
+                if ($form->model()->status == Period::STATUS_IN_PROGRESS) {
                     $redis->setex('realPersonBid@periodId' . $form->model()->id, 86400 * 10, $form->model()->id);
                 }
             });

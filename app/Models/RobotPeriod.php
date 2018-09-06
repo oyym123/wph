@@ -31,6 +31,26 @@ class RobotPeriod extends Common
 
     protected $table = 'robot_period';
 
+    /** 异步执行 */
+    public function asyncInsert()
+    {
+        $periods = DB::table('period')->where([
+            'deleted_at' => null,
+            'status' => Period::STATUS_IN_PROGRESS
+        ])->get()->toArray();
+        $ids = [];
+
+        if ($periods) {
+            $ids = array_column($periods, 'id');
+        }
+        
+        $periodIds = DB::table('robot_period')->select('period_id')->whereIn('period_id', $ids)->get()->toArray();
+        $noIds = array_diff($ids, array_column($periodIds, 'period_id'));
+        foreach ($noIds as $id) {
+            $this->batchSave($id, Period::find($id)->product_id);
+        }
+    }
+
     /** 批量分配 */
     public static function batchSave($periodId, $productId)
     {
