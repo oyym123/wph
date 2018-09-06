@@ -53,9 +53,9 @@ class Bid extends Common
         $rate = $period->bid_price / $product->sell_price;
         $lastPrice = $this->getLastBidInfo($redis, $period->id, 'bid_price');
         if ($lastPrice) {
-            $price = number_format($lastPrice + $product->bid_step, 2);
+            $price = round($lastPrice + $product->bid_step, 2);
         } else {
-            $price = number_format($product->bid_step, 2);
+            $price = round($product->bid_step, 2);
         }
 
         DB::table('period')->where(['id' => $periodId])->update([
@@ -316,9 +316,9 @@ class Bid extends Common
             $robotPeriod = RobotPeriod::getInfo($period->id);
 
             if ($lastPrice) {
-                $price = number_format($lastPrice + $product->bid_step, 2);
+                $price = round($lastPrice + $product->bid_step, 2);
             } else {
-                $price = number_format($product->bid_step, 2);
+                $price = round($product->bid_step, 2);
             }
             DB::table('period')->where(['id' => $period->id])->update(['bid_price' => $price]);//自增0.1
             $rate = $period->bid_price / $product->sell_price;
