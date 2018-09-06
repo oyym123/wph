@@ -374,7 +374,7 @@ class Bid extends Common
                 //加入竞拍队列，3秒之后进入数据库Bid表
                 //dispatch(new BidTask($data));
             }
-            // $this->socket($period->id);
+            $this->socket($period->id);
         }
     }
 
