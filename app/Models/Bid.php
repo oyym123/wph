@@ -109,7 +109,10 @@ class Bid extends Common
 
         if ($auto == 1) {
             //当有用户访问的时候才进行广播
-            $this->socket($period->id);
+            $flag = $redis->hget('visit@PeriodRecord', $period->id);
+            if ($flag >= 1) {
+                $this->socket($period->id);
+            }
         }
 
         if ($data['status'] == self::STATUS_FAIL) {
