@@ -491,6 +491,16 @@ class Bid extends Common
         return $this->belongsTo('App\Models\Period');
     }
 
+    public function clearVisit()
+    {
+        $redis = app('redis')->connection('first');
+        $periods = new Period();
+        //获取所有正在进行中的期数,循环加入机器人竞拍，每8秒扫描一遍
+        foreach ($periods->getAll() as $period) {
+            $redis->hset('visit@PeriodRecord', $period->id, 0);
+        }
+    }
+
     public function socket($periodId)
     {
         set_time_limit(0);
