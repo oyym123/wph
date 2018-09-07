@@ -34,8 +34,6 @@ class PeriodController extends WebController
      */
     public function nextPeriod()
     {
-        (new Period())->saveData($this->request->product_id);
-        exit;
         $res = (new Period())->nextPeriod($this->request->product_id);
         self::showMsg(['period_id' => $res]);
     }

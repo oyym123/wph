@@ -332,6 +332,7 @@ class Period extends Common
                 'code' => $code,
             ];
             $result = self::create($data);
+            //防止产生重复的数据
             $res = DB::table('period')->select(['id'])->where(['created_at' => $result->created_at])->get()->toArray();
             $ids = array_column($res, 'id');
             if (count($ids) == 2) {
