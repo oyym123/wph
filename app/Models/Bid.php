@@ -374,7 +374,8 @@ class Bid extends Common
                 //dispatch(new BidTask($data));
             }
             //当有用户访问的时候才进行广播
-            if ($redis->hget('visit@PeriodRecord', $period->id) == 1) {
+            $flag = $redis->hget('visit@PeriodRecord', $period->id);
+            if ($flag == 1) {
                 $this->socket($period->id);
             }
         }
