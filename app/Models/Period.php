@@ -179,6 +179,7 @@ class Period extends Common
         return $this->putCache($cacheKey, $res, 0.1);
     }
 
+
     /** 获取产品详情 */
     public function getProductDetail($id)
     {
@@ -186,15 +187,17 @@ class Period extends Common
         $product = $period->product;
         $auctioneer = $period->Auctioneer;
         $collection = new Collection();
-//       $bid = new Bid();
-//        $bid->limit = 3;
+
         $userCount = DB::table('bid')->select('user_id')->where(['period_id' => $period->id])->groupBy(['user_id'])->get();
         $this->limit = 6;
         $proxy = [];
         if ($this->userId > 0) {
             $proxy = AutoBid::isAutoBid($this->userId, $period->id);
         }
+
         $redis = app('redis')->connection('first');
+        //设置访问记录
+        $redis->hset('visit@PeriodRecord', $period->id, 1);
         $expend = (new Expend())->periodExpend($period->id, $this->userId);
 
         $data = [

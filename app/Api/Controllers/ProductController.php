@@ -154,6 +154,25 @@ class ProductController extends WebController
     }
 
     /**
+     * @SWG\Get(path="/api/product/cancel-visit",
+     *   tags={"产品"},
+     *   summary="取消访问",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="period_id", in="query", default="", description="", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function cancelVisit()
+    {
+        $redis = app('redis')->connection('first');
+        $redis->hset('visit@PeriodRecord', $this->request->period_id, 0);
+    }
+
+    /**
      * @SWG\Get(path="/api/product/past-deals",
      *   tags={"产品"},
      *   summary="往期成交",
