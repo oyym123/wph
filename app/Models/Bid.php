@@ -107,6 +107,14 @@ class Bid extends Common
             (new Expend())->bidPay($expend);
         }
 
+        if ($auto == 1) { 
+            //当有用户访问的时候才进行广播
+            $flag = $redis->hget('visit@PeriodRecord', $period->id);
+            if ($flag >= 1) {
+                $this->socket($period->id);
+            }
+        }
+
         if ($data['status'] == self::STATUS_FAIL) {
             //重置倒计时
             if ($countdown <= 10) {
@@ -495,7 +503,6 @@ class Bid extends Common
     {
         $redis = app('redis')->connection('first');
         $periods = new Period();
-        //获取所有正在进行中的期数,循环加入机器人竞拍，每8秒扫描一遍
         foreach ($periods->getAll() as $period) {
             $redis->hset('visit@PeriodRecord', $period->id, 0);
         }
