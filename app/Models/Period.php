@@ -196,8 +196,9 @@ class Period extends Common
         }
 
         $redis = app('redis')->connection('first');
+        $num = $redis->hget('visit@PeriodRecord', $this->request->period_id);
         //设置访问记录
-        $redis->hset('visit@PeriodRecord', $period->id, 1);
+        $redis->hset('visit@PeriodRecord', $period->id, $num + 1);
         $expend = (new Expend())->periodExpend($period->id, $this->userId);
 
         $data = [

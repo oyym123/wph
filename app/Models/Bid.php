@@ -375,7 +375,7 @@ class Bid extends Common
             }
             //当有用户访问的时候才进行广播
             $flag = $redis->hget('visit@PeriodRecord', $period->id);
-            if ($flag == 1) {
+            if ($flag >= 1) {
                 $this->socket($period->id);
             }
         }

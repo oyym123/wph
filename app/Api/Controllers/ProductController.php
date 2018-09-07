@@ -170,7 +170,8 @@ class ProductController extends WebController
     {
         $redis = app('redis')->connection('first');
         if ($this->request->period_id) {
-            $redis->hset('visit@PeriodRecord', $this->request->period_id, 0);
+            $num = $redis->hget('visit@PeriodRecord', $this->request->period_id);
+            $redis->hset('visit@PeriodRecord', $this->request->period_id, $num - 1);
         }
     }
 
