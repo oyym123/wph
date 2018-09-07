@@ -169,7 +169,9 @@ class ProductController extends WebController
     public function cancelVisit()
     {
         $redis = app('redis')->connection('first');
-        $redis->hset('visit@PeriodRecord', $this->request->period_id, 0);
+        if ($this->request->period_id) {
+            $redis->hset('visit@PeriodRecord', $this->request->period_id, 0);
+        }
     }
 
     /**

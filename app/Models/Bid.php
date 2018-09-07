@@ -373,7 +373,10 @@ class Bid extends Common
                 //加入竞拍队列，3秒之后进入数据库Bid表
                 //dispatch(new BidTask($data));
             }
-           // $this->socket($period->id);
+            //当有用户访问的时候才进行广播
+            if ($redis->hget('visit@PeriodRecord', $period->id) == 1) {
+                $this->socket($period->id);
+            }
         }
     }
 
