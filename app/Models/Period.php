@@ -183,6 +183,10 @@ class Period extends Common
     /** 获取产品详情 */
     public function getProductDetail($id)
     {
+        $cacheKey = 'period@getProductDetails' . $id;
+        if ($this->hasCache($cacheKey)) {
+            return $this->getCache($cacheKey);
+        }
         $period = $this->getPeriod(['id' => $id]);
         $product = $period->product;
         $auctioneer = $period->Auctioneer;
@@ -280,7 +284,7 @@ class Period extends Common
                 ),
             //'bid_records' => $bid->bidRecord($period->id)
         ];
-        return $data;
+        return $this->putCache($cacheKey, $data, 0.025);
     }
 
 //    /** 是否有真人参与 */
