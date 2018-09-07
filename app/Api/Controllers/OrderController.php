@@ -161,8 +161,7 @@ class OrderController extends WebController
                         ->where([
                             'buyer_id' => $this->userId,
                             //'type' => Order::TYPE_BID,
-                            'status' => Order::STATUS_COMPLETE
-                        ])->offset($this->offset)->limit($this->limit)->get();
+                        ])->whereIn('status', $status)->offset($this->offset)->limit($this->limit)->get();
                     foreach ($orders as $order) {
                         $product = $order->product;
                         if ($order->period_id == 0) {
