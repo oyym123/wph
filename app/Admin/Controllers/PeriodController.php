@@ -142,7 +142,7 @@ class PeriodController extends Controller
                 $redis = app('redis')->connection('first');
                 //竞拍开关
                 if ($form->model()->status == Period::STATUS_IN_PROGRESS) {
-                    $redis->setex('realPersonBid@periodId' . $form->model()->id, 86400 * 10, $form->model()->id);
+                    $redis->setex('realPersonBidEnd@periodId' . $form->model()->id, 86400 * 10, $form->model()->id);
                 }
             });
         });

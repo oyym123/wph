@@ -186,13 +186,16 @@ class Bid extends Common
                 $lastBid = $this->getLastBidInfo($redis, $period->id);
                 if (($lastBid->bid_price / $product->sell_price) > $period->robot_rate) {
                     if ($lastBid->is_real == Period::REAL_PERSON_NO) {//当为机器人时可以停止
-                        //竞拍开关
                         $redis->setex('realPersonBid@periodId' . $period->id, 86400 * 10, $period->id);
                         $redis->setex('period@robotSuccess' . $period->id, 10000, 'success');
-                    } else {//当为真人时则暂停
-                        //竞拍开关
-                        $redis->del('realPersonBid@periodId' . $period->id);
-                        $redis->del('period@robotSuccess' . $period->id);
+                    } else {
+                        $y = $redis->ttl('realPersonBidEnd@periodId' . $bid->period_id);
+                        if ($y < 0) { //当为真人时,竞拍开关
+                            $redis->del('realPersonBid@periodId' . $period->id);
+                            $redis->del('period@robotSuccess' . $period->id);
+                        } else {
+                            $redis->setex('realPersonBid@periodId' . $period->id, 86400 * 10, $period->id);
+                        }
                     }
                 }
                 $flag = ($x = $redis->ttl('realPersonBid@periodId' . $bid->period_id)) > 0 ? 1 : 0;
