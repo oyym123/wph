@@ -90,7 +90,12 @@ class PeriodController extends Controller
             $grid->disableCreateButton();
             $grid->disableExport();
             $grid->filter(function ($filter) {
-                // 在这里添加字段过滤器
+                // 关联关系查询
+                $filter->where(function ($query) {
+                    $query->whereHas('product', function ($query) {
+                        $query->where('title', 'like', "%{$this->input}%");
+                    });
+                }, '产品标题');
                 $filter->in('status', '状态')->select(Period::getStatus());
                 $filter->in('real_person', '是否有真人参与')->select(User::getIsReal());
                 $filter->between('created_at', '创建时间')->datetime();
@@ -101,7 +106,7 @@ class PeriodController extends Controller
             $grid->product_id('产品图片')->display(function ($released) {
                 $product = DB::table('product')->where(['id' => $released])->first();
                 return '<a href="product?id=' . $product->id . '" target="_blank" ><img src="' .
-                    Common::getImg($product->img_cover) . '?imageView/1/w/65/h/45" ></a>';
+                    Common::getImg($product->img_cover) . '?imageView/1/w/65/h/45" ></a>' . $product->title;
             });
             $grid->user_id('中标者ID');
             $grid->bid_price('中标者价格');

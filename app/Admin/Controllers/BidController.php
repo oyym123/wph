@@ -85,8 +85,10 @@ class BidController extends Controller
             $grid->disableExport();
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器
-                $filter->in('status', '状态')->select(Common::commonStatus());
-                $filter->in('is_real', '是否真人')->select(\App\User::getIsReal());
+                $filter->equal('period_id', '期数id')->integer();
+                $filter->like('product_title', '产品标题');
+                $filter->in('status', '状态')->multipleSelect(Common::commonStatus());
+                $filter->in('is_real', '是否真人')->multipleSelect(\App\User::getIsReal());
                 $filter->between('created_at', '创建时间')->datetime();
                 $filter->between('updated_at', '修改时间')->datetime();
             });
@@ -108,8 +110,12 @@ class BidController extends Controller
             $grid->bid_price('当前价格')->sortable();
             $grid->product_id('产品图片')->display(function ($released) {
                 $product = Product::find($released);
-                return '<a href="product?id=' . $product->id . '" target="_blank" ><img src="' .
-                    $product->getImgCover() . '?imageView/1/w/65/h/45" ></a>';
+                if ($product) {
+                    return '<a href="product?id=' . $product->id . '" target="_blank" ><img src="' .
+                        $product->getImgCover() . '?imageView/1/w/65/h/45" ></a>';
+                } else {
+                    return $released;
+                }
             });
             $grid->product_title('产品');
 
