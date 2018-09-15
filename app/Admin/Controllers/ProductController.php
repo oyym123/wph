@@ -112,7 +112,12 @@ class ProductController extends Controller
             $grid->sell_price('市场价');
             $grid->bid_step('每次涨价');
             $grid->type('产品类型')->display(function ($released) {
-                return ProductType::getOne($released, ['name'])->name;
+                $res = ProductType::getOne($released, ['name']);
+                if (empty($res)) {
+                    return '';
+                } else {
+                    return $res->name;
+                }
             });
             $grid->pay_amount('每次竞拍价');
             $grid->buy_by_diff('是否可以差价购')->display(function ($released) {
