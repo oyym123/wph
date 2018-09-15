@@ -13,7 +13,12 @@ class ProductType extends Common
 
     public static function getOne($id, $field = [])
     {
-        return DB::table('product_type')->select($field)->where('id', $id)->first();
+        $res = DB::table('product_type')->select($field)->where('id', $id)->whereNull('deleted_at')->first();
+        if (empty($res)) {
+            return '';
+        } else {
+            return $res;
+        }
     }
 
     public static function getList($flag = null)
