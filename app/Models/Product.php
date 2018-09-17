@@ -38,6 +38,14 @@ class Product extends Common
         return $key != 999 ? $data[$key] : $data;
     }
 
+    /** 售出类型 */
+    public static function sellType()
+    {
+        return [
+            self::SHOPPING_YES => '购物币专区',
+            self::SHOPPING_NO => '竞拍专区'
+        ];
+    }
 
     /** 加入购物币专区 */
     public static function getIsBid($key = 999)

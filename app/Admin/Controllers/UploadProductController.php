@@ -78,7 +78,7 @@ class UploadProductController extends Controller
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器
                 $filter->in('status', '状态')->select(Common::commonStatus());
-                $filter->in('type', '产品类型')->select(ProductType::getList(1));
+                $filter->in('product_type', '产品类型')->select(ProductType::getList(1));
                 $filter->between('created_at', '创建时间')->datetime();
                 $filter->between('updated_at', '修改时间')->datetime();
             });

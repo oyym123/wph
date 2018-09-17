@@ -98,6 +98,7 @@ class ProductController extends Controller
                 $filter->like('title', '标题');
                 $filter->in('status', '状态')->select(Common::commonStatus());
                 $filter->in('type', '产品类型')->select(ProductType::getList(1));
+                $filter->equal('is_shop', '售出类型')->select(Product::sellType());
                 // 设置created_at字段的范围查询
                 $filter->between('created_at', '创建时间')->datetime();
                 $filter->between('updated_at', '修改时间')->datetime();
@@ -125,6 +126,9 @@ class ProductController extends Controller
             });
             $grid->status('状态')->display(function ($released) {
                 return $released ? '有效' : '无效';
+            });
+            $grid->is_shop('售出类型')->display(function ($released) {
+                return $released ? '购物币' : '竞拍';
             });
             $grid->created_at('创建时间');
             $grid->updated_at('修改时间');
@@ -204,7 +208,7 @@ class ProductController extends Controller
                     } else {
                         (new Period())->saveData($form->model()->id);
                     }
-                } elseif ($form->model()->is_shop == 1 && $status){
+                } elseif ($form->model()->is_shop == 1 && $status) {
                     DB::table('product')->where(['id' => $form->model()->id])->update([
                         'pay_amount' => $payAmount,
                         'is_shop' => $status,
