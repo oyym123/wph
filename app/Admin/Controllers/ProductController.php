@@ -104,7 +104,10 @@ class ProductController extends Controller
                 $filter->between('updated_at', '修改时间')->datetime();
             });
 
-            $grid->id('ID')->sortable();
+            $grid->id('是否正在竞拍【绿=是,红=否】')->display(function ($released) {
+                $model = Period::where(['product_id' => $released, 'status' => Period::STATUS_IN_PROGRESS])->first();
+                return $model ? '<p style="color: green" >' . $released . '</p>' : '<p style="color: red" >' . $released . '</p>';
+            });
             $grid->img_cover('产品封面图')->display(function ($released) {
                 return '<a href="' . env('QINIU_URL_IMAGES') . $released . '" target="_blank" ><img src="' .
                     env('QINIU_URL_IMAGES') . $released . '?imageView/1/w/65/h/45" ></a>';
@@ -124,12 +127,15 @@ class ProductController extends Controller
             $grid->buy_by_diff('是否可以差价购')->display(function ($released) {
                 return $released ? '是' : '否';
             });
+
             $grid->status('状态')->display(function ($released) {
                 return $released ? '有效' : '无效';
             });
             $grid->is_shop('售出类型')->display(function ($released) {
                 return $released ? '购物币' : '竞拍';
             });
+
+
             $grid->created_at('创建时间');
             $grid->updated_at('修改时间');
         });
@@ -200,11 +206,11 @@ class ProductController extends Controller
                     ])->first();
 
                     if ($period) {
-                        $error = new MessageBag([
-                            'title' => '操作错误!',
-                            'message' => '该产品正在竞拍，请勿重复添加',
-                        ]);
-                        return back()->with(compact('error'));
+//                        $error = new MessageBag([
+//                            'title' => '操作错误!',
+//                            'message' => '该产品正在竞拍，请勿重复添加',
+//                        ]);
+//                        return back()->with(compact('error'));
                     } else {
                         (new Period())->saveData($form->model()->id);
                     }
