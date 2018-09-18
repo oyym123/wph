@@ -146,8 +146,12 @@ class Bid extends Common
     /** 获取最后三条记录 */
     public function getThreePersonId($redis, $periodId)
     {
-        $lastPersonIds = json_decode($redis->hget('bid@threePersonId', $periodId), true);
-        return $lastPersonIds;
+        if ($redis->hexists('bid@threePersonId', $periodId)) {
+            $lastPersonIds = json_decode($redis->hget('bid@threePersonId', $periodId), true);
+            return $lastPersonIds;
+        } else {
+            return '';
+        }
     }
 
     /** 获取最后一个竞拍人的id */
@@ -401,18 +405,38 @@ class Bid extends Common
         $data = [];
         if ($this->limit == 3) {
             $redis = app('redis')->connection('first');
-            foreach ($this->getThreePersonId($redis, $periodId) as $key => $bid) {
-                if ($bid['bid_price']) {
+            $model = $this->getThreePersonId($redis, $periodId);
+            if (!empty($model)) {
+                foreach ($model as $key => $bid) {
+                    if ($bid['bid_price']) {
+                        $data[] = [
+                            'period_id' => $bid['period_id'],
+                            'bid_price' => number_format($bid['bid_price'], 2),
+                            'num' => round($bid['bid_price'], 2) * 10,
+                            'bid_time' => $bid['end_time'],
+                            'nickname' => $bid['nickname'],
+                            'avatar' => '',
+                            'status' => $bid['status'],
+                            'area' => $bid['province'] . $bid['city'],
+                            'countdown' => ($x = $redis->ttl('period@countdown' . $bid['period_id'])) > 0 ? $x : 0,
+                            'bid_type' => $key == 0 ? self::TYPE_LEAD : self::TYPE_OUT, //0 =出局 1=领先
+                        ];
+                    }
+                }
+            } else {
+                $bids = Bid::has('user')->where(['period_id' => $periodId])->limit($this->limit)->orderBy('bid_price', 'desc')->get();
+                foreach ($bids as $key => $bid) {
+                    $user = $bid->user;
                     $data[] = [
-                        'period_id' => $bid['period_id'],
-                        'bid_price' => number_format($bid['bid_price'], 2),
-                        'num' => round($bid['bid_price'], 2) * 10,
-                        'bid_time' => $bid['end_time'],
-                        'nickname' => $bid['nickname'],
+                        'period_id' => $bid->period_id,
+                        'bid_price' => number_format($bid->bid_price, 2),
+                        'num' => round($bid->bid_price, 2) * 10,
+                        'bid_time' => $bid->end_time,
+                        'nickname' => $bid->nickname,
                         'avatar' => '',
-                        'status' => $bid['status'],
-                        'area' => $bid['province'] . $bid['city'],
-                        'countdown' => ($x = $redis->ttl('period@countdown' . $bid['period_id'])) > 0 ? $x : 0,
+                        'status' => $bid->status,
+                        'area' => $user->province . $user->city,
+                        'countdown' => ($x = $redis->ttl('period@countdown' . $bid->period_id)) > 0 ? $x : 0,
                         'bid_type' => $key == 0 ? self::TYPE_LEAD : self::TYPE_OUT, //0 =出局 1=领先
                     ];
                 }
