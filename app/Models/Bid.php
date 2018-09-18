@@ -144,8 +144,12 @@ class Bid extends Common
     }
 
     /** 获取最后三条记录 */
-    public function getThreePersonId($redis, $periodId)
+    public function getThreePersonId($redis, $periodId, $flag = 1)
     {
+        if($flag){
+            $lastPersonIds = json_decode($redis->hget('bid@threePersonId', $periodId), true);
+            return $lastPersonIds;
+        }
         if ($redis->hexists('bid@threePersonId', $periodId)) {
             $lastPersonIds = json_decode($redis->hget('bid@threePersonId', $periodId), true);
             return $lastPersonIds;
@@ -405,7 +409,7 @@ class Bid extends Common
         $data = [];
         if ($this->limit == 3) {
             $redis = app('redis')->connection('first');
-            $model = $this->getThreePersonId($redis, $periodId);
+            $model = $this->getThreePersonId($redis, $periodId, 0);
             if (!empty($model)) {
                 foreach ($model as $key => $bid) {
                     if ($bid['bid_price']) {
