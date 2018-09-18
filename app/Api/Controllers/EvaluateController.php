@@ -53,7 +53,7 @@ class EvaluateController extends WebController
         if (is_array($imgs)) {
             $imgs = json_encode($imgs);
         }
-        
+
         if (count(json_decode($imgs, true)) < 2) {
             self::showMsg('至少传' . 2 . '张图片!', 4);
         }
@@ -153,7 +153,7 @@ class EvaluateController extends WebController
         $model = new Evaluate();
         $model->offset = $this->offset;
         $model->limit = $this->limit;
-        self::showMsg($model->getList());
+        self::showMsg($model->getList(['sort' => 0]));
     }
 
     /**
