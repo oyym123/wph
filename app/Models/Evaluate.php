@@ -37,7 +37,7 @@ class Evaluate extends Common
     public function getList($where = [])
     {
         $data = [];
-        $evaluates = Evaluate::where($where)->offset($this->offset)->limit($this->limit)->orderBy('created_at', 'desc')->get();
+        $evaluates = Evaluate::has('product')->where($where)->offset($this->offset)->limit($this->limit)->orderBy('created_at', 'desc')->get();
         $products = new Product();
         foreach ($evaluates as $evaluate) {
             $product = $products->getCacheProduct($evaluate->product_id);
@@ -86,6 +86,12 @@ class Evaluate extends Common
     public function User()
     {
         return $this->hasOne('App\User', 'id', 'user_id');
+    }
+
+    /** 获取拍产品表信息 */
+    public function Product()
+    {
+        return $this->hasOne('App\Models\Product', 'id', 'product_id');
     }
 
     /** 获取评论 */

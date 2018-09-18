@@ -153,7 +153,7 @@ class EvaluateController extends WebController
         $model = new Evaluate();
         $model->offset = $this->offset;
         $model->limit = $this->limit;
-        self::showMsg($model->getList(['sort' => 0]));
+        self::showMsg($model->getList());
     }
 
     /**
