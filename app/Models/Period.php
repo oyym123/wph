@@ -161,7 +161,7 @@ class Period extends Common
         $bid = new Bid();
         foreach ($periods as $period) {
             $product = Product::find($period->product_id);
-            if($product){
+
                 $res[] = [
                     'id' => $period->id,
                     'product_id' => $product->id,
@@ -173,7 +173,7 @@ class Period extends Common
                     'bid_step' => $product->pay_amount,
                     'is_favorite' => $collection->isCollect($this->userId, $product->id),
                 ];
-            }
+            
         }
         if (empty($res) && $this->offset == 0) {
             self::showMsg('没有数据', 2);
