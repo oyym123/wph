@@ -111,7 +111,7 @@ class UserController extends WebController
                 $data['ip'] = $address['ip'];
                 $data['country'] = $address['country'];
                 $data['province'] = $province ?: '北京';
-                $data['city'] = $city ?: '北京';
+                $data['city'] = $city ?: '';
                 $data['invite_code'] = md5(md5(time() . rand(1, 10000)));
                 $data['email'] = rand(10000, 99999) . '@163.com';
                 $data['gift_currency'] = config('bid.user_gift_currency');

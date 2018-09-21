@@ -161,17 +161,19 @@ class Period extends Common
         $bid = new Bid();
         foreach ($periods as $period) {
             $product = Product::find($period->product_id);
-            $res[] = [
-                'id' => $period->id,
-                'product_id' => $product->id,
-                'period_code' => $period->code,
-                'title' => $product->title,
-                'status' => 0, //正在进行中
-                'img_cover' => self::getImg($product->img_cover),
-                'sell_price' => number_format($bid->getLastBidInfo($redis, $period->id, 'bid_price'), 2),
-                'bid_step' => $product->pay_amount,
-                'is_favorite' => $collection->isCollect($this->userId, $product->id),
-            ];
+            if($product){
+                $res[] = [
+                    'id' => $period->id,
+                    'product_id' => $product->id,
+                    'period_code' => $period->code,
+                    'title' => $product->title,
+                    'status' => 0, //正在进行中
+                    'img_cover' => self::getImg($product->img_cover),
+                    'sell_price' => number_format($bid->getLastBidInfo($redis, $period->id, 'bid_price'), 2),
+                    'bid_step' => $product->pay_amount,
+                    'is_favorite' => $collection->isCollect($this->userId, $product->id),
+                ];
+            }
         }
         if (empty($res) && $this->offset == 0) {
             self::showMsg('没有数据', 2);
