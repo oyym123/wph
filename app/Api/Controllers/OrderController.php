@@ -174,7 +174,7 @@ class OrderController extends WebController
                             $periodId = $period->id;
                             $periodCode = $period->code;
                             $bidStep = $period->bid_step;
-                            $savePrice = ($x = round(((1 - ($period->bid_price / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
+                            $savePrice = ($x = round(((1 - ($order->pay_amount / $product->sell_price)) * 100), 1)) > 0 ? $x : 0.0;
                         }
 
                         $data['period_id'] = $periodId;
