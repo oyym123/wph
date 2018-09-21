@@ -91,7 +91,11 @@ class ProductController extends Controller
                 $actions->disableView();
                 $actions->disableDelete();
             });
-
+            $grid->tools(function ($tools) {
+                $tools->batch(function ($batch) {
+                    $batch->disableDelete();
+                });
+            });
             $grid->disableExport();
             $grid->filter(function ($filter) {
                 // 在这里添加字段过滤器
