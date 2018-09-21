@@ -39,6 +39,8 @@ Route::group([
         $router->resource('bid-type', 'BidTypeController');
         //上传产品
         $router->resource('upload-product', 'UploadProductController');
+        //文章内容
+        $router->resource('article', 'ArticleController');
     });
 
     $router->get('/', 'HomeController@index');

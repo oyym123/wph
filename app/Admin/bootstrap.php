@@ -21,7 +21,7 @@ use Encore\Admin\Grid\Column;
 
 
 Admin::js('/vendor/laravel-admin/AdminLTE/plugins/select2/select2.full.min.js');
-Encore\Admin\Form::forget(['map', 'editor']);
+Encore\Admin\Form::forget(['map']);
 Column::extend('color', function ($value, $color) {
     return "<span style='color: $color'>$value</span>";
 });

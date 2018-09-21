@@ -99,7 +99,15 @@ Route::group(['middleware' => 'web'], function () {
     });
 
     Route::get('/common-problems', function () { //常见问题
-        return view('api.user.common-problems');
+        $res = \App\Models\Article::where([
+            'status' => 1,
+            'type' => \App\Models\Article::TYPE_COMMON_QUESTION
+        ])->first();
+        if ($res) {
+            echo $res->contents;
+        } else {
+            return view('api.user.common-problems');
+        }
     });
 
     Route::get('/user-agreement', function () { //常见问题
