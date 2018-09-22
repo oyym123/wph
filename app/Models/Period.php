@@ -161,7 +161,7 @@ class Period extends Common
         $bid = new Bid();
         foreach ($periods as $period) {
             $product = Product::find($period->product_id);
-            if($product){
+            if ($product) {
                 $res[] = [
                     'id' => $period->id,
                     'product_id' => $product->id,
@@ -183,7 +183,7 @@ class Period extends Common
 
 
     /** 获取产品详情 */
-    public function getProductDetail($id)
+    public function getProductDetail($id, $flag = 0)
     {
         $cacheKey = 'period@getProductDetails' . $id;
         if ($this->hasCache($cacheKey)) {
@@ -202,9 +202,11 @@ class Period extends Common
         }
 
         $redis = app('redis')->connection('first');
-        $num = $redis->hget('visit@PeriodRecord', $period->id);
-        //设置访问记录
-        $redis->hset('visit@PeriodRecord', $period->id, $num + 1);
+        if ($flag) {
+            $num = $redis->hget('visit@PeriodRecord', $period->id);
+            //设置访问记录
+            $redis->hset('visit@PeriodRecord', $period->id, $num + 1);
+        }
 
         $expend = (new Expend())->periodExpend($period->id, $this->userId);
 

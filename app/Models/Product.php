@@ -118,7 +118,7 @@ class Product extends Common
 
     public function getProduct($id)
     {
-        if ($model = Product::find($id)) {
+        if ($model = DB::table('product')->where(['id' => $id])->first()) {
             return $model;
         }
         self::showMsg($id . '该产品不存在!', self::CODE_NO_DATA);
