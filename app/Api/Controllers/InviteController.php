@@ -115,7 +115,7 @@ class InviteController extends WebController
                 'params' => [
                     'key' => 'url',
                     'type' => 'String',
-                    'value' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/make_money',
+                    'value' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/make-money',
                 ],
             ],
         ];
