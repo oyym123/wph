@@ -151,7 +151,7 @@ class ProductController extends WebController
         $period->userId = $this->userId;
         $period->userEntity = $this->userIdent;
         $flag = $this->request->flag ?: 0;
-        self::showMsg($period->getProductDetail($this->request->period_id, 1));
+        self::showMsg($period->getProductDetail($this->request->period_id, $flag));
     }
 
     /**
