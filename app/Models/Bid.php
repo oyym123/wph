@@ -318,7 +318,7 @@ class Bid extends Common
                 continue;
             }
 
-            if ($flag == $period->bid_price + $product->bid_step) {
+            if ($flag == $period->bid_price + $product->bid_step && $countdownLength == 10) {
                 //减少竞拍次数
                 echo $this->writeLog(['period_id' => $period->id, 'info' => '该时段已经竞拍过一次啦']);
                 continue;
