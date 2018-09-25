@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Excel;
 
 class Product extends Common
 {
-    use SoftDeletes;
+    //use SoftDeletes;
 
     protected $table = 'product';
 
@@ -118,7 +118,7 @@ class Product extends Common
 
     public function getProduct($id)
     {
-        if ($model = DB::table('product')->where(['id' => $id])->first()) {
+        if ($model = Product::find($id)) {
             return $model;
         }
         self::showMsg($id . '该产品不存在!', self::CODE_NO_DATA);

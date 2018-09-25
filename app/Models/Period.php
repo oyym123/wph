@@ -395,7 +395,7 @@ class Period extends Common
             ];
         }
         $res = [
-            'img' => $product->getImgCover(),
+            'img' => self::getImg($product->img_cover),
             'title' => $product->title,
             'present_price' => $data[0]['bid_price'],
             'max_price' => max($bidPrices),
