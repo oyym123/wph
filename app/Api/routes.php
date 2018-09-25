@@ -110,6 +110,16 @@ Route::group(['middleware' => 'web'], function () {
         }
     });
 
+    Route::get('/make-money', function () { //常见问题
+        $res = \App\Models\Article::where([
+            'status' => 1,
+            'type' => \App\Models\Article::TYPE_MAKE_MONEY
+        ])->first();
+        if ($res) {
+            echo $res->contents;
+        }
+    });
+
     Route::get('/user-agreement', function () { //常见问题
         return view('api.user.user-agreement');
     });

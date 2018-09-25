@@ -109,13 +109,13 @@ class InviteController extends WebController
         $data = [
             'get_invite_currency' => [
                 'id' => 1,
-                'title' => '如何获得推广金额',
+                'title' => '如何赚钱',
                 'img' => '',
                 'function' => 'html',
                 'params' => [
                     'key' => 'url',
                     'type' => 'String',
-                    'value' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/balance-desc',
+                    'value' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/make_money',
                 ],
             ],
         ];
