@@ -109,8 +109,8 @@ class Bid extends Common
 
         if ($data['status'] == self::STATUS_FAIL) {
             //重置倒计时
-            if ($countdown <= 10) {
-                $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
+            if ($countdown <= $product->countdown_length) {
+                $redis->setex('period@countdown' . $period->id, $product->countdown_length, $data['bid_price']);
             }
             $data['id'] = DB::table('bid')->insertGetId($data);
             $this->setLastPersonId($redis, $data);
@@ -146,7 +146,7 @@ class Bid extends Common
     /** 获取最后三条记录 */
     public function getThreePersonId($redis, $periodId, $flag = 1)
     {
-        if($flag){
+        if ($flag) {
             $lastPersonIds = json_decode($redis->hget('bid@threePersonId', $periodId), true);
             return $lastPersonIds;
         }
@@ -289,14 +289,14 @@ class Bid extends Common
     }
 
     /** 机器人竞价 */
-    public function robotBid()
+    public function robotBid($countdownLength = 10)
     {
         $periods = new Period();
         $products = new Product();
         $redis = app('redis')->connection('first');
 
         //获取所有正在进行中的期数,循环加入机器人竞拍，每8秒扫描一遍
-        foreach ($periods->getAll() as $period) {
+        foreach ($periods->getAll([Period::STATUS_IN_PROGRESS], $countdownLength) as $period) {
             //当有真人参与，且跟拍到平均价以上时，机器人将不跟拍
             if ($redis->ttl('realPersonBid@periodId' . $period->id) > 1) {
                 echo $this->writeLog(['period_id' => $period->id, 'info' => '有真人参与，且跟拍到平均价以上，机器人将不跟拍']);
@@ -305,8 +305,9 @@ class Bid extends Common
             $countdown = $redis->ttl('period@countdown' . $period->id);
             $flag = $redis->get('period@countdown' . $period->id);
             $success = $redis->get('period@robotSuccess' . $period->id);
+            $product = $products->getCacheProduct($period->product_id);
 
-            if ($countdown > 10) {
+            if ($countdown > $product->countdown_length) {
                 echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍还未开始']);
                 continue;
             }
@@ -316,8 +317,6 @@ class Bid extends Common
                 echo $this->writeLog(['period_id' => $period->id, 'info' => '竞拍倒计时结束']);
                 continue;
             }
-
-            $product = $products->getCacheProduct($period->product_id);
 
             if ($flag == $period->bid_price + $product->bid_step) {
                 //减少竞拍次数
@@ -343,7 +342,6 @@ class Bid extends Common
             }
             DB::table('period')->where(['id' => $period->id])->update(['bid_price' => $price]);//自增0.1
             $rate = $period->bid_price / $product->sell_price;
-
             $time = date('Y-m-d H:i:s', time());
             $data = [
                 'product_id' => $period->product_id,
@@ -385,7 +383,7 @@ class Bid extends Common
                 $data['city'] = $robotPeriod->city;
                 $this->setThreePersonId($redis, $data);
             } else {
-                $redis->setex('period@countdown' . $period->id, 10, $data['bid_price']);
+                $redis->setex('period@countdown' . $period->id, $product->countdown_length, $data['bid_price']);
                 $data['id'] = DB::table('bid')->insertGetId($data);
                 $this->setLastPersonId($redis, $data);
 

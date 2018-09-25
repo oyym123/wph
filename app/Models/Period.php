@@ -26,6 +26,7 @@ class Period extends Common
         'auctioneer_id',
         'robot_rate',
         'person_rate',
+        'countdown_length'
     ];
 
     protected $table = 'period';
@@ -302,14 +303,15 @@ class Period extends Common
 //    }
 
     /** 获取所有期数，默认进行中 */
-    public function getAll($status = [self::STATUS_IN_PROGRESS])
+    public function getAll($status = [self::STATUS_IN_PROGRESS], $countdownLength = 10)
     {
         $cacheKey = 'period@allInProgress' . json_encode($status);
         if ($this->hasCache($cacheKey)) {
             return $this->getCache($cacheKey);
         } else {
             $periods = DB::table('period')->where([
-                'deleted_at' => null
+                'deleted_at' => null,
+                'countdown_length' => $countdownLength,
             ])->whereIn('status', $status)->get();
             return $this->putCache($cacheKey, $periods, 0.1);
         }
@@ -338,6 +340,7 @@ class Period extends Common
             $code = date('Ymd', time()) . str_pad($period + 1, 4, '0', STR_PAD_LEFT);
             $data = [
                 'product_id' => $productId,
+                'countdown_length' => Product::find($productId)->countdown_length,
                 'auctioneer_id' => Auctioneer::randAuctioneer(),
                 'status' => self::STATUS_IN_PROGRESS,
                 'robot_rate' => config('bid.robot_rate'),
