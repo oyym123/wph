@@ -136,6 +136,7 @@ class Invite extends Common
             'invite_code' => $this->userEntity->invite_code ?: '',
             'first_level_list' => $user1,
             'second_level_list' => $user2,
+            'make_money'=>'https://' . $_SERVER["HTTP_HOST"] . '/api/make-money', //如何赚钱地址
         ];
         return $res;
     }
