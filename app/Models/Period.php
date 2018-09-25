@@ -305,7 +305,7 @@ class Period extends Common
     /** 获取所有期数，默认进行中 */
     public function getAll($status = [self::STATUS_IN_PROGRESS], $countdownLength = 10)
     {
-        $cacheKey = 'period@allInProgress' . json_encode($status);
+        $cacheKey = 'period@allInProgress' . json_encode($status) . $countdownLength;
         if ($this->hasCache($cacheKey)) {
             return $this->getCache($cacheKey);
         } else {
