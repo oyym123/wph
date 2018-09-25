@@ -188,8 +188,10 @@ class Product extends Common
         set_time_limit(0);
         $upload = UploadProduct::find($uploadId);
         $payAmount = BidType::find($upload->bid_type)->amount;
+        $countdownLength = 10;
         if ($upload->product_type == 1) {
             $payAmount = 10;
+            $countdownLength = 5;
         }
 
         if ($flag == 'shop') {
@@ -239,7 +241,7 @@ class Product extends Common
         $model->pay_amount = $payAmount;
         $model->sell_price = $upload->sell_price;
         $model->status = self::STATUS_ENABLE;
-        $model->countdown_length = 10;
+        $model->countdown_length = $countdownLength;
         $model->bid_step = 0.1;
         $model->buy_by_diff = 1;
         $model->created_at = date('Y-m-d H:i:s', time());

@@ -188,8 +188,10 @@ class ProductController extends Controller
 
             $form->saved(function (Form $form) {
                 $payAmount = BidType::find($form->model()->bid_type)->amount;
+                $countdownLength = 10;
                 if ($form->model()->type == 1) {
                     $payAmount = 10;
+                    $countdownLength = 5;
                 }
                 $collectionCount = $form->model()->collection_count;
                 if ($form->model()->collection_count <= 0) {
@@ -201,7 +203,8 @@ class ProductController extends Controller
                         'pay_amount' => $payAmount,
                         'is_bid' => Product::BID_YES,
                         'is_shop' => Product::SHOPPING_NO,
-                        'collection_count' => $collectionCount
+                        'collection_count' => $collectionCount,
+                        'countdown_length' => $countdownLength
                     ]);
 
                     $period = Period::where([
@@ -222,7 +225,8 @@ class ProductController extends Controller
                     DB::table('product')->where(['id' => $form->model()->id])->update([
                         'pay_amount' => $payAmount,
                         'is_shop' => $status,
-                        'collection_count' => $collectionCount
+                        'collection_count' => $collectionCount,
+                        'countdown_length' => $countdownLength
                     ]);
                 }
                 //清除产品缓存
