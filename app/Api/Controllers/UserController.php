@@ -239,6 +239,7 @@ class UserController extends WebController
             'gift_currency' => $this->userIdent->gift_currency,
             'invite_currency' => $this->userIdent->invite_currency,
             'shopping_currency' => $this->userIdent->shopping_currency,
+            'make_money' => 'https://' . $_SERVER["HTTP_HOST"] . '/api/make-money'
         );
         self::showMsg($data);
     }
