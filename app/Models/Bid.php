@@ -179,7 +179,7 @@ class Bid extends Common
         $redis = app('redis')->connection('first');
         $periods = new Period();
         $products = new Product();
-        foreach ($periods->getAll() as $period) {
+        foreach ($periods->getAll([Period::STATUS_IN_PROGRESS], 1) as $period) {
             $bid = $this->getLastBidInfo($redis, $period->id);
             if ($bid) {
                 $product = $products->getCacheProduct($period->product_id);

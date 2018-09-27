@@ -303,16 +303,23 @@ class Period extends Common
 //    }
 
     /** 获取所有期数，默认进行中 */
-    public function getAll($status = [self::STATUS_IN_PROGRESS], $countdownLength = 10)
+    public function getAll($status = [self::STATUS_IN_PROGRESS], $flag = 10)
     {
-        $cacheKey = 'period@allInProgress' . json_encode($status) . $countdownLength;
+        $countdownLength = '';
+        if ($flag == 10) {
+            $countdownLength = [10];
+        } elseif ($flag == 5) {
+            $countdownLength = [5];
+        } elseif ($flag == 1) {
+            $countdownLength = [5, 10];
+        }
+        $cacheKey = 'period@allInProgress' . json_encode($status) . json_encode($countdownLength);
         if ($this->hasCache($cacheKey)) {
             return $this->getCache($cacheKey);
         } else {
             $periods = DB::table('period')->where([
                 'deleted_at' => null,
-                'countdown_length' => $countdownLength,
-            ])->whereIn('status', $status)->get();
+            ])->whereIn('countdown_length', $countdownLength)->whereIn('status', $status)->get();
             return $this->putCache($cacheKey, $periods, 0.1);
         }
     }
