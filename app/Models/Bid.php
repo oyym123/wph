@@ -537,7 +537,7 @@ class Bid extends Common
     {
         $redis = app('redis')->connection('first');
         $periods = new Period();
-        foreach ($periods->getAll() as $period) {
+        foreach ($periods->getAll([Period::STATUS_IN_PROGRESS], 1) as $period) {
             $redis->hset('visit@PeriodRecord', $period->id, 0);
         }
     }
