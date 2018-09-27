@@ -187,7 +187,7 @@ class Bid extends Common
                 $lastBid = $this->getLastBidInfo($redis, $period->id);
 
                 if (($lastBid->bid_price / $product->sell_price) > $period->robot_rate) {
-                    if (empty($lastBid) || $lastBid->is_real == Period::REAL_PERSON_NO) {//当为机器人时可以停止
+                    if ($lastBid->is_real == Period::REAL_PERSON_NO) {//当为机器人时可以停止
                         $redis->setex('realPersonBid@periodId' . $period->id, 86400 * 10, $period->id);
                         $redis->setex('period@robotSuccess' . $period->id, 10000, 'success');
                     } else {
