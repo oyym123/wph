@@ -170,7 +170,9 @@ class ProductController extends Controller
                 'required' => '请填写市场价',
             ])->default(0.1);
             $form->select('bid_type', '出价类型')->options(BidType::getList(1))->default(1);
-            $form->select('type', '产品类型')->options(ProductType::getList(1));
+            $form->select('type', '产品类型')->options(ProductType::getList(1))->rules('required', [
+                'required' => '请填写产品类型',
+            ]);
             $form->image('img_cover', '产品封面图');
             // $form->image('imgs', '产品子图');
             $form->multipleImage('imgs', '产品子图')->removable();
