@@ -34,7 +34,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('checkout-bid')->daily()->at('02:00');
         $schedule->command('del-robot')->daily()->at('02:00');
         $schedule->command('clear-visit')->daily()->at('02:00');
-      //  $schedule->command('create-robot-period')->daily()->at('02:00');
+        $schedule->command('del-bid')->daily()->at('02:00');
+        //  $schedule->command('create-robot-period')->daily()->at('02:00');
         //$schedule->command('route:list')->dailyAt('02:00');
         // $schedule->command('inspire')
         //          ->hourly();

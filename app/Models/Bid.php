@@ -548,4 +548,18 @@ class Bid extends Common
         exec("/usr/sbin/node /usr/local/node/client.js $periodId");
         //shell_exec("node G:node/client.js $periodId");
     }
+
+    /** 清除数据，防止数据过大影响查询 */
+    public function delBid()
+    {
+        //确保有110条数据能被保留下来
+        $res = DB::table('bid')->where(['status' => Bid::STATUS_ENABLE])->where('bid_price', '>', 11)->get();
+        foreach ($res as $item) {
+            $num = ($item->bid_price - 11) * 10;
+            $bidIds = DB::table('bid')->select('id')->where(['period_id' => $item->period_id, 'is_real' => Period::REAL_PERSON_NO])->limit($num)->orderBy('bid_price', 'asc')->get()->toArray();
+            if ($bidIds) {
+                DB::table('bid')->whereIn('id', array_column($bidIds, 'id'))->delete();
+            }
+        }
+    }
 }
