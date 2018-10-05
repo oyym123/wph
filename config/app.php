@@ -179,7 +179,7 @@ return [
         Encore\Admin\AdminServiceProvider::class,
         Overtrue\LaravelWechat\ServiceProvider::class,
         zgldh\QiniuStorage\QiniuFilesystemServiceProvider::class,
-
+        Stevenyangecho\UEditor\UEditorServiceProvider::class,
     ],
 
     /*

@@ -102,7 +102,10 @@ class ArticleController extends Controller
             $form->text('title', '标题')->rules('required', [
                 'required' => '请填写标题',
             ]);
-            $form->editor('contents', '内容')->rules('required', [
+//            $form->editor('contents', '内容')->rules('required', [
+//                'required' => '请填写内容',
+//            ]);
+            $form->ueditor('contents', '内容')->rules('required', [
                 'required' => '请填写内容',
             ]);
             $form->select('type', '文章类型')->options(Article::getStatus());
