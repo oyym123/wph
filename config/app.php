@@ -163,7 +163,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-
+        Stevenyangecho\UEditor\UEditorServiceProvider::class,
         /*
          * Package Service Providers...
          */
@@ -179,7 +179,7 @@ return [
         Encore\Admin\AdminServiceProvider::class,
         Overtrue\LaravelWechat\ServiceProvider::class,
         zgldh\QiniuStorage\QiniuFilesystemServiceProvider::class,
-        Stevenyangecho\UEditor\UEditorServiceProvider::class,
+
     ],
 
     /*
