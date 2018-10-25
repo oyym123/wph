@@ -115,7 +115,9 @@ class UserController extends WebController
                 $data['invite_code'] = md5(md5(time() . rand(1, 10000)));
                 $data['email'] = rand(10000, 99999) . '@163.com';
                 $data['gift_currency'] = config('bid.user_gift_currency');
+                $data['spid'] = $request->spid ?: '';
                 $model = (new User())->saveData($data);
+
 
                 if ($request->invite_code && empty($model->be_invited_code)) {
                     if ((new Invite())->checkoutCode($request->invite_code, $model->id)) {

@@ -545,7 +545,7 @@ class Bid extends Common
     public function socket($periodId)
     {
         set_time_limit(0);
-        exec("/usr/sbin/node /usr/local/node/client.js $periodId");
+        exec("/usr/bin/node /usr/local/node/client.js $periodId");
         //shell_exec("node G:node/client.js $periodId");
     }
 
