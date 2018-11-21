@@ -248,4 +248,10 @@ class Order extends Common
     {
         return $this->hasOne('App\Models\Product', 'id', 'product_id');
     }
+
+    /** 获取用户表信息 */
+    public function User()
+    {
+        return $this->hasOne('App\User', 'id', 'buyer_id');
+    }
 }

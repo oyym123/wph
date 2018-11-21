@@ -147,6 +147,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('evaluate/lists', 'EvaluateController@lists'); //首页晒单列表
     Route::get('evaluate/detail', 'EvaluateController@detail'); //晒单详情
     Route::get('evaluate', 'EvaluateController@index'); //晒单列表
+    Route::get('evaluate/add-evaluate', 'EvaluateController@addEvaluate'); //晒单列表
 
     //收藏
     Route::get('collection/collect', 'CollectionController@collect');

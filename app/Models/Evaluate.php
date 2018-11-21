@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\QiniuHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
@@ -80,6 +81,67 @@ class Evaluate extends Common
             'imgs' => $images
         ];
         return $data;
+    }
+
+    public static function getInfo($url = '')
+    {
+        //初始化
+        $curlobj = curl_init();
+        //设置访问的url
+        curl_setopt($curlobj, CURLOPT_URL, $url);
+        //执行后不直接打印出
+        curl_setopt($curlobj, CURLOPT_RETURNTRANSFER, true);
+        //  curl_setopt($curlobj, CURLOPT_HEADER, 0);
+        //设置https 支持
+        // date_default_timezone_get('PRC');   //使用cookies时，必须先设置时区
+        curl_setopt($curlobj, CURLOPT_SSL_VERIFYPEER, 0);  //终止从服务端验证
+        curl_setopt($curlobj, CURLOPT_FOLLOWLOCATION, 1);
+        $output = curl_exec($curlobj);  //执行获取内容
+        curl_close($curlobj);          //关闭curl
+        return $output;
+    }
+
+    /** 获取京东评论数据，传入产品id号 */
+    public function createEvaluate($productId, $url)
+    {
+        $randNum = rand(1, 9);
+        $period = Period::has('product')
+            ->where([
+                'product_id' => $productId,
+                'status' => Period::STATUS_OVER
+            ])
+            ->offset(0)->limit($randNum)->orderBy('created_at', 'desc')->get()->toArray();
+
+        if (empty($period)) {
+            exit('没有该产品期数');
+        }
+
+        preg_match("/com\/(.*)(?).html/", $url, $link);
+
+        $getUrl = 'https://sclub.jd.com/comment/productPageComments.action?productId=' . $link[1] . '&score=0&sortType=5&page=0&pageSize=10&isShadowSku=0&rid=0&fold=1';
+        $res = iconv('GBK', 'UTF-8', $this->getInfo($getUrl));
+        $arr = json_decode($res, true);
+        if (isset($arr['comments'])) {
+            $arr = array_slice($arr['comments'], 0, count($period));
+            foreach ($arr as $key => $item) {
+                if ($item['images']) {
+                    foreach ($item['images'] as $images) {
+                        $img = str_replace(['//', '128x96', 'n0/s'], ['', '1280x960', 'n1/s'], $images['imgUrl']);
+                        $descImage[] = QiniuHelper::fetchImg($img)[0]['key'];
+                    }
+                    $data = [
+                        'imgs' => json_encode($descImage, true),
+                        'order_id' => 0,
+                        'product_id' => $productId,
+                        'period_id' => $period[$key]['id'],
+                        'content' => $item['content'],
+                        'user_id' => $period[$key]['user_id'] ?: 5957,
+                    ];
+                    self::create($data);
+                }
+            }
+        }
+        return ['抓取成功！'];
     }
 
     /** 获取用户表信息 */

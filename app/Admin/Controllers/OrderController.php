@@ -77,16 +77,16 @@ class OrderController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-        $content->body(Admin::show(Order::findOrFail($id), function (Show $show) {
-            $show->panel()
-                ->tools(function ($tools) {
-                    $tools->disableEdit();
-                    $tools->disableList();
-                    $tools->disableDelete();
-                });
+            $content->body(Admin::show(Order::findOrFail($id), function (Show $show) {
+                $show->panel()
+                    ->tools(function ($tools) {
+                        $tools->disableEdit();
+                        $tools->disableList();
+                        $tools->disableDelete();
+                    });
 
-        }));
-    });
+            }));
+        });
         echo "<script>history.go(-1);</script>";
     }
 
@@ -99,6 +99,18 @@ class OrderController extends Controller
     {
         return Admin::grid(Order::class, function (Grid $grid) {
             $grid->filter(function ($filter) {
+                // 关联关系查询
+                $filter->where(function ($query) {
+                    $query->whereHas('user', function ($query) {
+                        $query->where('nickname', 'like', "%{$this->input}%");
+                    });
+                }, '昵称');
+
+                $filter->where(function ($query) {
+                    $query->whereHas('user', function ($query) {
+                        $query->where('spid', 'like', "%{$this->input}%");
+                    });
+                }, 'spid');
 
                 $filter->expand();
                 $filter->like('sn', '订单号');
@@ -106,6 +118,8 @@ class OrderController extends Controller
                 $filter->in('type', '类型')->select(Order::getType());
                 $filter->between('created_at', '创建时间')->datetime();
                 $filter->between('updated_at', '修改时间')->datetime();
+
+
             });
             $grid->tools(function ($tools) {
                 $tools->batch(function ($batch) {

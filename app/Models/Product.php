@@ -206,12 +206,20 @@ class Product extends Common
         preg_match_all("/cd.jd.com\/description(.*)(?)\'/siU", $output, $desc);
 
         $descImage = $imgUrls = $descImages = $imgs = [];
-        if ($desc[1][0]) {
-            $descUrl = 'cd.jd.com/description' . $desc[1][0];
-            $outputDesc = self::getInfo("$descUrl");
-            preg_match_all("/\/\/img(.*)(?)(png|jpg)/siU", $outputDesc, $descImg);
-            $descImages = array_slice($descImg[0], 0, 6);
+
+        if (!empty($desc[1])) {
+            if ($desc[1][0]) {
+                $descUrl = 'cd.jd.com/description' . $desc[1][0];
+            }
+        } else {
+            preg_match_all("/cd.jd.com\/qrcode\?skuId=(.*)(?)&/siU", $output, $desc1);
+            $descUrl = 'https://dx.3.cn/desc/' . $desc1[1][0];
         }
+
+        $outputDesc = self::getInfo("$descUrl");
+        preg_match_all("/\/\/img(.*)(?)(png|jpg)/siU", $outputDesc, $descImg);
+        $descImages = array_slice($descImg[0], 0, 6);
+
         preg_match_all("/data-origin=\"(.*)(?)\" alt=\"(.*)(?)\"/", $output, $titles);
         $title = '';
         if ($titles[2][0]) {

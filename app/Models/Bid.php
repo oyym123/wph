@@ -82,6 +82,13 @@ class Bid extends Common
         ];
 
         if ($auto == 0) { //表示没有自动竞拍，则记录支出,进行正常收费
+            $bid = new Bid();//限制用户不可连续竞拍
+            if ($bid->getLastBidInfo($redis, $periodId, 'user_id') == $this->userId) {
+                return [
+                    'status' => 40,
+                ];
+            }
+
             //判断消耗的金额类型
             if ($this->userIdent->gift_currency >= $data['pay_amount']) {
                 $data['pay_type'] = self::TYPE_GIFT_CURRENCY; //当有赠币时，优先使用
@@ -94,6 +101,7 @@ class Bid extends Common
                     'pay_amount' => $data['pay_amount'] - $this->userIdent->bid_currency
                 ];
             }
+
 
             $expend = [
                 'type' => $data['pay_type'],
@@ -556,7 +564,7 @@ class Bid extends Common
         $res = DB::table('bid')->where(['status' => Bid::STATUS_ENABLE])->where('bid_price', '>', 11)->get();
         foreach ($res as $item) {
             $num = ($item->bid_price - 11) * 10;
-            $bidIds = DB::table('bid')->select('id')->where(['period_id' => $item->period_id, 'is_real' => Period::REAL_PERSON_NO])->limit($num)->orderBy('bid_price', 'asc')->get()->toArray();
+            $bidIds = DB::table('bid')->select('id')->where(['period_id' => $item->period_id])->limit($num)->orderBy('bid_price', 'asc')->get()->toArray();
             if ($bidIds) {
                 DB::table('bid')->whereIn('id', array_column($bidIds, 'id'))->delete();
             }

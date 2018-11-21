@@ -194,4 +194,26 @@ class EvaluateController extends WebController
         ];
         self::showMsg($data);
     }
+
+    /**
+     * @SWG\Get(path="/api/evaluate/add-evaluate",
+     *   tags={"晒单"},
+     *   summary="添加评价",
+     *   description="Author: OYYM",
+     *   @SWG\Parameter(name="product_id", in="query", default="", description="产品id", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Parameter(name="url", in="query", default="", description="京东网址", required=true,
+     *     type="string",
+     *   ),
+     *   @SWG\Response(
+     *       response=200,description="successful operation"
+     *   )
+     * )
+     */
+    public function addEvaluate()
+    {
+        $model = new Evaluate();
+        self::showMsg($model->createEvaluate($this->request->product_id, $this->request->url));
+    }
 }
