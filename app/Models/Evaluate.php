@@ -104,13 +104,13 @@ class Evaluate extends Common
     /** 获取京东评论数据，传入产品id号 */
     public function createEvaluate($productId, $url)
     {
-        $randNum = rand(1, 9);
+        $randNum = rand(6, 9);
         $period = Period::has('product')
             ->where([
                 'product_id' => $productId,
                 'status' => Period::STATUS_OVER
             ])
-            ->offset(0)->limit($randNum)->orderBy('created_at', 'desc')->get()->toArray();
+            ->offset(0)->limit($randNum)->orderBy('created_at', 'asc')->get()->toArray();
 
         if (empty($period)) {
             exit('没有该产品期数');
