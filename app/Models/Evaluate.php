@@ -26,6 +26,7 @@ class Evaluate extends Common
         'imgs', //使用的金额
         'content',
         'sort',
+        'created_at'
     ];
 
     public function saveData($data)
@@ -125,17 +126,25 @@ class Evaluate extends Common
             $arr = array_slice($arr['comments'], 0, count($period));
             foreach ($arr as $key => $item) {
                 if ($item['images']) {
+                    $descImage = [];
                     foreach ($item['images'] as $images) {
                         $img = str_replace(['//', '128x96', 'n0/s'], ['', '1280x960', 'n1/s'], $images['imgUrl']);
-                        $descImage[] = QiniuHelper::fetchImg($img)[0]['key'];
+                        $imgs = QiniuHelper::fetchImg($img)[0]['key'];
+                        if ($imgs != null) {
+                            $descImage[] = $imgs;
+                        }
                     }
+                    $time = strtotime($period[$key]['created_at']);
+                    $rundTime = rand(86400, 86400 * 3);//模拟1~3天到货时间
+                    $date = ($x = ($rundTime + $time)) < time() ? $x : time();
                     $data = [
-                        'imgs' => json_encode($descImage, true),
+                        'imgs' => json_encode($descImage),
                         'order_id' => 0,
                         'product_id' => $productId,
                         'period_id' => $period[$key]['id'],
                         'content' => $item['content'],
                         'user_id' => $period[$key]['user_id'] ?: 5957,
+                        'created_at' => date('Y-m-d H:i:s', $date)
                     ];
                     self::create($data);
                 }
